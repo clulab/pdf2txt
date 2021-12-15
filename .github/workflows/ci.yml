@@ -17,7 +17,7 @@ jobs:
       with:
         java-version: 1.8
     - name: Run tests
-      run: sbt coverage test
+      run: sbt test
 #    - name: Lint check via scalafmt
 #      run: sbt scalafmtCheckAll
 #    - name: Coverage Report

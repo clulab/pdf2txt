@@ -30,10 +30,13 @@ lazy val core = (project in file("."))
   .enablePlugins(BuildInfoPlugin)
   .disablePlugins(PlayScala, JavaAppPackaging, SbtNativePackager)
   .dependsOn(common % "compile -> compile; test -> test")
-  .aggregate(common)
+  .aggregate(common, tika)
   .settings(
     assembly / aggregate := false,
     assembly / mainClass := Some("org.clulab.pdf2txt.apps.HelloWorldApp")
   )
 
 lazy val common = project
+
+lazy val tika = project
+  .dependsOn(common % "compile -> compile; test -> test")
