@@ -1,0 +1,4 @@
+-Xmx12g
+-Dfile.encoding=UTF-8
+-XX:+CMSClassUnloadingEnabled
+-XX:+UseConcMarkSweepGC

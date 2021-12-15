@@ -1,0 +1,19 @@
+pipeline {
+  agent any
+  environment {
+    _JAVA_OPTIONS = "-Xmx14g"
+    JAVA_TOOL_OPTIONS = "-Dfile.encoding=UTF-8"
+  }
+  stages {
+    stage('Test') {
+      steps {
+        ansiColor('xterm') {
+          echo "Testing..."
+          echo "_JAVA_OPTIONS is ${_JAVA_OPTIONS}"
+          echo "JAVA_TOOL_OPTIONS is ${JAVA_TOOL_OPTIONS}"
+          sh "sbt +test"
+        }
+      }
+    }
+  }
+}

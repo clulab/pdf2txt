@@ -1,0 +1,87 @@
+<configuration>
+    <property name="clulab:pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" />
+
+    <appender name="clulab:stderr" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.err</target>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>TRACE</level>
+            <onMatch>DENY</onMatch>
+        </filter>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>DENY</onMatch>
+        </filter>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>DENY</onMatch>
+        </filter>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>DENY</onMatch>
+        </filter>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+        <encoder>
+            <pattern>${clulab:pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="clulab:stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.out</target>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>TRACE</level>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>DENY</onMatch>
+        </filter>
+        <encoder>
+            <pattern>${clulab:pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="clulab:Pdf2txt" class="ch.qos.logback.core.FileAppender">
+        <param name="Append" value="true" />
+        <file>${HOSTNAME}-Pdf2txt.log</file>
+        <encoder>
+            <pattern>${clulab:pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- This accounts for anything coming from the clulabcommon subproject. -->
+    <logger name="org.clulab.pdf2txt.common" level="all" additivity="false">
+        <appender-ref ref="clulab:stderr"/>
+        <appender-ref ref="clulab:stdout"/>
+        <appender-ref ref="clulab:Pdf2txt"/>
+    </logger>
+
+    <!-- This accounts for anything coming from the core project. -->
+    <!-- ALL TRACE DEBUG INFO WARN ERROR FATAL OFF -->
+    <logger name="org.clulab.pdf2txt" level="all" additivity="false">
+        <appender-ref ref="clulab:stderr"/>
+        <appender-ref ref="clulab:stdout"/>
+        <appender-ref ref="clulab:Pdf2txt"/>
+    </logger>
+
+    <!-- This handles anything from outside of clulab that isn't configured otherwise. -->
+    <root level="all">
+        <appender-ref ref="clulab:stderr"/>
+        <appender-ref ref="clulab:stdout"/>
+        <appender-ref ref="clulab:Pdf2txt"/>
+    </root>
+</configuration>
