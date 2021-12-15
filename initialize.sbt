@@ -12,7 +12,7 @@ ThisBuild / initialize := {
   val _ = initialize.value // Run the previous initialization.
   val required = "1.8"
   val current  = sys.props("java.specification.version")
-  val approved = current == required
+  val approved = true // current == required
 
   // To stop sbt in its tracks, make this assumption.
   // assume(approved)
@@ -20,5 +20,5 @@ ThisBuild / initialize := {
   if (approved)
     sLog.value.info(s"Java $current was detected and approved.")
   else
-    sLog.value.error(s"Unsupported Java version: Eidos requires $required but found $current instead.")
+    sLog.value.error(s"Unsupported Java version: pdf2txt requires $required but found $current instead.")
 }
