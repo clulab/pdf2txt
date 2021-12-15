@@ -1,0 +1,41 @@
+
+# sbt
+target/
+boot/
+lib_managed/
+src_managed/
+project/plugins/project/
+.bsp/
+
+# Scala-IDE specific
+.scala_dependencies
+.worksheet
+
+# IntelliJ
+.idea/
+
+# Eclipse
+.classpath
+.project
+.settings/org.eclipse.core.resources.prefs
+
+# VS Code
+.vscode/
+.bloop
+.metals
+
+# GitKraken
+\.classpath
+
+# ~ files
+*~
+
+# For MacOS filesystem
+.DS_Store
+
+# Java
+*.class
+
+# Application
+*.log
+
