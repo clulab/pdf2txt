@@ -29,7 +29,7 @@ class Pdf2txt() extends Pdf2txtConfigured {
     }
   }
 
-  def run(dir: String): Unit = {
+  def dir(dir: String): Unit = {
     val files = FileUtils.findFiles(dir, ".pdf")
 
     files.par.foreach { file =>
@@ -59,8 +59,7 @@ class Pdf2txt() extends Pdf2txtConfigured {
   }
 }
 
-object Pdf2txt extends App with Logging {
-  val dir = args.lift(0).getOrElse(".")
+object Pdf2txt extends Logging {
 
-  new Pdf2txt().run(dir)
+  def apply(): Pdf2txt = new Pdf2txt()
 }
