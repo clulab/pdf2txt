@@ -29,7 +29,7 @@ libraryDependencies ++= {
 lazy val core = (project in file("."))
   .enablePlugins(BuildInfoPlugin)
   .disablePlugins(PlayScala, JavaAppPackaging, SbtNativePackager)
-  .dependsOn(common % "compile -> compile; test -> test")
+  .dependsOn(common % "compile -> compile; test -> test", tika)
   .aggregate(common, tika)
   .settings(
     assembly / aggregate := false,
