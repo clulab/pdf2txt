@@ -19,8 +19,10 @@ class Pdf2txt() extends Pdf2txtConfigured {
         throw throwable
     }
 
+    val cookedText = new Document(text).getCookedText
+
     try {
-      printWriter.println(text)
+      printWriter.println(cookedText)
     }
     catch {
       case throwable: Throwable =>

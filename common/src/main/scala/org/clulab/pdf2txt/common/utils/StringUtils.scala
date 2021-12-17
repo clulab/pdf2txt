@@ -27,4 +27,11 @@ object StringUtils {
 
   def afterFirst(string: String, char: Char, all: Boolean = true, keep: Boolean = false): String =
     after(string, string.indexOf(char), all, keep)
+
+  def substring(text: String, range: Range): String = text.substring(range.start, range.end)
+
+  implicit class StringOps(string: String) {
+
+    def substring(range: Range): String = substring(range)
+  }
 }

@@ -12,18 +12,30 @@ import java.io.InputStream
 
 class Tika() {
   val config = {
-    getClass.getResourceAsStream("/org/clulab/pdf2txt/tika/tika-config.xml").autoClose { source =>
-      new TikaConfig(source)
+    getClass.getResourceAsStream("/org/clulab/pdf2txt/tika/tika-config.xml").autoClose { inputStream =>
+      new TikaConfig(inputStream)
     }
   }
   val detector: Detector = config.getDetector
   val parser = new AutoDetectParser(config)
 
-  def read(inputStream: InputStream): String = {
-    val handler = new BodyContentHandler();
-    val metadata = new Metadata();
+  def isPdf(inputStream: InputStream): Boolean = {
+    val metadata = new Metadata()
+    val mediaType = detector.detect(inputStream, metadata)
 
-    parser.parse(inputStream, handler, metadata);
-    handler.toString();
+    inputStream.reset()
+    mediaType.toString == "application/pdf"
+  }
+
+  def read(inputStream: InputStream): String = {
+    val handler = new BodyContentHandler()
+    val metadata = new Metadata()
+
+    if (isPdf(inputStream)) {
+      parser.parse(inputStream, handler, metadata)
+      handler.toString()
+    }
+    else
+      throw new RuntimeException("Not PDF!")
   }
 }
