@@ -1,7 +1,9 @@
 package org.clulab.pdf2txt
 
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
-import org.clulab.pdf2txt.common.utils.{FileUtils, Logging, Pdf2txtConfigured, StringUtils}
+import org.clulab.pdf2txt.common.utils.{FileUtils, Logging, Pdf2txtConfigured}
+import org.clulab.pdf2txt.common.utils.StringUtils._
+import org.clulab.pdf2txt.document.DocumentByParagraph
 import org.clulab.pdf2txt.tika.Tika
 
 import java.io.{File, FileInputStream, InputStream, PrintWriter}
@@ -19,7 +21,7 @@ class Pdf2txt() extends Pdf2txtConfigured {
         throw throwable
     }
 
-    val cookedText = new Document(text).getCookedText
+    val cookedText = new DocumentByParagraph(text).getCookedText
 
     try {
       printWriter.println(cookedText)
@@ -38,7 +40,7 @@ class Pdf2txt() extends Pdf2txtConfigured {
       try {
         println(s"Converting ${file.getAbsolutePath}...")
         new FileInputStream(file).autoClose { inputStream =>
-          val outputFilename = StringUtils.beforeLast(file.getAbsolutePath, '.', true) + ".txt"
+          val outputFilename = file.getAbsolutePath.beforeLast('.', true) + ".txt"
 
           try {
             FileUtils.printWriterFromFile(new File(outputFilename)).autoClose { printWriter =>
