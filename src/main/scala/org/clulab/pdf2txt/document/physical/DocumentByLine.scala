@@ -1,7 +1,8 @@
-package org.clulab.pdf2txt.document
+package org.clulab.pdf2txt.document.physical
 
-import org.clulab.pdf2txt.common.utils.{CookedText, StringUtils, TextRange}
 import org.clulab.pdf2txt.common.utils.StringUtils._
+import org.clulab.pdf2txt.common.utils.{StringUtils, TextRange}
+import org.clulab.pdf2txt.document.{Document, DocumentConstructor}
 
 import scala.util.matching.Regex
 

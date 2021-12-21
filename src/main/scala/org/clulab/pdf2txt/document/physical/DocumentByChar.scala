@@ -1,8 +1,9 @@
-package org.clulab.pdf2txt.document
+package org.clulab.pdf2txt.document.physical
 
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
-import org.clulab.pdf2txt.common.utils.{Sourcer, StringUtils}
 import org.clulab.pdf2txt.common.utils.StringUtils._
+import org.clulab.pdf2txt.common.utils.{Sourcer, StringUtils}
+import org.clulab.pdf2txt.document.{Document, DocumentConstructor}
 
 class DocumentByChar protected(rawText: String, range: Range) extends Document(rawText, range) {
 
@@ -11,7 +12,7 @@ class DocumentByChar protected(rawText: String, range: Range) extends Document(r
   override def addCookedText(stringBuilder: StringBuilder): Unit = {
     rawText.substring(range).foreach { char =>
       // Most of the time this will be the singleton None, so there is no object creation overhead.
-      val cookedOpt = DocumentByChar.map.get(char)
+      val cookedOpt = DocumentByChar.unicodeMap.get(char)
 
       if (cookedOpt.isEmpty) stringBuilder.append(char) // Avoid conversion to string.
       else stringBuilder.append(cookedOpt.get)
@@ -20,9 +21,10 @@ class DocumentByChar protected(rawText: String, range: Range) extends Document(r
 }
 
 object DocumentByChar extends DocumentConstructor {
-  val map: Map[Char, String] = mkMap("/org/clulab/pdf2txt/unicode_to_ascii.tsv")
-
-  def mkMap(resourceName: String): Map[Char, String] = {
+  val unicodeMap: Map[Char, String] = mkUnicodeMap("/org/clulab/pdf2txt/unicode_to_ascii.tsv")
+  val accentMap: Map[Char, String] = mkAccentMap()
+  
+  def mkUnicodeMap(resourceName: String): Map[Char, String] = {
     Sourcer.sourceFromResource(resourceName).autoClose { source =>
       source
           .getLines()

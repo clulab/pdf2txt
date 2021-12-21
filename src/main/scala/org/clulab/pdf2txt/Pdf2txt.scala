@@ -3,7 +3,9 @@ package org.clulab.pdf2txt
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.{FileUtils, Logging, Pdf2txtConfigured}
 import org.clulab.pdf2txt.common.utils.StringUtils._
-import org.clulab.pdf2txt.document.{DocumentByChar, DocumentByLine, DocumentByParagraph, DocumentByWord, DocumentConstructor}
+import org.clulab.pdf2txt.document.logical.{DocumentByParagraph, DocumentByWord}
+import org.clulab.pdf2txt.document.physical.DocumentByLine
+import org.clulab.pdf2txt.document.DocumentConstructor
 import org.clulab.pdf2txt.tika.Tika
 
 import java.io.{File, FileInputStream, InputStream, PrintWriter}

@@ -1,8 +1,10 @@
-package org.clulab.pdf2txt.document
+package org.clulab.pdf2txt.document.logical
 
 import org.clulab.pdf2txt.LanguageModel
-import org.clulab.pdf2txt.common.utils.{CookedText, StringUtils, TextRange}
 import org.clulab.pdf2txt.common.utils.StringUtils._
+import org.clulab.pdf2txt.common.utils.{StringUtils, TextRange}
+import org.clulab.pdf2txt.document.{Document, DocumentConstructor}
+import org.clulab.processors.clu.CluProcessor
 
 import scala.util.matching.Regex
 
@@ -18,7 +20,7 @@ class DocumentByWord protected(rawText: String, range: Range) extends Document(r
 
   def newPostSeparators(): Seq[WordSeparator] = Seq(newSeparator(Range(range.end, range.end)))
 
-  def parse(): Seq[Word] =  {
+  def oldParse(): Seq[Word] = {
     val separators = DocumentByWord.separatorRegex.findAllMatchIn(rawText.substring(range)).map { separator =>
       newSeparator(Range(range.start + separator.start, range.start + separator.end))
     }.toSeq
@@ -49,6 +51,15 @@ class DocumentByWord protected(rawText: String, range: Range) extends Document(r
     words
   }
 
+  def parse(): Seq[Word] = {
+    val document = DocumentByWord.processor.mkDocument(rawText, keepText = true)
+
+
+
+
+
+  }
+
   val words: Seq[Word] = parse()
 
   override def addCookedText(stringBuilder: StringBuilder): Unit = {
@@ -61,6 +72,8 @@ class DocumentByWord protected(rawText: String, range: Range) extends Document(r
 
 object DocumentByWord extends DocumentConstructor {
   val separatorRegex: Regex = StringUtils.WHITESPACE_STRINGS.mkString("(", "|", ")+").r
+  val processor = new CluProcessor()
+
 
   def apply(rawText: String): DocumentByWord = new DocumentByWord(rawText)
 }
