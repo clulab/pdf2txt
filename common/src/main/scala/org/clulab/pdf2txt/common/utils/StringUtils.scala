@@ -1,5 +1,7 @@
 package org.clulab.pdf2txt.common.utils
 
+import java.text.Normalizer
+
 object StringUtils {
   val LF = '\n' // line feed
   val CR = '\r' // carriage return
@@ -12,9 +14,11 @@ object StringUtils {
   val HARD_SPACE = '\u00A0' // non-breaking
   val SPACE = ' '
 
-  val SOFT_HYPHEN = '-'
+  val DASH = '-'
+
+  val SOFT_HYPHEN = '\u00AD'
   val HARD_HYPHEN = '\u2011' // non-breaking
-  val HYPHEN = SOFT_HYPHEN
+  val HYPHEN = DASH
 
   val PERIOD = '.'
 
@@ -35,7 +39,9 @@ object StringUtils {
   val RIGHT_DOUBLE_QUOTE = '\u201D'
 
   val WHITESPACE_CHARS: Array[Char] = Array(SOFT_SPACE, HARD_SPACE, LF, CR, HTAB, VTAB)
+  val WHITESPACE_STRINGS: Array[String] = WHITESPACE_CHARS.map(_.toString)
   val PARAGRAPH_BREAK_STRINGS: Array[String] = Array(CR.toString + LF.toString, LF.toString)
+  val LINE_BREAK_STRINGS: Array[String] = PARAGRAPH_BREAK_STRINGS
   val SENTENCE_BREAK_CHARS: Array[Char] = Array(PERIOD, UPRIGHT_EXCLAMATION, INVERTED_EXCLAMATION, UPRIGHT_QUESTION, INVERTED_QUESTION)
   val SENTENCE_BREAK_STRINGS: Array[String] = {
     val endPuncts = SENTENCE_BREAK_CHARS.map(_.toString)
@@ -77,9 +83,14 @@ object StringUtils {
   def afterFirst(string: String, char: Char, all: Boolean = true, keep: Boolean = false): String =
     after(string, string.indexOf(char), all, keep)
 
-  def substring(text: String, range: Range): String = text.substring(range.start, range.end)
+  def substring(string: String, range: Range): String = string.substring(range.start, range.end)
 
-  def withoutWhitespace(text: String): String = text.filterNot(WHITESPACE_CHARS.contains)
+  def withoutWhitespace(string: String): String = string.filterNot(WHITESPACE_CHARS.contains)
+
+  def normalizeUnicode(string: String): String = Normalizer.normalize(string, Normalizer.Form.NFKC)
+
+  def toUnicodeChar(string: String): Char = Integer.parseInt(string, 16).toChar
+
 
   implicit class StringOps(string: String) {
 
@@ -88,5 +99,9 @@ object StringUtils {
     def withoutWhitespace: String = StringUtils.withoutWhitespace(string)
 
     def beforeLast(char: Char, all: Boolean = true, keep: Boolean = false): String = string
+
+    def normalizeUnicode: String = StringUtils.normalizeUnicode(string)
+
+    def toUnicodeChar: Char = StringUtils.toUnicodeChar(string)
   }
 }

@@ -3,7 +3,7 @@ package org.clulab.pdf2txt
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.{FileUtils, Logging, Pdf2txtConfigured}
 import org.clulab.pdf2txt.common.utils.StringUtils._
-import org.clulab.pdf2txt.document.DocumentByParagraph
+import org.clulab.pdf2txt.document.{DocumentByChar, DocumentByLine, DocumentByParagraph, DocumentByWord, DocumentConstructor}
 import org.clulab.pdf2txt.tika.Tika
 
 import java.io.{File, FileInputStream, InputStream, PrintWriter}
@@ -21,7 +21,12 @@ class Pdf2txt() extends Pdf2txtConfigured {
         throw throwable
     }
 
-    val cookedText = new DocumentByParagraph(text).getCookedText
+    val cookedText = Pdf2txt.documentConstructors.foldLeft(text) { (rawText, documentConstructor) =>
+      val document = documentConstructor(rawText)
+      val cookedText = document.getCookedText
+
+      cookedText
+    }
 
     try {
       printWriter.println(cookedText)
@@ -64,6 +69,12 @@ class Pdf2txt() extends Pdf2txtConfigured {
 }
 
 object Pdf2txt extends Logging {
+  val documentConstructors: Array[DocumentConstructor] = Array(
+    DocumentByParagraph,
+    DocumentByLine,
+    DocumentByWord,
+    DocumentByChar
+  )
 
   def apply(): Pdf2txt = new Pdf2txt()
 }

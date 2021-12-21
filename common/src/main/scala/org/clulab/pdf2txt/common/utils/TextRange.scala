@@ -8,6 +8,8 @@ class TextRange(text: String, range: Range) {
 
   def isEmpty: Boolean = range.isEmpty
 
+  def nonEmpty: Boolean = !isEmpty
+
   def getText: String = addText(new StringBuilder()).toString
 
   def addText(stringBuilder: StringBuilder): Unit = stringBuilder ++ text
