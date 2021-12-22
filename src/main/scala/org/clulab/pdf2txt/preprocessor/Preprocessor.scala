@@ -1,4 +1,4 @@
-package org.clulab.pdf2txt.apps.preprocessor
+package org.clulab.pdf2txt.preprocessor
 
 import org.clulab.pdf2txt.common.utils.TextRange
 

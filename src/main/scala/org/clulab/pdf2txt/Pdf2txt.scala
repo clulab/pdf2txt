@@ -3,15 +3,14 @@ package org.clulab.pdf2txt
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.{FileUtils, Logging, Pdf2txtConfigured}
 import org.clulab.pdf2txt.common.utils.StringUtils._
-import org.clulab.pdf2txt.document.logical.{DocumentByParagraph, DocumentByWord}
-import org.clulab.pdf2txt.document.physical.{DocumentByChar, DocumentByLine}
-import org.clulab.pdf2txt.document.DocumentConstructor
+import org.clulab.pdf2txt.preprocessor.{LineBreakPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakPreprocessor}
 import org.clulab.pdf2txt.tika.Tika
 
 import java.io.{File, FileInputStream, InputStream, PrintWriter}
 
 class Pdf2txt() extends Pdf2txtConfigured {
   val tika = new Tika()
+  val preprocessors = Pdf2txt.preprocessors
 
   def convert(inputStream: InputStream, printWriter: PrintWriter): Unit = {
     val rawText = try {
@@ -23,13 +22,9 @@ class Pdf2txt() extends Pdf2txtConfigured {
         throw throwable
     }
 
-//    val cookedText = Pdf2txt.documentConstructors.foldLeft(rawText) { (rawText, documentConstructor) =>
-//      val document = documentConstructor(rawText)
-//      val cookedText = document.getCookedText
-//
-//      cookedText
-//    }
-    val cookedText = rawText
+    val cookedText = preprocessors.foldLeft(rawText) { (rawText, preprocessor) =>
+      preprocessor.preprocess(rawText, rawText.range)
+    }
 
     try {
       printWriter.println(cookedText)
@@ -72,11 +67,11 @@ class Pdf2txt() extends Pdf2txtConfigured {
 }
 
 object Pdf2txt extends Logging {
-  val documentConstructors: Array[DocumentConstructor] = Array(
-    DocumentByParagraph,
-    DocumentByLine,
-    DocumentByWord,
-    DocumentByChar
+  val preprocessors: Array[Preprocessor] = Array(
+    new ParagraphPreprocessor(),
+    new UnicodePreprocessor(),
+    new LineBreakPreprocessor(),
+    new WordBreakPreprocessor()
   )
 
   def apply(): Pdf2txt = new Pdf2txt()

@@ -1,6 +1,5 @@
-package org.clulab.pdf2txt.apps.preprocessor
+package org.clulab.pdf2txt.preprocessor
 
-import org.clulab.pdf2txt.common.utils.StringUtils._
 import org.clulab.pdf2txt.document.logical.DocumentByParagraph
 
 class ParagraphPreprocessor extends Preprocessor {
@@ -14,6 +13,3 @@ class ParagraphPreprocessor extends Preprocessor {
   }
 }
 
-object ParagraphPreprocessor {
-  def apply: ParagraphPreprocessor = new ParagraphPreprocessor()
-}
