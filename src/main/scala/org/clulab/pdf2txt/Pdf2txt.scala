@@ -1,7 +1,7 @@
 package org.clulab.pdf2txt
 
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
-import org.clulab.pdf2txt.common.utils.{FileUtils, Logging, Pdf2txtConfigured}
+import org.clulab.pdf2txt.common.utils.{FileUtils, Logging, Pdf2txtConfigured, TextRange}
 import org.clulab.pdf2txt.common.utils.StringUtils._
 import org.clulab.pdf2txt.preprocessor.{LineBreakPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakPreprocessor}
 import org.clulab.pdf2txt.tika.Tika
@@ -12,55 +12,66 @@ class Pdf2txt() extends Pdf2txtConfigured {
   val tika = new Tika()
   val preprocessors = Pdf2txt.preprocessors
 
-  def convert(inputStream: InputStream, printWriter: PrintWriter): Unit = {
-    val rawText = try {
+  def logError(throwable: Throwable, message: String): Unit = {
+    Pdf2txt.logger.error(message, throwable)
+    throw throwable
+  }
+
+  def read(inputStream: InputStream): String = {
+    try {
       tika.read(inputStream)
     }
     catch {
-      case throwable: Throwable =>
-        Pdf2txt.logger.error(s"Tika failed to read.", throwable)
-        throw throwable
+      case throwable: Throwable => logError(throwable, s"Tika failed to read.")
     }
+  }
 
-    val cookedText = preprocessors.foldLeft(rawText) { (rawText, preprocessor) =>
-      preprocessor.preprocess(rawText, rawText.range)
+  def process(rawText: String): String = {
+    preprocessors.foldLeft(rawText) { (rawText, preprocessor) =>
+      val stringBuilder = new StringBuilder()
+
+      preprocessor.preprocess(TextRange(rawText)).foreach(stringBuilder ++ _.toString)
+      stringBuilder.toString
     }
+  }
 
+  def write(printWriter: PrintWriter, text: String): Unit = {
     try {
-      printWriter.println(cookedText)
+      printWriter.println(text)
     }
     catch {
-      case throwable: Throwable =>
-        Pdf2txt.logger.error(s"PrintWriter failed to write.", throwable)
-        throw throwable
+      case throwable: Throwable => logError(throwable, s"PrintWriter failed to write.")
     }
+  }
+
+  def convert(inputStream: InputStream, printWriter: PrintWriter): Unit = {
+    val rawText = read(inputStream)
+    val cookedText = process(rawText)
+
+    write(printWriter, cookedText)
   }
 
   def dir(dir: String): Unit = {
     val files = FileUtils.findFiles(dir, ".pdf")
 
-    files.par.foreach { file =>
+    files.par.foreach { inputFile =>
       try {
-        println(s"Converting ${file.getAbsolutePath}...")
-        new FileInputStream(file).autoClose { inputStream =>
-          val outputFilename = file.getAbsolutePath.beforeLast('.', true) + ".txt"
+        println(s"Converting ${inputFile.getAbsolutePath}...")
+        new FileInputStream(inputFile).autoClose { inputStream =>
+          val outputFile = new File(inputFile.getAbsolutePath.beforeLast('.', true) + ".txt")
 
           try {
-            FileUtils.printWriterFromFile(new File(outputFilename)).autoClose { printWriter =>
+            FileUtils.printWriterFromFile(outputFile).autoClose { printWriter =>
               convert(inputStream, printWriter)
             }
           }
           catch {
-            case throwable: Throwable =>
-              Pdf2txt.logger.error(s"Could not process output file $outputFilename.", throwable)
-              throw throwable
+            case throwable: Throwable => logError(throwable, s"Could not process output file ${inputFile.getAbsolutePath}.")
           }
         }
       }
       catch {
-        case throwable: Throwable =>
-          Pdf2txt.logger.error(s"Could not process input file ${file.getAbsolutePath}.", throwable)
-          throw throwable
+        case throwable: Throwable => logError(throwable, s"Could not process input file ${inputFile.getAbsolutePath}.")
       }
     }
   }

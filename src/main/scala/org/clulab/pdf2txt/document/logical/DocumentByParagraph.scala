@@ -2,98 +2,53 @@ package org.clulab.pdf2txt.document.logical
 
 import org.clulab.pdf2txt.common.utils.StringUtils._
 import org.clulab.pdf2txt.common.utils.{CookedText, StringUtils, TextRange}
-import org.clulab.pdf2txt.document.{Document, DocumentConstructor}
+import org.clulab.pdf2txt.document.{Document}
 
 import scala.util.matching.Regex
 
 // Make sure that each paragraph ends with content that is terminated like a sentence should be.
-class DocumentByParagraph(rawText: String, range: Range) extends Document(rawText, range) {
+class DocumentByParagraph(textRange: TextRange) extends Document(textRange) {
+  val paragraphTextRanges = textRange.removeAll(textRange.findAll(DocumentByParagraph.separatorRegex)).toArray
+  val preSeparator =
+      if (paragraphTextRanges.isEmpty) textRange // all of it
+      else textRange.subRange(textRange.start, paragraphTextRanges.head.start)
+  val interSeparators = paragraphTextRanges.sliding(2).map { case Array(prev, next) =>
+    textRange.subRange(prev.end, next.start)
+  }.toArray
+  val postSeparator =
+      if (paragraphTextRanges.isEmpty) textRange.endRange // none of it
+      else textRange.subRange(paragraphTextRanges.last.end, textRange.end)
+  val paragraphs = paragraphTextRanges.indices.map { index =>
+    val paragraphContent = new ParagraphContent(paragraphTextRanges(index))
+    val paragraphSeparator = new ParagraphSeparator(interSeparators.lift(index).getOrElse(postSeparator))
 
-  def this(rawText: String) = this(rawText, Range(0, rawText.length))
-
-  def newContent(range: Range): ParagraphContent = new ParagraphContent(rawText, range)
-
-  def newSeparator(range: Range): ParagraphSeparator = new ParagraphSeparator(rawText, range)
-
-  def newContents(range: Range): Seq[ParagraphContent] = Seq(newContent(range))
-
-  def newPostSeparators(): Seq[ParagraphSeparator] = Seq(newSeparator(Range(range.end, range.end)))
-
-  def parse(): Seq[Paragraph] = {
-    // 3. Add implicit end-of-sentence punctuation. That is, the generated text
-    // often include 2+ new lines to indicate different paragraphs.
-    val separators = DocumentByParagraph.separatorRegex.findAllMatchIn(rawText.substring(range)).map { separator =>
-      newSeparator(Range(range.start + separator.start, range.start + separator.end))
-    }.toSeq
-    val preContents =
-        if (separators.isEmpty) Seq.empty // Save it for post, if necessary.
-        else newContents(Range(range.start, separators.head.start))
-    val interContents = separators.sliding(2).map { case Seq (left, right) =>
-      newContent(Range(left.end, right.start))
-    }
-    val (postContents, postSeparators) =
-        if (separators.isEmpty)
-          if (this.isEmpty) Document.noContentsOrSeparators
-          // Handle the entire content and close with a Separator.
-          else (newContents(range), newPostSeparators())
-        else
-          if (separators.last.end >= range.end) Document.noContentsOrSeparators
-          // Handle any content trailing the last Separator.
-          else (newContents(Range(separators.last.end, range.end)), newPostSeparators())
-    val allContents = preContents ++ interContents ++ postContents
-    val allSeparators = separators ++ postSeparators
-
-    assert(allContents.length == separators.length)
-
-    val paragraphs = allContents.zip(allSeparators).map { case (content, separator) =>
-      Paragraph(rawText, content, separator)
-    }
-
-    paragraphs
+    Paragraph(paragraphContent, paragraphSeparator)
   }
-
-  val paragraphs: Seq[Paragraph] = parse()
 
   def byParagraph: Iterator[Paragraph] = paragraphs.iterator
 }
 
-object DocumentByParagraph extends DocumentConstructor {
+object DocumentByParagraph {
   val separatorRegex: Regex = StringUtils.PARAGRAPH_BREAK_STRINGS.map(_ + "{2,}").mkString("(", "|", ")").r
-
-  override def apply(rawText: String): DocumentByParagraph = new DocumentByParagraph(rawText)
-  override def apply(rawText: String, range: Range): DocumentByParagraph = new DocumentByParagraph(rawText, range)
 }
 
-class ParagraphContent(rawText: String, range: Range) extends TextRange(rawText, range) with CookedText {
+class ParagraphContent(val textRange: TextRange) {
 
   def hasEndOfSentence: Boolean = {
-    val reverseText = rawText.withoutWhitespace.reverse
+    val reverseText = textRange.toString.withoutWhitespace.reverse
 
     ParagraphContent.reverseSentenceBreakStrings.exists { reverseSentenceBreak =>
       reverseText.startsWith(reverseSentenceBreak)
     }
   }
 
-  override def addCookedText(stringBuilder: StringBuilder): Unit = {
-    stringBuilder ++ rawText
-    if (!isEmpty && !hasEndOfSentence)
-      // ... and the line on top does not end with end-of-sentence punctuation, add " ." to it.
-      stringBuilder ++ " ." // Add this to the last sentence?
-  }
+  def hasText: Boolean = true
 }
 
 object ParagraphContent {
   val reverseSentenceBreakStrings: Array[String] = StringUtils.SENTENCE_BREAK_STRINGS.map(_.reverse)
 }
 
-class ParagraphSeparator(rawText: String, range: Range) extends TextRange(rawText, range) {
-}
+class ParagraphSeparator(val textRange: TextRange)
 
-case class Paragraph protected (rawText: String, content: ParagraphContent, separator: ParagraphSeparator)
-    extends TextRange(rawText, Range(content.start, separator.end)) with CookedText {
-
-  override def addCookedText(stringBuilder: StringBuilder): Unit = {
-    content.addCookedText(stringBuilder)
-    separator.addText(stringBuilder)
-  }
-}
+case class Paragraph(content: ParagraphContent, separator: ParagraphSeparator)

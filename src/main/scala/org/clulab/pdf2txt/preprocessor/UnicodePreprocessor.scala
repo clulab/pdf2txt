@@ -2,12 +2,15 @@ package org.clulab.pdf2txt.preprocessor
 
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.StringUtils._
-import org.clulab.pdf2txt.common.utils.{Sourcer, StringUtils}
+import org.clulab.pdf2txt.common.utils.{Sourcer, StringUtils, TextRange}
 import org.clulab.pdf2txt.document.physical.DocumentByChar
 
 class UnicodePreprocessor(unicodeOptions: UnicodeOptions = UnicodePreprocessor.defaultUnicodeOptions) extends Preprocessor {
 
-  def preprocess(rawText: String, range: Range, stringBuilder: StringBuilder): Unit = {
+  // Return a new text range with all the characters in it.
+  // Otherwise, there will be a text range for every character.
+  def preprocess(textRange: TextRange): Seq[TextRange] = {
+    val SPACE = ' '
     val document = DocumentByChar(rawText)
 
     document.byChar.foreach { char =>
@@ -17,12 +20,12 @@ class UnicodePreprocessor(unicodeOptions: UnicodeOptions = UnicodePreprocessor.d
         val known = asciiOpt.isDefined
 
         if (known)
-          if (unicodeOptions.knownToSpace) stringBuilder += ' '
+          if (unicodeOptions.knownToSpace) stringBuilder + SPACE
           else
             if (unicodeOptions.keepKnownAccent && UnicodePreprocessor.accentSet(char)) stringBuilder += char
             else stringBuilder ++ asciiOpt.get
         else
-          if (unicodeOptions.unknownToSpace) stringBuilder += ' '
+          if (unicodeOptions.unknownToSpace) stringBuilder + SPACE
           else stringBuilder + char
       }
     }
