@@ -91,6 +91,7 @@ object StringUtils {
 
   def toUnicodeChar(string: String): Char = Integer.parseInt(string, 16).toChar
 
+  def range(string: String): Range = Range(0, string.length)
 
   implicit class StringOps(string: String) {
 
@@ -103,5 +104,7 @@ object StringUtils {
     def normalizeUnicode: String = StringUtils.normalizeUnicode(string)
 
     def toUnicodeChar: Char = StringUtils.toUnicodeChar(string)
+
+    def range: Range = StringUtils.range(string)
   }
 }

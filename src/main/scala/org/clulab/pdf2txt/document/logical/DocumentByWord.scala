@@ -57,7 +57,7 @@ class DocumentByWord protected(rawText: String, range: Range) extends Document(r
 
 
 
-
+    null
   }
 
   val words: Seq[Word] = parse()
@@ -80,7 +80,7 @@ object DocumentByWord extends DocumentConstructor {
 
 class WordContent(rawText: String, range: Range) extends TextRange(rawText, range) {
 
-  def addCookedText(stringBuilder: StringBuilder, nextContentOpt: Option[WordContent]): Unit = {
+  def addCookedText(stringBuilder: StringBuilder, nextContentOpt: Option[WordContent]): Boolean = {
 
     def addRawText(): Boolean = {
       stringBuilder ++ rawText
@@ -95,13 +95,9 @@ class WordContent(rawText: String, range: Range) extends TextRange(rawText, rang
       addRawText()
     else {
       // Need a sentence.
-      val combine = LanguageModel.instance.shouldCombine()
-
+      // val combine = LanguageModel.instance.shouldCombine()
+true
     }
-    stringBuilder ++ rawText
-    if (!isEmpty)
-      // ... and the line on top does not end with end-of-sentence punctuation, add " ." to it.
-      stringBuilder ++ " ." // Add this to the last sentence?
   }
 }
 
@@ -111,7 +107,7 @@ class WordSeparator(rawText: String, range: Range) extends TextRange(rawText, ra
 case class Word protected (rawText: String, content: WordContent, separator: WordSeparator)
   extends TextRange(rawText, Range(content.start, separator.end)) {
 
-  override def addCookedText(stringBuilder: StringBuilder, nextWordOpt: Option[Word]): Unit = {
+  def addCookedText(stringBuilder: StringBuilder, nextWordOpt: Option[Word]): Unit = {
     if (!content.addCookedText(stringBuilder, nextWordOpt.map(_.content)))
       separator.addText(stringBuilder)
   }

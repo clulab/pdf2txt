@@ -93,17 +93,17 @@ class LineContent(rawText: String, range: Range) extends TextRange(rawText, rang
         addRawText()
       else {
         val nextContent = nextContentOpt.get
-        val startsWithChar = nextContent.nonEmpty && rawText()
-
+        val startsWithChar = nextContent.nonEmpty // && rawText()
+true
       }
     }
 
-    val prevWordOpt = getLastWordOpt(rawText.substring(range))
-    val nextWordOpt = nextContentOpt.map { text => getFirstWordOpt(text.rawText.substring(range)) }
-    stringBuilder ++ rawText
-    if (!isEmpty)
+//    val prevWordOpt = getLastWordOpt(rawText.substring(range))
+//    val nextWordOpt = nextContentOpt.map { text => getFirstWordOpt(text.rawText.substring(range)) }
+//    stringBuilder ++ rawText
+//    if (!isEmpty)
       // ... and the line on top does not end with end-of-sentence punctuation, add " ." to it.
-      stringBuilder ++ " ." // Add this to the last sentence?
+//      stringBuilder ++ " ." // Add this to the last sentence?
   }
 }
 

@@ -15,5 +15,5 @@ class LanguageModel {
 }
 
 object LanguageModel {
-  val instance = new LanguageModel()
+  lazy val instance = new LanguageModel()
 }
