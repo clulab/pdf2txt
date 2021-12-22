@@ -7,7 +7,7 @@ import org.clulab.pdf2txt.document.{Document, DocumentConstructor}
 import scala.util.matching.Regex
 
 // Make sure that each paragraph ends with content that is terminated like a sentence should be.
-class DocumentByParagraph protected(rawText: String, range: Range) extends Document(rawText, range) {
+class DocumentByParagraph(rawText: String, range: Range) extends Document(rawText, range) {
 
   def this(rawText: String) = this(rawText, Range(0, rawText.length))
 
@@ -33,11 +33,11 @@ class DocumentByParagraph protected(rawText: String, range: Range) extends Docum
     }
     val (postContents, postSeparators) =
         if (separators.isEmpty)
-          if (this.isEmpty) noContentsOrSeparators
+          if (this.isEmpty) Document.noContentsOrSeparators
           // Handle the entire content and close with a Separator.
           else (newContents(range), newPostSeparators())
         else
-          if (separators.last.end >= range.end) noContentsOrSeparators
+          if (separators.last.end >= range.end) Document.noContentsOrSeparators
           // Handle any content trailing the last Separator.
           else (newContents(Range(separators.last.end, range.end)), newPostSeparators())
     val allContents = preContents ++ interContents ++ postContents
@@ -54,14 +54,14 @@ class DocumentByParagraph protected(rawText: String, range: Range) extends Docum
 
   val paragraphs: Seq[Paragraph] = parse()
 
-  override def addCookedText(stringBuilder: StringBuilder): Unit =
-      paragraphs.foreach(_.addCookedText(stringBuilder))
+  def byParagraph: Iterator[Paragraph] = paragraphs.iterator
 }
 
 object DocumentByParagraph extends DocumentConstructor {
   val separatorRegex: Regex = StringUtils.PARAGRAPH_BREAK_STRINGS.map(_ + "{2,}").mkString("(", "|", ")").r
 
-  def apply(rawText: String): DocumentByParagraph = new DocumentByParagraph(rawText)
+  override def apply(rawText: String): DocumentByParagraph = new DocumentByParagraph(rawText)
+  override def apply(rawText: String, range: Range): DocumentByParagraph = new DocumentByParagraph(rawText, range)
 }
 
 class ParagraphContent(rawText: String, range: Range) extends TextRange(rawText, range) with CookedText {

@@ -5,8 +5,10 @@ import org.clulab.pdf2txt.common.utils.StringUtils._
 import org.clulab.pdf2txt.common.utils.{Sourcer, StringUtils}
 import org.clulab.pdf2txt.document.physical.DocumentByChar
 
-class UnicodePreprocessor(rawText: String, range: Range, unicodeOptions: UnicodeOptions) extends Preprocessor(rawText, range) {
 
+// These should take the text to preprocess, and the range?
+
+class UnicodePreprocessor(rawText: String, range: Range, unicodeOptions: UnicodeOptions) extends Preprocessor(rawText, range) {
   val document = DocumentByChar(rawText)
 
   def addCookedText(stringBuilder: StringBuilder): Unit = {
@@ -36,7 +38,8 @@ object UnicodePreprocessor extends PreprocessorConstructor {
   lazy val accentSet: Set[Char] = mkAccentSet("/org/clulab/processors/bionlp/accented_characters.tsv")
   val defaultUnicodeOptions = UnicodeOptions(unknownToSpace = true, knownToSpace = false, keepKnownAccent = false)
 
-  def apply(rawText: String): Preprocessor = apply(rawText, defaultUnicodeOptions)
+  override def apply(rawText: String): Preprocessor = apply(rawText, rawText.range)
+  override def apply(rawText: String, range: Range): Preprocessor = new UnicodePreprocessor(rawText, range, defaultUnicodeOptions)
 
   def apply(rawText: String, unicodeOptions: UnicodeOptions): Preprocessor =
       new UnicodePreprocessor(rawText, Range(0, rawText.length), unicodeOptions)

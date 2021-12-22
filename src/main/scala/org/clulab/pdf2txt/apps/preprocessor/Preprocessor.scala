@@ -11,4 +11,5 @@ abstract class Preprocessor(rawText: String, range: Range) extends TextRange(raw
 
 trait PreprocessorConstructor {
   def apply(rawText: String): Preprocessor
+  def apply(rawText: String, range: Range): Preprocessor
 }

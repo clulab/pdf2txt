@@ -14,7 +14,7 @@ class Pdf2txt() extends Pdf2txtConfigured {
   val tika = new Tika()
 
   def convert(inputStream: InputStream, printWriter: PrintWriter): Unit = {
-    val text = try {
+    val rawText = try {
       tika.read(inputStream)
     }
     catch {
@@ -23,12 +23,13 @@ class Pdf2txt() extends Pdf2txtConfigured {
         throw throwable
     }
 
-    val cookedText = Pdf2txt.documentConstructors.foldLeft(text) { (rawText, documentConstructor) =>
-      val document = documentConstructor(rawText)
-      val cookedText = document.getCookedText
-
-      cookedText
-    }
+//    val cookedText = Pdf2txt.documentConstructors.foldLeft(rawText) { (rawText, documentConstructor) =>
+//      val document = documentConstructor(rawText)
+//      val cookedText = document.getCookedText
+//
+//      cookedText
+//    }
+    val cookedText = rawText
 
     try {
       printWriter.println(cookedText)

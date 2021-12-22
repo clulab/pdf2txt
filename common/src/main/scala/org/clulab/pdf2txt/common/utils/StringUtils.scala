@@ -93,6 +93,10 @@ object StringUtils {
 
   def range(string: String): Range = Range(0, string.length)
 
+  def iterator(string: String): Iterator[Char] = iterator(string, string.range)
+
+  def iterator(string: String, range: Range): Iterator[Char] = new CharIterator(string, range)
+
   implicit class StringOps(string: String) {
 
     def substring(range: Range): String = StringUtils.substring(string, range)
@@ -106,5 +110,17 @@ object StringUtils {
     def toUnicodeChar: Char = StringUtils.toUnicodeChar(string)
 
     def range: Range = StringUtils.range(string)
+
+    def toIterator: Iterator[Char] = StringUtils.iterator(string)
+
+    def toIterator(range: Range): Iterator[Char] = StringUtils.iterator(string, range)
   }
+}
+
+class CharIterator(string: String, range: Range) extends Iterator[Char] {
+  val rangeIterator = range.iterator
+
+  override def hasNext: Boolean = rangeIterator.hasNext
+
+  override def next(): Char = string(rangeIterator.next)
 }

@@ -8,9 +8,7 @@ import org.clulab.processors.clu.CluProcessor
 
 import scala.util.matching.Regex
 
-class DocumentByWord protected(rawText: String, range: Range) extends Document(rawText, range) {
-
-  def this(rawText: String) = this(rawText, Range(0, rawText.length))
+class DocumentByWord(rawText: String, range: Range) extends Document(rawText, range) {
 
   def newContent(range: Range): WordContent = new WordContent(rawText, range)
 
@@ -32,11 +30,11 @@ class DocumentByWord protected(rawText: String, range: Range) extends Document(r
     }
     val (postContents, postSeparators) =
       if (separators.isEmpty)
-        if (this.isEmpty) noContentsOrSeparators
+        if (this.isEmpty) Document.noContentsOrSeparators
         // Handle the entire content and close with a Separator.
         else (newContents(range), newPostSeparators())
       else
-        if (separators.last.end >= range.end) noContentsOrSeparators
+        if (separators.last.end >= range.end) Document.noContentsOrSeparators
         // Handle any content trailing the last Separator.
         else (newContents(Range(separators.last.end, range.end)), newPostSeparators())
     val allContents = preContents ++ interContents ++ postContents
@@ -62,7 +60,7 @@ class DocumentByWord protected(rawText: String, range: Range) extends Document(r
 
   val words: Seq[Word] = parse()
 
-  override def addCookedText(stringBuilder: StringBuilder): Unit = {
+  def addCookedText(stringBuilder: StringBuilder): Unit = {
     words.foldRight(None: Option[Word]) { (currWord, nextWordOpt) =>
       currWord.addCookedText(stringBuilder, nextWordOpt)
       Some(currWord)
@@ -74,8 +72,8 @@ object DocumentByWord extends DocumentConstructor {
   val separatorRegex: Regex = StringUtils.WHITESPACE_STRINGS.mkString("(", "|", ")+").r
   val processor = new CluProcessor()
 
-
-  def apply(rawText: String): DocumentByWord = new DocumentByWord(rawText)
+  override def apply(rawText: String): DocumentByWord = apply(rawText, rawText.range)
+  override def apply(rawText: String, range: Range): DocumentByWord = new DocumentByWord(rawText, range)
 }
 
 class WordContent(rawText: String, range: Range) extends TextRange(rawText, range) {

@@ -7,9 +7,7 @@ import org.clulab.pdf2txt.document.{Document, DocumentConstructor}
 import scala.util.matching.Regex
 
 // Make sure that words split between lines are joined back up.
-class DocumentByLine protected(rawText: String, range: Range) extends Document(rawText, range) {
-
-  def this(rawText: String) = this(rawText, Range(0, rawText.length))
+class DocumentByLine(rawText: String, range: Range) extends Document(rawText, range) {
 
   def newContent(range: Range): LineContent = new LineContent(rawText, range)
 
@@ -31,11 +29,11 @@ class DocumentByLine protected(rawText: String, range: Range) extends Document(r
     }
     val (postContents, postSeparators) =
         if (separators.isEmpty)
-          if (this.isEmpty) noContentsOrSeparators
+          if (this.isEmpty) Document.noContentsOrSeparators
           // Handle the entire content and close with a Separator.
           else (newContents(range), newPostSeparators())
         else
-          if (separators.last.end >= range.end) noContentsOrSeparators
+          if (separators.last.end >= range.end) Document.noContentsOrSeparators
           // Handle any content trailing the last Separator.
           else (newContents(Range(separators.last.end, range.end)), newPostSeparators())
     val allContents = preContents ++ interContents ++ postContents
@@ -52,7 +50,7 @@ class DocumentByLine protected(rawText: String, range: Range) extends Document(r
 
   val lines: Seq[Line] = parse()
 
-  override def addCookedText(stringBuilder: StringBuilder): Unit = {
+  def addCookedText(stringBuilder: StringBuilder): Unit = {
     lines.foldRight(None: Option[Line]) { (currLine, nextLineOpt) =>
       currLine.addCookedText(stringBuilder, nextLineOpt)
       Some(currLine)
@@ -63,7 +61,8 @@ class DocumentByLine protected(rawText: String, range: Range) extends Document(r
 object DocumentByLine extends DocumentConstructor {
   val separatorRegex: Regex = StringUtils.LINE_BREAK_STRINGS.map(_ + "{1,}").mkString("(", "|", ")").r
 
-  def apply(rawText: String): DocumentByLine = new DocumentByLine(rawText)
+  override def apply(rawText: String): DocumentByLine = apply(rawText, rawText.range)
+  override def apply(rawText: String, range: Range): DocumentByLine = new DocumentByLine(rawText, range)
 }
 
 class LineContent(rawText: String, range: Range) extends TextRange(rawText, range) {
