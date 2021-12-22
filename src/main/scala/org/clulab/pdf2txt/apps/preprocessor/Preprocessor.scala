@@ -2,14 +2,14 @@ package org.clulab.pdf2txt.apps.preprocessor
 
 import org.clulab.pdf2txt.common.utils.TextRange
 
-abstract class Preprocessor(rawText: String, range: Range) extends TextRange(rawText, range) {
+abstract class Preprocessor extends {
 
-  def getCookedText: String = addCookedText(new StringBuilder()).toString
+  def preprocess(rawText: String, range: Range): String = {
+    val stringBuilder = new StringBuilder()
 
-  def addCookedText(stringBuilder: StringBuilder): Unit
-}
+    preprocess(rawText, range, stringBuilder)
+    stringBuilder.toString
+  }
 
-trait PreprocessorConstructor {
-  def apply(rawText: String): Preprocessor
-  def apply(rawText: String, range: Range): Preprocessor
+  def preprocess(rawText: String, range: Range, stringBuilder: StringBuilder): Unit
 }

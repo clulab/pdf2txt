@@ -5,13 +5,11 @@ import org.clulab.pdf2txt.common.utils.StringUtils._
 import org.clulab.pdf2txt.common.utils.{Sourcer, StringUtils}
 import org.clulab.pdf2txt.document.physical.DocumentByChar
 
+class UnicodePreprocessor(unicodeOptions: UnicodeOptions) extends Preprocessor {
 
-// These should take the text to preprocess, and the range?
+  def preprocess(rawText: String, range: Range, stringBuilder: StringBuilder): Unit = {
+    val document = DocumentByChar(rawText)
 
-class UnicodePreprocessor(rawText: String, range: Range, unicodeOptions: UnicodeOptions) extends Preprocessor(rawText, range) {
-  val document = DocumentByChar(rawText)
-
-  def addCookedText(stringBuilder: StringBuilder): Unit = {
     document.byChar.foreach { char =>
       if (char < 0x80) stringBuilder += char
       else {
@@ -33,16 +31,13 @@ class UnicodePreprocessor(rawText: String, range: Range, unicodeOptions: Unicode
 
 case class UnicodeOptions(unknownToSpace: Boolean, knownToSpace: Boolean, keepKnownAccent: Boolean)
 
-object UnicodePreprocessor extends PreprocessorConstructor {
+object UnicodePreprocessor {
   lazy val unicodeMap: Map[Char, String] = mkUnicodeMap("/org/clulab/pdf2txt/unicode_to_ascii.tsv")
   lazy val accentSet: Set[Char] = mkAccentSet("/org/clulab/processors/bionlp/accented_characters.tsv")
   val defaultUnicodeOptions = UnicodeOptions(unknownToSpace = true, knownToSpace = false, keepKnownAccent = false)
 
-  override def apply(rawText: String): Preprocessor = apply(rawText, rawText.range)
-  override def apply(rawText: String, range: Range): Preprocessor = new UnicodePreprocessor(rawText, range, defaultUnicodeOptions)
-
-  def apply(rawText: String, unicodeOptions: UnicodeOptions): Preprocessor =
-      new UnicodePreprocessor(rawText, Range(0, rawText.length), unicodeOptions)
+  def apply: UnicodePreprocessor = apply(defaultUnicodeOptions)
+  def apply(unicodeOptions: UnicodeOptions): UnicodePreprocessor = new UnicodePreprocessor(defaultUnicodeOptions)
 
   def mkUnicodeMap(resourceName: String): Map[Char, String] = {
     Sourcer.sourceFromResource(resourceName).autoClose { source =>
