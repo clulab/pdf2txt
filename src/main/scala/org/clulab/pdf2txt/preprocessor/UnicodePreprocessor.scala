@@ -8,10 +8,11 @@ import org.clulab.pdf2txt.document.physical.DocumentByChar
 class UnicodePreprocessor(unicodeOptions: UnicodeOptions = UnicodePreprocessor.defaultUnicodeOptions) extends Preprocessor {
 
   // Return a new text range with all the characters in it.
-  // Otherwise, there will be a text range for every character.
+  // Otherwise, there might be a text range for every character.
   def preprocess(textRange: TextRange): Seq[TextRange] = {
     val SPACE = ' '
-    val document = DocumentByChar(rawText)
+    val document = new DocumentByChar(textRange)
+    val stringBuilder = new StringBuilder()
 
     document.byChar.foreach { char =>
       if (char < 0x80) stringBuilder + char
@@ -29,6 +30,7 @@ class UnicodePreprocessor(unicodeOptions: UnicodeOptions = UnicodePreprocessor.d
           else stringBuilder + char
       }
     }
+    Seq(TextRange(stringBuilder.toString))
   }
 }
 

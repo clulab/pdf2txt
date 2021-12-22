@@ -24,9 +24,11 @@ case class TextRange(text: String, range: Range) {
     }.toSeq
   }
 
-  def startRange: TextRange = TextRange(text, Range(start, start))
+  def startRange: TextRange = emptyRange(start)
 
-  def endRange: TextRange = TextRange(text, Range(end, end))
+  def endRange: TextRange = emptyRange(end)
+
+  def emptyRange(pos: Int): TextRange = TextRange(text, Range(pos, pos))
 
   def subRange(range: Range): TextRange = TextRange(text, range)
 
@@ -50,9 +52,16 @@ case class TextRange(text: String, range: Range) {
       preTextRanges ++ interTextRanges ++ postTextRanges
     }
   }
+
+  def matches(string: String): Boolean = {
+    val offset = start
+
+    text.length == string.length &&
+        string.indices.forall { index => string(index) == text(offset + index) }
+  }
 }
 
 object TextRange {
 
-  def apply(text: String) = TextRange(text, text.range)
+  def apply(text: String): TextRange = TextRange(text, text.range)
 }

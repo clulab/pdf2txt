@@ -1,85 +1,80 @@
 package org.clulab.pdf2txt.document.logical
 
-import org.clulab.pdf2txt.common.utils.StringUtils._
-import org.clulab.pdf2txt.document.{Document, DocumentConstructor}
+import org.clulab.pdf2txt.common.utils.{PairIterator, TextRange}
+import org.clulab.pdf2txt.document.Document
 import org.clulab.processors.clu.CluProcessor
 import org.clulab.processors.{Sentence => ProcessorsSentence}
 
-class DocumentBySentence(rawText: String, range: Range) extends Document(rawText, range) {
-  protected val processorsSentences = DocumentBySentence.processor.mkDocument(rawText.substring(range), keepText = false).sentences
-  protected val separators = processorsSentences // for easier comparison to DocumentByParagraph
+class DocumentBySentence(textRange: TextRange) extends Document(textRange) {
+  val processorsString = " " // trim is for processors
+  // Processors works on the entire string, so startOffsets and endOffsets need to be adjusted.
+  val offset = textRange.start
+  val contents = DocumentBySentence.processor.mkDocument(textRange.toString, keepText = false).sentences
   val preSeparator =
-      if (separators.isEmpty) Range(range.start, range.start)
-      else Range(range.start, separators.head.startOffsets.head)
-  val interSeparators = separators.sliding(2).map { case Array(prev, next) =>
-    Range(range.start + prev.endOffsets.last, range.start + next.startOffsets.head)
-  }
-  val postSeparator =
-      if (separators.isEmpty) range
-      else Range(range.start + separators.last.endOffsets.last, range.end)
+      if (contents.isEmpty) textRange // all of it
+      else textRange.subRange(offset, offset + contents.head.startOffsets.head)
+  val interSeparators = contents.sliding(2).map { case Array(prev, next) =>
+    textRange.subRange(offset + prev.endOffsets.last, offset + next.startOffsets.head)
+  }.toArray
+  val postSentenceSeparator =
+      if (contents.isEmpty) textRange.endRange // none of it
+      else textRange.subRange(offset + contents.last.endOffsets.last, textRange.end)
+  val postSeparator = textRange.endRange // it is used by the sentence
+  val sentences = contents.indices.map { index =>
+    val sentenceContent = SentenceContent(textRange, contents(index))
+    val sentenceSeparator = SentenceSeparator(interSeparators.lift(index).getOrElse(postSentenceSeparator))
 
-  def parse(): Seq[Sentence] = {
-    processorsSentences.map { processorsSentence =>
-      // The processorsSentence has start and end based on original range, so reuse it.
-      (new Sentence(rawText, range, processorsSentence))
-    }
+    Sentence(sentenceContent, sentenceSeparator)
   }
-
-  val sentences: Seq[Sentence] = parse()
 
   def bySentence: Iterator[Sentence] = sentences.iterator
 }
 
-class Sentence(rawText: String, range: Range, processorsSentence: ProcessorsSentence) {
-  // If there was an offset in range at the beginning, then it still needs to be taken into account
-  val preRange = Range(range.start, range.start)
-  val interRanges = processorsSentence.words.indices.toArray.sliding(2).map { case Array(prev, next) =>
-    Range(processorsSentence.endOffsets(prev), processorsSentence.startOffsets(next))
+object DocumentBySentence {
+  lazy val processor = new CluProcessor()
+}
+
+case class SentenceContent(textRange: TextRange, processorsSentence: ProcessorsSentence) {
+  // Processors works on the entire string, so startOffsets and endOffsets need to be adjusted.
+  val offset = textRange.start
+  val contents = processorsSentence.words.indices
+  val preSeparator = textRange.emptyRange(offset + processorsSentence.startOffsets.head)
+  val interSeparators = processorsSentence.words.indices.toArray.sliding(2).map { case Array(prev, next) =>
+    textRange.subRange(offset + processorsSentence.endOffsets(prev), offset + processorsSentence.startOffsets(next))
   }.toArray
-  val postRange = Range(range.end, range.end)
-  val leadingRanges = preRange +: interRanges
-  val trailingRanges = interRanges :+ postRange
+  val postWordSeparator = textRange.emptyRange(offset + processorsSentence.endOffsets.last)
+  val postSeparator = textRange.endRange // It is used by the word
+  val words = contents.indices.map { index =>
+    val wordTextRange = textRange.subRange(offset + processorsSentence.startOffsets(index), offset + processorsSentence.endOffsets(index))
+    val wordContent = WordContent(wordTextRange, processorsSentence.words(index))
+    val wordSeparator = WordSeparator(interSeparators.lift(index).getOrElse(postWordSeparator))
 
-  def parse(): Seq[Word] = {
-    processorsSentence.words.indices.map { index =>
-      val range = Range(processorsSentence.startOffsets(index), processorsSentence.endOffsets(index))
-      val wordContent = new WordContent(rawText, range, processorsSentence.words(index))
-      val wordSeparator = new WordSeparator(rawText, leadingRanges(index))
-
-      Word(wordContent, wordSeparator)
-    }
+    Word(wordContent, wordSeparator)
   }
-
-  val words = parse()
 
   def byWord: Iterator[Word] = words.iterator
 
-  def byWordPair: Iterator[(Word, Word)] = {
-    null
-  }
+  def byWordPair: Iterator[(Word, Word)] = new PairIterator(words)
 }
+
+case class SentenceSeparator(textRange: TextRange)
+
+case class Sentence(content: SentenceContent, separator: SentenceSeparator)
 
 case class Word(wordContent: WordContent, wordSeparator: WordSeparator) {
 
-  def endsWithHyphen: Boolean = wordContent.endsWithHyphen
+  def isHyphenated: Boolean = wordContent.isHyphenated
 
   def separatedBySingleLine: Boolean = wordSeparator.isNewline
 
   def separatedBySpace: Boolean = wordSeparator.isSpace
 }
 
-class WordContent(rawText: String, range: Range, cookedText: String) {
-  def endsWithHyphen = cookedText.endsWith("-")
+case class WordContent(textRange: TextRange, processorWord: String) {
+  def isHyphenated = processorWord.endsWith("-")
 }
 
-class WordSeparator(rawText: String, range: Range) {
-  def isNewline = rawText == "\n" // use matches string
-  def isSpace = rawText == " "
-}
-
-object DocumentBySentence {
-  val processor = new CluProcessor()
-
-  def apply(rawText: String): DocumentBySentence = apply(rawText, rawText.range)
-  def apply(rawText: String, range: Range): DocumentBySentence = new DocumentBySentence(rawText, range)
+case class WordSeparator(textRange: TextRange) {
+  def isNewline = textRange.matches("\n")
+  def isSpace = textRange.matches(" ")
 }

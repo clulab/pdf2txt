@@ -18,7 +18,7 @@ class ParagraphPreprocessor extends Preprocessor {
         textRanges ++ TextRange(" .")
       textRanges ++ paragraph.separator.textRange
     }
-    // The post separator is taken up in the paragraph
+    textRanges ++ document.postSeparator
     textRanges
   }
 }
