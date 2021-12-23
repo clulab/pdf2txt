@@ -6,7 +6,7 @@ class PairIterator[T](soloIterable: Iterable[T]) extends Iterator[(T, T)] {
       if (soloIterator.hasNext) Some(soloIterator.next())
       else None
 
-  def hasNext: Boolean = hasNext
+  def hasNext: Boolean = soloIterator.hasNext
 
   def next(): (T, T) = {
     val result = (prevOpt.get, soloIterator.next())
@@ -14,4 +14,8 @@ class PairIterator[T](soloIterable: Iterable[T]) extends Iterator[(T, T)] {
     prevOpt = Some(result._2)
     result
   }
+}
+
+object PairIterator {
+  def apply[T](soloIterable: Iterable[T]): PairIterator[T] = new PairIterator(soloIterable)
 }

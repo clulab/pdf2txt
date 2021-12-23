@@ -13,7 +13,7 @@ class DocumentBySentence(textRange: TextRange) extends Document(textRange) {
   val preSeparator =
       if (contents.isEmpty) textRange // all of it
       else textRange.subRange(offset, offset + contents.head.startOffsets.head)
-  val interSeparators = contents.sliding(2).map { case Array(prev, next) =>
+  val interSeparators = PairIterator(contents).map { case (prev, next) =>
     textRange.subRange(offset + prev.endOffsets.last, offset + next.startOffsets.head)
   }.toArray
   val postSentenceSeparator =
@@ -39,7 +39,7 @@ case class SentenceContent(textRange: TextRange, processorsSentence: ProcessorsS
   val offset = textRange.start
   val contents = processorsSentence.words.indices
   val preSeparator = textRange.emptyRange(offset + processorsSentence.startOffsets.head)
-  val interSeparators = processorsSentence.words.indices.toArray.sliding(2).map { case Array(prev, next) =>
+  val interSeparators = PairIterator(processorsSentence.words.indices).map { case (prev, next) =>
     textRange.subRange(offset + processorsSentence.endOffsets(prev), offset + processorsSentence.startOffsets(next))
   }.toArray
   val postWordSeparator = textRange.emptyRange(offset + processorsSentence.endOffsets.last)

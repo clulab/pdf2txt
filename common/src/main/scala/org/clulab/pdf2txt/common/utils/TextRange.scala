@@ -42,7 +42,7 @@ case class TextRange(text: String, range: Range) {
       val preTextRanges =
           if (start < textRanges.head.start) Seq.empty
           else Seq(subRange(start, textRanges.head.start))
-      val interTextRanges = textRanges.sliding(2).map { case Seq(leftTextRange, rightTextRange) =>
+      val interTextRanges = PairIterator(textRanges).map { case (leftTextRange, rightTextRange) =>
         subRange(leftTextRange.end, rightTextRange.start)
       }.toSeq
       val postTextRanges =
