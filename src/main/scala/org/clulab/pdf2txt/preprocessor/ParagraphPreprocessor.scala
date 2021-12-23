@@ -11,15 +11,14 @@ class ParagraphPreprocessor extends Preprocessor {
     val document = new DocumentByParagraph(textRange)
     val textRanges = new mutable.ArrayBuffer[TextRange]()
 
-    textRanges ++ document.preSeparator
+    textRanges += document.preSeparator
     document.byParagraph.foreach { paragraph =>
-      textRanges ++ paragraph.content.textRange
-      if (!paragraph.content.hasEndOfSentence)
-        textRanges ++ TextRange(" .")
-      textRanges ++ paragraph.separator.textRange
+      textRanges += paragraph.content.textRange
+      if (paragraph.content.hasText && !paragraph.content.hasEndOfSentence)
+        textRanges += TextRange(" .")
+      textRanges += paragraph.separator.textRange
     }
-    textRanges ++ document.postSeparator
+    textRanges += document.postSeparator
     textRanges
   }
 }
-

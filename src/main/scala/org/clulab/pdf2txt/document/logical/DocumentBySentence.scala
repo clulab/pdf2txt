@@ -1,6 +1,6 @@
 package org.clulab.pdf2txt.document.logical
 
-import org.clulab.pdf2txt.common.utils.{PairIterator, TextRange}
+import org.clulab.pdf2txt.common.utils.{PairIterator, StringUtils, TextRange}
 import org.clulab.pdf2txt.document.Document
 import org.clulab.processors.clu.CluProcessor
 import org.clulab.processors.{Sentence => ProcessorsSentence}
@@ -17,9 +17,9 @@ class DocumentBySentence(textRange: TextRange) extends Document(textRange) {
     textRange.subRange(offset + prev.endOffsets.last, offset + next.startOffsets.head)
   }.toArray
   val postSentenceSeparator =
-      if (contents.isEmpty) textRange.endRange // none of it
+      if (contents.isEmpty) textRange.emptyEnd // none of it
       else textRange.subRange(offset + contents.last.endOffsets.last, textRange.end)
-  val postSeparator = textRange.endRange // it is used by the sentence
+  val postSeparator = textRange.emptyEnd // it is used by the sentence
   val sentences = contents.indices.map { index =>
     val sentenceContent = SentenceContent(textRange, contents(index))
     val sentenceSeparator = SentenceSeparator(interSeparators.lift(index).getOrElse(postSentenceSeparator))
@@ -43,7 +43,7 @@ case class SentenceContent(textRange: TextRange, processorsSentence: ProcessorsS
     textRange.subRange(offset + processorsSentence.endOffsets(prev), offset + processorsSentence.startOffsets(next))
   }.toArray
   val postWordSeparator = textRange.emptyRange(offset + processorsSentence.endOffsets.last)
-  val postSeparator = textRange.endRange // It is used by the word
+  val postSeparator = textRange.emptyEnd // It is used by the word
   val words = contents.indices.map { index =>
     val wordTextRange = textRange.subRange(offset + processorsSentence.startOffsets(index), offset + processorsSentence.endOffsets(index))
     val wordContent = WordContent(wordTextRange, processorsSentence.words(index))
@@ -59,22 +59,13 @@ case class SentenceContent(textRange: TextRange, processorsSentence: ProcessorsS
 
 case class SentenceSeparator(textRange: TextRange)
 
-case class Sentence(content: SentenceContent, separator: SentenceSeparator)
-
-case class Word(wordContent: WordContent, wordSeparator: WordSeparator) {
-
-  def isHyphenated: Boolean = wordContent.isHyphenated
-
-  def separatedBySingleLine: Boolean = wordSeparator.isNewline
-
-  def separatedBySpace: Boolean = wordSeparator.isSpace
+case class Sentence(content: SentenceContent, separator: SentenceSeparator) {
+  val preSeparator = content.preSeparator.emptyStart
+  val postSeparator = separator.textRange.emptyEnd
 }
 
-case class WordContent(textRange: TextRange, processorWord: String) {
-  def isHyphenated = processorWord.endsWith("-")
-}
+case class Word(content: WordContent, separator: WordSeparator)
 
-case class WordSeparator(textRange: TextRange) {
-  def isNewline = textRange.matches("\n")
-  def isSpace = textRange.matches(" ")
-}
+case class WordContent(textRange: TextRange, processorWord: String)
+
+case class WordSeparator(textRange: TextRange)

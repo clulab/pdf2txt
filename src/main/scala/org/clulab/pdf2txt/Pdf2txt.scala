@@ -12,9 +12,10 @@ class Pdf2txt() extends Pdf2txtConfigured {
   val tika = new Tika()
   val preprocessors = Pdf2txt.preprocessors
 
-  def logError(throwable: Throwable, message: String): Unit = {
+  def logError(throwable: Throwable, message: String): String = {
     Pdf2txt.logger.error(message, throwable)
     throw throwable
+    message
   }
 
   def read(inputStream: InputStream): String = {

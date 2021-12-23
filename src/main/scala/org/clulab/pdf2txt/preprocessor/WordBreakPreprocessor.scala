@@ -1,34 +1,69 @@
 package org.clulab.pdf2txt.preprocessor
 
-import org.clulab.pdf2txt.common.utils.StringUtils._
+import org.clulab.pdf2txt.LanguageModel
+import org.clulab.pdf2txt.common.utils.TextRange
 import org.clulab.pdf2txt.document.logical.DocumentBySentence
+
+import scala.collection.mutable
 
 class WordBreakPreprocessor extends Preprocessor {
 
-  def preprocess(rawText: String, range: Range, stringBuilder: StringBuilder): Unit = {
-    val document = DocumentBySentence(rawText)
+  def isSpace(textRange: TextRange): Boolean = textRange.matches(" ")
 
-    stringBuilder ++ document.preSeparator
+  def shouldMerge(left: String, right: String, prev: Seq[String]): Boolean = true
+
+  def preprocess(textRange: TextRange): Seq[TextRange] = {
+    val document = new DocumentBySentence(textRange)
+    val textRanges = new mutable.ArrayBuffer[TextRange]()
+
+    textRanges += document.preSeparator
     document.bySentence.foreach { sentence =>
-      stringBuilder ++ rawText.substring(sentence.preRange)
-      sentence.byWordPair.foreach { case (prevWord, nextWord) =>
-        if (prevWord.separatedBySpace) {
-          if (true) { // should join
-            stringBuilder ++ prevWord.wordContent.toString
-            // Skip the single space separator then
-          } else {
-            stringBuilder ++ prevWord.wordContent.toString
-            stringBuilder ++ prevWord.wordSeparator.toString
+      val words = new mutable.ArrayBuffer[String]
+      var joined = false
+
+      textRanges += sentence.preSeparator // These should be annealed, even if different words but ranged match up
+      sentence.content.byWordPair.foreach { case (prevWord, nextWord) =>
+        if (joined)
+          joined = false
+        else {
+          val prevProcessorWord = prevWord.content.processorWord
+
+          if (isSpace(prevWord.separator.textRange)) {
+            val nextProcessorWord = nextWord.content.processorWord
+
+            if (WordBreakPreprocessor.languageModel.shouldJoin(prevProcessorWord, nextProcessorWord, words)) {
+              val processorWord = prevProcessorWord + nextProcessorWord
+
+              words += processorWord
+              textRanges += TextRange(processorWord)
+              textRanges += nextWord.separator.textRange
+
+              joined = true
+            } else {
+              words += prevProcessorWord
+              textRanges += prevWord.content.textRange
+              textRanges += prevWord.separator.textRange
+            }
+          }
+          else {
+            words += prevProcessorWord
+            textRanges += prevWord.content.textRange
+            textRanges += prevWord.separator.textRange
           }
         }
-        else {
-          stringBuilder ++ prevWord.wordContent.toString
-          stringBuilder ++ prevWord.wordSeparator.toString
-        }
       }
-      stringBuilder ++ sentence.words.last.toString
-      stringBuilder ++ rawText.substring(sentence.postRange)
+      // A sentence must have at least one word, so there is certainly one left over.
+      if (!joined) {
+        textRanges += sentence.content.words.last.content.textRange
+        textRanges += sentence.content.words.last.separator.textRange
+      }
+      textRanges += sentence.postSeparator
+      textRanges += sentence.separator.textRange
     }
-    stringBuilder ++ document.postSeparator
+    textRanges += document.postSeparator
   }
+}
+
+object WordBreakPreprocessor {
+  val languageModel = new LanguageModel()
 }

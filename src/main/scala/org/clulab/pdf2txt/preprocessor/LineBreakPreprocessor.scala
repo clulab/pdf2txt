@@ -1,29 +1,43 @@
 package org.clulab.pdf2txt.preprocessor
 
-import org.clulab.pdf2txt.common.utils.StringUtils._
-import org.clulab.pdf2txt.document.logical.DocumentBySentence
+import org.clulab.pdf2txt.common.utils.TextRange
+import org.clulab.pdf2txt.document.logical.{DocumentBySentence, Word}
+
+import scala.collection.mutable
 
 class LineBreakPreprocessor extends Preprocessor {
 
-  def preprocess(rawText: String, range: Range, stringBuilder: StringBuilder): Unit = {
-    val document = DocumentBySentence(rawText)
+  def isHyphenated(text: String): Boolean = text.endsWith("-")
 
-    stringBuilder ++ document.preSeparator
+  def separatedBySingleLine(word: Word): Boolean = isSingleNewline(word.separator.textRange)
+
+  def isSingleNewline(textRange: TextRange): Boolean = textRange.matches("\n")
+
+  def preprocess(textRange: TextRange): Seq[TextRange] = {
+    val document = new DocumentBySentence(textRange)
+    val textRanges = new mutable.ArrayBuffer[TextRange]()
+
+    textRanges += document.preSeparator
     document.bySentence.foreach { sentence =>
-      stringBuilder ++ rawText.substring(sentence.preRange)
-      // Know that there is at least a next word to be printed.
-      sentence.byWordPair.foreach { case (prevWord, _) =>
-        if (prevWord.endsWithHyphen && prevWord.separatedBySingleLine) {
-          stringBuilder ++ prevWord.wordContent.toString // without last
+      textRanges += sentence.preSeparator
+      sentence.content.byWordPair.foreach { case (prevWord, _) =>
+        // We have to convert to processor's word here, at least if there is hyphenation.
+        val processorWord = prevWord.content.processorWord
+
+        if (isHyphenated(processorWord) && processorWord.length > 1 && separatedBySingleLine(prevWord)) {
+          textRanges += TextRange(processorWord)
         }
         else {
-          stringBuilder ++ prevWord.wordContent.toString
-          stringBuilder ++ prevWord.wordSeparator.toString
+          textRanges += TextRange(processorWord)
+          textRanges += prevWord.separator.textRange
         }
       }
-      stringBuilder ++ sentence.words.last.toString
-      stringBuilder ++ rawText.substring(sentence.postRange)
+      // A sentence must have at least one word, so there is certainly one left over.
+      textRanges += TextRange(sentence.content.words.last.content.processorWord)
+      textRanges += sentence.content.words.last.separator.textRange
+      textRanges += sentence.postSeparator
+      textRanges += sentence.separator.textRange
     }
-    stringBuilder ++ document.postSeparator
+    textRanges += document.postSeparator
   }
 }

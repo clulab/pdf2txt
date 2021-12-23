@@ -24,9 +24,9 @@ case class TextRange(text: String, range: Range) {
     }.toSeq
   }
 
-  def startRange: TextRange = emptyRange(start)
+  def emptyStart: TextRange = emptyRange(start)
 
-  def endRange: TextRange = emptyRange(end)
+  def emptyEnd: TextRange = emptyRange(end)
 
   def emptyRange(pos: Int): TextRange = TextRange(text, Range(pos, pos))
 
@@ -59,6 +59,18 @@ case class TextRange(text: String, range: Range) {
     text.length == string.length &&
         string.indices.forall { index => string(index) == text(offset + index) }
   }
+
+  def before(pos: Int): TextRange = subRange(start, pos)
+
+  def after(pos: Int): TextRange = subRange(pos, end)
+
+  def all: TextRange = this
+
+  def length: Int = range.length
+
+  def withoutLast: TextRange = if (isEmpty) this else subRange(start, end - 1)
+
+  def withoutHead: TextRange = if (isEmpty) this else subRange(1, end)
 }
 
 object TextRange {
