@@ -13,7 +13,7 @@ class WordBreakPreprocessor extends Preprocessor {
   def shouldMerge(left: String, right: String, prev: Seq[String]): Boolean = true
 
   def preprocess(textRange: TextRange): Seq[TextRange] = {
-    val document = new DocumentBySentence(textRange)
+    val document = new DocumentBySentence(None, textRange)
     val textRanges = new mutable.ArrayBuffer[TextRange]()
 
     textRanges += document.preSeparator
@@ -26,10 +26,10 @@ class WordBreakPreprocessor extends Preprocessor {
         if (joined)
           joined = false
         else {
-          val prevProcessorWord = prevWord.content.processorWord
+          val prevProcessorWord = prevWord.content.processorsWord
 
           if (isSpace(prevWord.separator.textRange)) {
-            val nextProcessorWord = nextWord.content.processorWord
+            val nextProcessorWord = nextWord.content.processorsWord
 
             if (WordBreakPreprocessor.languageModel.shouldJoin(prevProcessorWord, nextProcessorWord, words)) {
               val processorWord = prevProcessorWord + nextProcessorWord

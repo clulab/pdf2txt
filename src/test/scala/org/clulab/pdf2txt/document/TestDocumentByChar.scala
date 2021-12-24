@@ -8,6 +8,6 @@ class TestDocumentByChar extends Test {
   behavior of "DocumentByChar"
 
   it should "load files" in {
-    val document = new DocumentByChar(TextRange("This is a test."))
+    val document = new DocumentByChar(None, TextRange("This is a test."))
   }
 }

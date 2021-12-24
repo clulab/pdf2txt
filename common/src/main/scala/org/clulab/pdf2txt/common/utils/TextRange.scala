@@ -4,7 +4,9 @@ import org.clulab.pdf2txt.common.utils.StringUtils.{range, _}
 
 import scala.util.matching.Regex
 
-case class TextRange(text: String, range: Range) {
+class TextRange(val text: String, val range: Range) {
+
+  def this(textRange: TextRange) = this(textRange.text, textRange.range)
 
   override def toString: String = text.substring(range)
 
@@ -75,5 +77,14 @@ case class TextRange(text: String, range: Range) {
 
 object TextRange {
 
-  def apply(text: String): TextRange = TextRange(text, text.range)
+  def apply(text: String): TextRange = apply(text, text.range)
+
+  def apply(text: String, range: Range): TextRange = new TextRange(text, range)
+
+  def apply(prev: TextRange, next: TextRange): TextRange = {
+    assert(prev.text eq next.text)
+    assert(prev.end == next.start)
+
+    TextRange(prev.text, Range(prev.start, next.end))
+  }
 }

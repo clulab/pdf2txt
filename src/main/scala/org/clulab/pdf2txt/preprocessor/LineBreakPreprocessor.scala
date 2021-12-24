@@ -14,7 +14,7 @@ class LineBreakPreprocessor extends Preprocessor {
   def isSingleNewline(textRange: TextRange): Boolean = textRange.matches("\n")
 
   def preprocess(textRange: TextRange): Seq[TextRange] = {
-    val document = new DocumentBySentence(textRange)
+    val document = new DocumentBySentence(None, textRange)
     val textRanges = new mutable.ArrayBuffer[TextRange]()
 
     textRanges += document.preSeparator
@@ -22,7 +22,7 @@ class LineBreakPreprocessor extends Preprocessor {
       textRanges += sentence.preSeparator
       sentence.content.byWordPair.foreach { case (prevWord, _) =>
         // We have to convert to processor's word here, at least if there is hyphenation.
-        val processorWord = prevWord.content.processorWord
+        val processorWord = prevWord.content.processorsWord
 
         if (isHyphenated(processorWord) && processorWord.length > 1 && separatedBySingleLine(prevWord)) {
           textRanges += TextRange(processorWord)
@@ -33,7 +33,7 @@ class LineBreakPreprocessor extends Preprocessor {
         }
       }
       // A sentence must have at least one word, so there is certainly one left over.
-      textRanges += TextRange(sentence.content.words.last.content.processorWord)
+      textRanges += TextRange(sentence.content.words.last.content.processorsWord)
       textRanges += sentence.content.words.last.separator.textRange
       textRanges += sentence.postSeparator
       textRanges += sentence.separator.textRange

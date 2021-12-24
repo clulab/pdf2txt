@@ -5,7 +5,7 @@ import org.clulab.pdf2txt.document.Document
 import org.clulab.processors.clu.CluProcessor
 import org.clulab.processors.{Sentence => ProcessorsSentence}
 
-class DocumentBySentence(textRange: TextRange) extends Document(textRange) {
+case class DocumentBySentence(override val parentOpt: Option[Document], textRange: TextRange) extends Document(parentOpt, textRange) {
   val processorsString = " " // trim is for processors
   // Processors works on the entire string, so startOffsets and endOffsets need to be adjusted.
   val offset = textRange.start
@@ -21,10 +21,11 @@ class DocumentBySentence(textRange: TextRange) extends Document(textRange) {
       else textRange.subRange(offset + contents.last.endOffsets.last, textRange.end)
   val postSeparator = textRange.emptyEnd // it is used by the sentence
   val sentences = contents.indices.map { index =>
-    val sentenceContent = SentenceContent(textRange, contents(index))
-    val sentenceSeparator = SentenceSeparator(interSeparators.lift(index).getOrElse(postSentenceSeparator))
+    val processorsSentence: ProcessorsSentence = contents(index)
+    val contentTextRange = textRange.subRange(offset + processorsSentence.startOffsets.head, offset + processorsSentence.endOffsets.last)
+    val separatorTextRange = interSeparators.lift(index).getOrElse(postSentenceSeparator)
 
-    Sentence(sentenceContent, sentenceSeparator)
+    Sentence(Some(this), contentTextRange, separatorTextRange, processorsSentence)
   }
 
   def bySentence: Iterator[Sentence] = sentences.iterator
@@ -34,7 +35,8 @@ object DocumentBySentence {
   lazy val processor = new CluProcessor()
 }
 
-case class SentenceContent(textRange: TextRange, processorsSentence: ProcessorsSentence) {
+case class SentenceContent(override val parentOpt: Option[Document], textRange: TextRange, processorsSentence: ProcessorsSentence)
+    extends Document(parentOpt, textRange) {
   // Processors works on the entire string, so startOffsets and endOffsets need to be adjusted.
   val offset = textRange.start
   val contents = processorsSentence.words.indices
@@ -45,11 +47,11 @@ case class SentenceContent(textRange: TextRange, processorsSentence: ProcessorsS
   val postWordSeparator = textRange.emptyRange(offset + processorsSentence.endOffsets.last)
   val postSeparator = textRange.emptyEnd // It is used by the word
   val words = contents.indices.map { index =>
-    val wordTextRange = textRange.subRange(offset + processorsSentence.startOffsets(index), offset + processorsSentence.endOffsets(index))
-    val wordContent = WordContent(wordTextRange, processorsSentence.words(index))
-    val wordSeparator = WordSeparator(interSeparators.lift(index).getOrElse(postWordSeparator))
+    val processorsWord = processorsSentence.words(index)
+    val contentTextRange = textRange.subRange(offset + processorsSentence.startOffsets(index), offset + processorsSentence.endOffsets(index))
+    val separatorTextRange = interSeparators.lift(index).getOrElse(postWordSeparator)
 
-    Word(wordContent, wordSeparator)
+    Word(Some(this), contentTextRange, separatorTextRange, processorsWord)
   }
 
   def byWord: Iterator[Word] = words.iterator
@@ -57,15 +59,26 @@ case class SentenceContent(textRange: TextRange, processorsSentence: ProcessorsS
   def byWordPair: Iterator[(Word, Word)] = new PairIterator(words)
 }
 
-case class SentenceSeparator(textRange: TextRange)
+case class SentenceSeparator(override val parentOpt: Option[Document], textRange: TextRange)
+    extends Document(parentOpt, textRange)
 
-case class Sentence(content: SentenceContent, separator: SentenceSeparator) {
-  val preSeparator = content.preSeparator.emptyStart
-  val postSeparator = separator.textRange.emptyEnd
+case class Sentence(override val parentOpt: Option[Document], contentTextRange: TextRange, separatorTextRange: TextRange, processorsSentence: ProcessorsSentence)
+    extends Document(parentOpt, TextRange(contentTextRange, separatorTextRange)) {
+  val preSeparator = contentTextRange.emptyStart
+  val postSeparator = separatorTextRange.emptyEnd
+
+  val content = SentenceContent(Some(this), contentTextRange, processorsSentence)
+  val separator = SentenceSeparator(Some(this), separatorTextRange)
 }
 
-case class Word(content: WordContent, separator: WordSeparator)
+case class WordContent(override val parentOpt: Option[Document], textRange: TextRange, processorsWord: String)
+    extends Document(parentOpt, textRange)
 
-case class WordContent(textRange: TextRange, processorWord: String)
+case class WordSeparator(override val parentOpt: Option[Document], textRange: TextRange)
+    extends Document(parentOpt, textRange)
 
-case class WordSeparator(textRange: TextRange)
+case class Word(override val parentOpt: Option[Document], contentTextRange: TextRange, separatorTextRange: TextRange, processorsWord: String)
+    extends Document(parentOpt, TextRange(contentTextRange, separatorTextRange)) {
+  val content = WordContent(Some(this), contentTextRange, processorsWord)
+  val separator = WordSeparator(Some(this), separatorTextRange)
+}

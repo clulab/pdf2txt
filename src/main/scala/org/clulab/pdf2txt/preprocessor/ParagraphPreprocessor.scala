@@ -8,7 +8,7 @@ import scala.collection.mutable
 class ParagraphPreprocessor extends Preprocessor {
 
   def preprocess(textRange: TextRange): Seq[TextRange] = {
-    val document = new DocumentByParagraph(textRange)
+    val document = new DocumentByParagraph(None, textRange)
     val textRanges = new mutable.ArrayBuffer[TextRange]()
 
     textRanges += document.preSeparator
