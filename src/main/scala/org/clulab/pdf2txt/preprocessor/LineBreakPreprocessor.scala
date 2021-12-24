@@ -9,7 +9,7 @@ class LineBreakPreprocessor extends Preprocessor {
 
   def isHyphenated(text: String): Boolean = text.endsWith("-")
 
-  def separatedBySingleLine(word: Word): Boolean = isSingleNewline(word.separator.textRange)
+  def separatedBySingleLine(word: Word): Boolean = isSingleNewline(word.separator)
 
   def isSingleNewline(textRange: TextRange): Boolean = textRange.matches("\n")
 
@@ -29,14 +29,14 @@ class LineBreakPreprocessor extends Preprocessor {
         }
         else {
           textRanges += TextRange(processorWord)
-          textRanges += prevWord.separator.textRange
+          textRanges += prevWord.separator
         }
       }
       // A sentence must have at least one word, so there is certainly one left over.
       textRanges += TextRange(sentence.content.words.last.content.processorsWord)
-      textRanges += sentence.content.words.last.separator.textRange
+      textRanges += sentence.content.words.last.separator
       textRanges += sentence.postSeparator
-      textRanges += sentence.separator.textRange
+      textRanges += sentence.separator
     }
     textRanges += document.postSeparator
   }

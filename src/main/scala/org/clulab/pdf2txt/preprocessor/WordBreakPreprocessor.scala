@@ -28,7 +28,7 @@ class WordBreakPreprocessor extends Preprocessor {
         else {
           val prevProcessorWord = prevWord.content.processorsWord
 
-          if (isSpace(prevWord.separator.textRange)) {
+          if (isSpace(prevWord.separator)) {
             val nextProcessorWord = nextWord.content.processorsWord
 
             if (WordBreakPreprocessor.languageModel.shouldJoin(prevProcessorWord, nextProcessorWord, words)) {
@@ -36,29 +36,29 @@ class WordBreakPreprocessor extends Preprocessor {
 
               words += processorWord
               textRanges += TextRange(processorWord)
-              textRanges += nextWord.separator.textRange
+              textRanges += nextWord.separator
 
               joined = true
             } else {
               words += prevProcessorWord
-              textRanges += prevWord.content.textRange
-              textRanges += prevWord.separator.textRange
+              textRanges += prevWord.content
+              textRanges += prevWord.separator
             }
           }
           else {
             words += prevProcessorWord
-            textRanges += prevWord.content.textRange
-            textRanges += prevWord.separator.textRange
+            textRanges += prevWord.content
+            textRanges += prevWord.separator
           }
         }
       }
       // A sentence must have at least one word, so there is certainly one left over.
       if (!joined) {
-        textRanges += sentence.content.words.last.content.textRange
-        textRanges += sentence.content.words.last.separator.textRange
+        textRanges += sentence.content.words.last.content
+        textRanges += sentence.content.words.last.separator
       }
       textRanges += sentence.postSeparator
-      textRanges += sentence.separator.textRange
+      textRanges += sentence.separator
     }
     textRanges += document.postSeparator
   }

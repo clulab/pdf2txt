@@ -13,10 +13,10 @@ class ParagraphPreprocessor extends Preprocessor {
 
     textRanges += document.preSeparator
     document.byParagraph.foreach { paragraph =>
-      textRanges += paragraph.content.textRange
+      textRanges += paragraph.content
       if (paragraph.content.hasText && !paragraph.content.hasEndOfSentence)
         textRanges += TextRange(" .")
-      textRanges += paragraph.separator.textRange
+      textRanges += paragraph.separator
     }
     textRanges += document.postSeparator
     textRanges
