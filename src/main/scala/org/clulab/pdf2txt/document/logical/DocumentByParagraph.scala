@@ -58,7 +58,7 @@ case class ParagraphDocument(override val parentOpt: Option[Document], contentTe
   }
 
   def hasText: Boolean = {
-    !charDocument.iterator.forall { char =>
+    !charDocument.forall { char =>
       StringUtils.WHITESPACE_CHARS.contains(char)
     }
   }

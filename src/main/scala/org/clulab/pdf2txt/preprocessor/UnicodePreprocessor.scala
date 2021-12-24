@@ -61,13 +61,13 @@ object UnicodePreprocessor {
   def mkAccentSet(resourceName: String): Set[Char] = {
     Sourcer.sourceFromResource(resourceName).autoClose { source =>
       source
-        .getLines()
-        .map(_.normalizeUnicode.trim)
-        .filter(_.nonEmpty)
-        .map { line =>
-          line.head
-        }
-        .toSet
+          .getLines()
+          .map(_.normalizeUnicode.trim)
+          .filter(_.nonEmpty)
+          .map { line =>
+            line.head
+          }
+          .toSet
     }
   }
 }

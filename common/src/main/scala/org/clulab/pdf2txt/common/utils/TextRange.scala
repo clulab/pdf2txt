@@ -1,18 +1,17 @@
 package org.clulab.pdf2txt.common.utils
 
-import org.clulab.pdf2txt.common.utils.StringUtils.{range, _}
+import org.clulab.pdf2txt.common.utils.StringUtils._
 
+import scala.collection.mutable
 import scala.util.matching.Regex
 
-class TextRange(val text: String, val range: Range) {
+class TextRange(val text: String, val range: Range) extends Iterable[Char] {
 
   def this(textRange: TextRange) = this(textRange.text, textRange.range)
 
   override def toString: String = text.substring(range)
 
-  def isEmpty: Boolean = range.isEmpty
-
-  def nonEmpty: Boolean = !isEmpty
+  override def isEmpty: Boolean = range.isEmpty
 
   def start: Int = range.start
 
@@ -87,4 +86,9 @@ object TextRange {
 
     TextRange(prev.text, Range(prev.start, next.end))
   }
+}
+
+class TextRanges() extends mutable.ArrayBuffer[TextRange]() {
+
+  def +=(textRangeOpt: Option[TextRange]): TextRanges = this ++= textRangeOpt.toSeq
 }

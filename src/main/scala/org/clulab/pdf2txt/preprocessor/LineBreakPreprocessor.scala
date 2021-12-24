@@ -1,6 +1,6 @@
 package org.clulab.pdf2txt.preprocessor
 
-import org.clulab.pdf2txt.common.utils.TextRange
+import org.clulab.pdf2txt.common.utils.{TextRange, TextRanges}
 import org.clulab.pdf2txt.document.logical.{DocumentBySentence, WordDocument}
 
 import scala.collection.mutable
@@ -15,11 +15,11 @@ class LineBreakPreprocessor extends Preprocessor {
 
   def preprocess(textRange: TextRange): Seq[TextRange] = {
     val document = new DocumentBySentence(None, textRange)
-    val textRanges = new mutable.ArrayBuffer[TextRange]()
+    val textRanges = new TextRanges()
 
-    textRanges ++= document.preSeparatorOpt.toSeq
+    textRanges += document.preSeparatorOpt
     document.contents.foreach { sentence =>
-      textRanges ++= sentence.preSeparatorOpt.toSeq
+      textRanges += sentence.preSeparatorOpt
 
       sentence.byWordPairOpt.foreach {
         case (None, Some(_)) => // Skip because we don't know if there are more words.
@@ -32,9 +32,10 @@ class LineBreakPreprocessor extends Preprocessor {
         else
           textRanges += prevWord
         case (Some(prevWord), None) => textRanges += prevWord
+        case (None, None) =>
       }
-      textRanges ++= sentence.postSeparatorOpt.toSeq
+      textRanges += sentence.postSeparatorOpt
     }
-    textRanges ++= document.postSeparatorOpt.toSeq
+    textRanges += document.postSeparatorOpt
   }
 }
