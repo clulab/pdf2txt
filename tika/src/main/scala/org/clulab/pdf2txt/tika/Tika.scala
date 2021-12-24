@@ -10,13 +10,7 @@ import org.apache.tika.sax.BodyContentHandler
 
 import java.io.InputStream
 
-class Tika() {
-  val config = new TikaConfig()
-//  val config = {
-//    getClass.getResourceAsStream("/org/clulab/pdf2txt/tika/tika-config.xml").autoClose { inputStream =>
-//      new TikaConfig(inputStream)
-//    }
-//  }
+class Tika(config: TikaConfig = new TikaConfig()) {
   val detector: Detector = config.getDetector
   val parser = new AutoDetectParser(config)
 
