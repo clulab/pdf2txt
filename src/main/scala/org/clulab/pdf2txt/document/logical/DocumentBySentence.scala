@@ -1,6 +1,6 @@
 package org.clulab.pdf2txt.document.logical
 
-import org.clulab.pdf2txt.common.utils.{PairIterator, StringUtils, TextRange}
+import org.clulab.pdf2txt.common.utils.{PairIterator, PairOptIterator, StringUtils, TextRange}
 import org.clulab.pdf2txt.document.physical.CharDocument
 import org.clulab.pdf2txt.document.{Document, Separator}
 import org.clulab.processors.clu.CluProcessor
@@ -69,7 +69,7 @@ case class SentenceDocument(override val parentOpt: Option[Document], contentTex
 
   def byWordPair: Iterator[(WordDocument, WordDocument)] = new PairIterator(contents)
 
-  def byWordPairOpt: Iterator[(Option[WordDocument], Option[WordDocument])] =
+  def byWordPairOpt: Iterator[(Option[WordDocument], Option[WordDocument])] = new PairOptIterator(contents)
 }
 
 case class WordDocument(override val parentOpt: Option[Document], contentTextRange: TextRange, separatorTextRange: TextRange, processorsWord: String)

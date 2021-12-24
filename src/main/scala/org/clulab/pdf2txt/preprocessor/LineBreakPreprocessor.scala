@@ -21,22 +21,18 @@ class LineBreakPreprocessor extends Preprocessor {
     document.contents.foreach { sentence =>
       textRanges ++= sentence.preSeparatorOpt.toSeq
 
-      sentence.byWordPair.foreach { case (prevWord, _) =>
+      sentence.byWordPairOpt.foreach {
+        case (None, Some(_)) => // Skip because we don't know if there are more words.
+        case (Some(prevWord), Some(_)) =>
         // We have to convert to processor's word here, at least if there is hyphenation.
         val processorWord = prevWord.processorsWord
 
-        if (isHyphenated(processorWord) && processorWord.length > 1 && separatedBySingleLine(prevWord)) {
-          textRanges += TextRange(processorWord)
-        }
-        else {
-          textRanges += TextRange(processorWord)
-          textRanges ++= prevWord.postSeparatorOpt.toSeq
-        }
+        if (isHyphenated(processorWord) && processorWord.length > 1 && separatedBySingleLine(prevWord))
+          textRanges += TextRange(processorWord).withoutLast // and no separator
+        else
+          textRanges += prevWord
+        case (Some(prevWord), None) => textRanges += prevWord
       }
-      // A sentence must have at least one word, so there is certainly one left over.
-      textRanges += TextRange(sentence.content.words.last.content.processorsWord)
-      textRanges += sentence.content.words.last.separator
-
       textRanges ++= sentence.postSeparatorOpt.toSeq
     }
     textRanges ++= document.postSeparatorOpt.toSeq
