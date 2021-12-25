@@ -72,6 +72,8 @@ class TextRange(val text: String, val range: Range) extends Iterable[Char] {
   def withoutLast: TextRange = if (isEmpty) this else subRange(start, end - 1)
 
   def withoutHead: TextRange = if (isEmpty) this else subRange(1, end)
+
+  def +(pos: Int): TextRange = subRange(pos + start, pos + end)
 }
 
 object TextRange {
@@ -91,4 +93,8 @@ object TextRange {
 class TextRanges() extends mutable.ArrayBuffer[TextRange]() {
 
   def +=(textRangeOpt: Option[TextRange]): TextRanges = this ++= textRangeOpt.toSeq
+
+  override def toString = foldLeft(new StringBuilder()) { case (stringBuilder, textRange) =>
+    stringBuilder ++= textRange.toString
+  }.toString
 }

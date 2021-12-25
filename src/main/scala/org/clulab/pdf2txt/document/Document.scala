@@ -9,14 +9,14 @@ abstract class Document(val parentOpt: Option[Document], textRange: TextRange) e
 
   // The children should account for the entire textRange.  If one were to get the text from all
   // children and concatenate it all, it should match the text of the parent.
-  def getChildren: Seq[Document] = {
+  def getChildren: Seq[TextRange] = {
     preSeparatorOpt.toSeq ++ contents ++ postSeparatorOpt.toSeq
   }
 }
 
 // The Separator is another document and could have its own separators.  In order to stop the
 // recursion, they could be null or Options.
-class Separator(parentOpt: Option[Document], textRange: TextRange) extends Document(parentOpt, textRange) {
-  override val preSeparatorOpt: Option[Separator] = None
-  override val postSeparatorOpt: Option[Separator] = None
+class Separator(parentOpt: Option[Document], textRange: TextRange) extends TextRange(textRange) {
+  val preSeparatorOpt: Option[Separator] = None
+  val postSeparatorOpt: Option[Separator] = None
 }
