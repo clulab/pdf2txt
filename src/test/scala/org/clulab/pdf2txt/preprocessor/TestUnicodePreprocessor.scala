@@ -15,7 +15,7 @@ class TestUnicodePreprocessor extends Test {
   def test(options: UnicodeOptions, expectedOutputText: String): Unit = {
     it should s"convert unicode to ascii with $options" in {
       val preprocessor = new UnicodePreprocessor(options)
-      val actualOutputText = preprocessor.preprocess(TextRange(inputText)).toString
+      val actualOutputText = preprocessor.preprocess(inputText).toString
 
       expectedOutputText shouldBe actualOutputText
     }

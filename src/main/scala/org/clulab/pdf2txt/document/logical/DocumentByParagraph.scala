@@ -10,28 +10,29 @@ import scala.util.matching.Regex
 // multiple paragraphs comprising entire document, contents are paragraphs
 case class DocumentByParagraph(override val parentOpt: Option[Document], textRange: TextRange) extends Document(parentOpt, textRange) {
   override val (preSeparatorOpt, contents, postSeparatorOpt) = {
-    val contents: Array[TextRange] = textRange.removeAll(textRange.findAll(DocumentByParagraph.separatorRegex)).toArray
+    val found = textRange.findAll(DocumentByParagraph.separatorRegex).toArray
+    val contents: Array[TextRange] = textRange.removeAll(found).toArray
     val preSeparator =
-      if (contents.isEmpty) textRange.all
-      else textRange.before(contents.head.start)
+        if (contents.isEmpty) textRange.all
+        else textRange.before(contents.head.start)
     val interSeparators = PairIterator(contents).map { case (prev, next) =>
       textRange.subRange(prev.end, next.start)
     }.toArray
     val postParagraphSeparator =
-      if (contents.isEmpty) textRange.emptyEnd
-      else textRange.after(contents.last.end)
+        if (contents.isEmpty) textRange.emptyEnd
+        else textRange.after(contents.last.end)
     val postSeparator = textRange.emptyEnd // it is used by the paragraph
     val paragraphDocuments = contents.indices.map { index =>
-      val contentTextRange = contents(index)
-      val separatorTextRange = interSeparators.lift(index).getOrElse(postParagraphSeparator)
+        val contentTextRange = contents(index)
+        val separatorTextRange = interSeparators.lift(index).getOrElse(postParagraphSeparator)
 
       ParagraphDocument(Some(this), contentTextRange, separatorTextRange)
     }
 
     (
-      Some(new Separator(Some(this), preSeparator)),
+      newSeparatorOpt(preSeparator),
       paragraphDocuments,
-      Some(new Separator(Some(this), postSeparator))
+      newSeparatorOpt(postSeparator)
     )
   }
 
@@ -40,7 +41,10 @@ case class DocumentByParagraph(override val parentOpt: Option[Document], textRan
 }
 
 object DocumentByParagraph {
-  val separatorRegex: Regex = StringUtils.PARAGRAPH_BREAK_STRINGS.map(_ + "{2,}").mkString("(", "|", ")").r
+  val separatorRegex: Regex = {
+    val result = StringUtils.PARAGRAPH_BREAK_STRINGS.mkString("(", "|", "){2,}").r
+    result
+  }
 }
 
 case class ParagraphDocument(override val parentOpt: Option[Document], contentTextRange: TextRange, separatorTextRange: TextRange)

@@ -11,9 +11,11 @@ class ParagraphPreprocessor extends Preprocessor {
 
     textRanges += document.preSeparatorOpt
     document.contents.foreach { paragraph =>
-      textRanges += paragraph
+      textRanges += paragraph.preSeparatorOpt
+      textRanges ++= paragraph.contents
       if (paragraph.hasText && !paragraph.hasEndOfSentence)
         textRanges += TextRange(" .")
+      textRanges += paragraph.postSeparatorOpt
     }
     textRanges += document.postSeparatorOpt
     textRanges

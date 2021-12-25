@@ -29,7 +29,7 @@ class Pdf2txt() extends Pdf2txtConfigured {
 
   def process(rawText: String): String = {
     preprocessors.foldLeft(rawText) { (rawText, preprocessor) =>
-      preprocessor.preprocess(TextRange(rawText)).toString
+      preprocessor.preprocess(rawText).toString
     }
   }
 

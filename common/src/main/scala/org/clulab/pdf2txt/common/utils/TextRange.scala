@@ -21,7 +21,7 @@ class TextRange(val text: String, val range: Range) extends Iterable[Char] {
 
   def findAll(regex: Regex): Seq[TextRange] = {
     regex.findAllMatchIn(toString).map { found =>
-      TextRange(text, Range(range.start + found.start, range.start + found.end))
+      subRange(found.start, found.end) + range.start
     }.toSeq
   }
 
@@ -41,14 +41,14 @@ class TextRange(val text: String, val range: Range) extends Iterable[Char] {
     if (textRanges.isEmpty) Seq(this)
     else {
       val preTextRanges =
-          if (start < textRanges.head.start) Seq.empty
-          else Seq(subRange(start, textRanges.head.start))
+          if (start < textRanges.head.start) Seq(subRange(start, textRanges.head.start))
+          else Seq.empty
       val interTextRanges = PairIterator(textRanges).map { case (leftTextRange, rightTextRange) =>
         subRange(leftTextRange.end, rightTextRange.start)
       }.toSeq
       val postTextRanges =
-          if (textRanges.last.end < end) Seq.empty
-          else Seq(subRange(textRanges.last.end, end))
+          if (textRanges.last.end < end) Seq(subRange(textRanges.last.end, end))
+          else Seq.empty
 
       preTextRanges ++ interTextRanges ++ postTextRanges
     }
