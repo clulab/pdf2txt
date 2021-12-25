@@ -98,3 +98,10 @@ class TextRanges() extends mutable.ArrayBuffer[TextRange]() {
     stringBuilder ++= textRange.toString
   }.toString
 }
+
+object TextRanges {
+
+  def apply(): TextRanges = new TextRanges()
+
+  def apply(textRange: TextRange): TextRanges = new TextRanges() += textRange
+}

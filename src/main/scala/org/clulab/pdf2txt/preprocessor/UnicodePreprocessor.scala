@@ -2,35 +2,35 @@ package org.clulab.pdf2txt.preprocessor
 
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.StringUtils._
-import org.clulab.pdf2txt.common.utils.{Sourcer, StringUtils, TextRange}
+import org.clulab.pdf2txt.common.utils.{Sourcer, StringUtils, TextRange, TextRanges}
 import org.clulab.pdf2txt.document.physical.DocumentByChar
 
 class UnicodePreprocessor(unicodeOptions: UnicodeOptions = UnicodePreprocessor.defaultUnicodeOptions) extends Preprocessor {
 
   // Return a new text range with all the characters in it.
   // Otherwise, there might be a text range for every character.
-  def preprocess(textRange: TextRange): Seq[TextRange] = {
+  def preprocess(textRange: TextRange): TextRanges = {
     val SPACE = ' '
     val document = new DocumentByChar(None, textRange)
     val stringBuilder = new StringBuilder()
 
     document.byChar.foreach { char =>
-      if (char < 0x80) stringBuilder + char
+      if (char < 0x80) stringBuilder += char
       else {
         val asciiOpt = UnicodePreprocessor.unicodeMap.get(char)
         val known = asciiOpt.isDefined
 
         if (known)
-          if (unicodeOptions.knownToSpace) stringBuilder + SPACE
+          if (unicodeOptions.knownToSpace) stringBuilder += SPACE
           else
             if (unicodeOptions.keepKnownAccent && UnicodePreprocessor.accentSet(char)) stringBuilder += char
-            else stringBuilder ++ asciiOpt.get
+            else stringBuilder ++= asciiOpt.get
         else
-          if (unicodeOptions.unknownToSpace) stringBuilder + SPACE
-          else stringBuilder + char
+          if (unicodeOptions.unknownToSpace) stringBuilder += SPACE
+          else stringBuilder += char
       }
     }
-    Seq(TextRange(stringBuilder.toString))
+    TextRanges(TextRange(stringBuilder.toString))
   }
 }
 

@@ -13,7 +13,7 @@ class LineBreakPreprocessor extends Preprocessor {
 
   def isSingleNewline(textRange: TextRange): Boolean = textRange.matches("\n")
 
-  def preprocess(textRange: TextRange): Seq[TextRange] = {
+  def preprocess(textRange: TextRange): TextRanges = {
     val document = new DocumentBySentence(None, textRange)
     val textRanges = new TextRanges()
 

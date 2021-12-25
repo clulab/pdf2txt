@@ -16,7 +16,7 @@ class WordBreakPreprocessor extends Preprocessor {
   def shouldJoin(left: String, right: String, prevWords: Seq[String]): Boolean =
     WordBreakPreprocessor.languageModel.shouldJoin(left, right, prevWords)
 
-  def preprocess(textRange: TextRange): Seq[TextRange] = {
+  def preprocess(textRange: TextRange): TextRanges = {
     val document = new DocumentBySentence(None, textRange)
     val textRanges = new TextRanges()
 

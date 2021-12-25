@@ -5,7 +5,7 @@ import org.clulab.pdf2txt.document.logical.DocumentByParagraph
 
 class ParagraphPreprocessor extends Preprocessor {
 
-  def preprocess(textRange: TextRange): Seq[TextRange] = {
+  def preprocess(textRange: TextRange): TextRanges = {
     val document = new DocumentByParagraph(None, textRange)
     val textRanges = new TextRanges()
 
