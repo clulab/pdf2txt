@@ -19,8 +19,7 @@ class TestDocumentByChar extends Test {
 
   it should "know its children" in {
     val document = DocumentByChar(None, TextRange(inputText))
-    val children = document.getChildren
-    val outputText = children.foldLeft(new StringBuilder()) { case (stringBuilder, textRange) =>
+    val outputText = document.getChildren.foldLeft(new StringBuilder()) { case (stringBuilder, textRange) =>
       stringBuilder ++= textRange.toString
     }.toString
 

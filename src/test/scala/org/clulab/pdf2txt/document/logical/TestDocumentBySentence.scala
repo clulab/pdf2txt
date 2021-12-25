@@ -19,8 +19,7 @@ class TestDocumentBySentence extends Test {
 
   it should "know its children" in {
     val document = DocumentBySentence(None, TextRange(inputText))
-    val children = document.getChildren
-    val outputText = children.foldLeft(new StringBuilder()) { case (stringBuilder, textRange) =>
+    val outputText = document.getChildren.foldLeft(new StringBuilder()) { case (stringBuilder, textRange) =>
       stringBuilder ++= textRange.toString
     }.toString
 
@@ -77,5 +76,70 @@ class TestDocumentBySentence extends Test {
 
     outputText shouldBe inputText
   }
-}
 
+  behavior of "SentenceDocument"
+
+  it should "know its content" in {
+    val document = DocumentBySentence(None, TextRange(inputText))
+
+    document.contents.zipWithIndex.foreach { case (sentence, sentenceIndex) =>
+      testSentence(sentence, sentence.toString)
+    }
+  }
+
+  behavior of "WordDocument"
+
+  it should "know its content" in {
+    val document = DocumentBySentence(None, TextRange(inputText))
+
+    document.contents.zipWithIndex.foreach { case (sentence, sentenceIndex) =>
+      sentence.contents.zipWithIndex.foreach { case (word, wordIndex) =>
+        testWord(word, word.toString)
+      }
+    }
+  }
+
+  def testSentence(sentence: SentenceDocument, inputText: String): Unit = {
+    {
+      val outputText = sentence.getChildren.foldLeft(new StringBuilder()) { case (stringBuilder, textRange) =>
+        stringBuilder ++= textRange.toString
+      }.toString
+
+      outputText shouldBe inputText
+    }
+
+    {
+      val textRanges = new TextRanges()
+
+      textRanges += sentence.preSeparatorOpt
+      textRanges ++= sentence.contents
+      textRanges += sentence.postSeparatorOpt
+
+      val outputText = textRanges.toString
+
+      outputText shouldBe inputText
+    }
+  }
+
+  def testWord(word: WordDocument, inputText: String): Unit = {
+    {
+      val outputText = word.getChildren.foldLeft(new StringBuilder()) { case (stringBuilder, textRange) =>
+        stringBuilder ++= textRange.toString
+      }.toString
+
+      outputText shouldBe inputText
+    }
+
+    {
+      val textRanges = new TextRanges()
+
+      textRanges += word.preSeparatorOpt
+      textRanges ++= word.contents
+      textRanges += word.postSeparatorOpt
+
+      val outputText = textRanges.toString
+
+      outputText shouldBe inputText
+    }
+  }
+}
