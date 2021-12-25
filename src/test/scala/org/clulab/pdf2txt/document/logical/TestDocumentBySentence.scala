@@ -40,7 +40,7 @@ class TestDocumentBySentence extends Test {
     outputText shouldBe inputText
   }
 
-  it should "know its sentence's separators and content" in {
+  it should "know separators and content of all sentences" in {
     val document = DocumentBySentence(None, TextRange(inputText))
     val textRanges = new TextRanges()
 
@@ -56,4 +56,26 @@ class TestDocumentBySentence extends Test {
 
     outputText shouldBe inputText
   }
+
+  it should "know separators and content of all words" in {
+    val document = DocumentBySentence(None, TextRange(inputText))
+    val textRanges = new TextRanges()
+
+    textRanges += document.preSeparatorOpt
+    document.contents.foreach { sentence =>
+      textRanges += sentence.preSeparatorOpt
+      sentence.contents.foreach { word =>
+        textRanges += word.preSeparatorOpt
+        textRanges ++= word.contents
+        textRanges += word.postSeparatorOpt
+      }
+      textRanges += sentence.postSeparatorOpt
+    }
+    textRanges += document.postSeparatorOpt
+
+    val outputText = textRanges.toString
+
+    outputText shouldBe inputText
+  }
 }
+

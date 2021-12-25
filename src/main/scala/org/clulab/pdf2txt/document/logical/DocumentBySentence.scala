@@ -30,11 +30,7 @@ case class DocumentBySentence(override val parentOpt: Option[Document], textRang
       SentenceDocument(Some(this), contentTextRange, separatorTextRange, offset, processorsSentence)
     }
 
-    (
-      Some(new Separator(Some(this), preSeparator)),
-      sentences,
-      Some(new Separator(Some(this), postSeparator))
-    )
+    (newSeparatorOpt(preSeparator), sentences, newSeparatorOpt(postSeparator))
   }
 
   def bySentence: Iterator[SentenceDocument] = contents.iterator
@@ -63,7 +59,7 @@ case class SentenceDocument(override val parentOpt: Option[Document], contentTex
       WordDocument(Some(this), contentTextRange, separatorTextRange, processorsWord)
     }
 
-    (None, wordDocuments, Some(new Separator(Some(this), separatorTextRange)))
+    (None, wordDocuments, newSeparatorOpt(separatorTextRange))
   }
 
   def byWord: Iterator[WordDocument] = contents.iterator
