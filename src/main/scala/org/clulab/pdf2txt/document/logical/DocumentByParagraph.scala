@@ -41,10 +41,7 @@ case class DocumentByParagraph(override val parentOpt: Option[Document], textRan
 }
 
 object DocumentByParagraph {
-  val separatorRegex: Regex = {
-    val result = StringUtils.PARAGRAPH_BREAK_STRINGS.mkString("(", "|", "){2,}").r
-    result
-  }
+  val separatorRegex: Regex = StringUtils.PARAGRAPH_BREAK_STRINGS.mkString("(", "|", "){2,}").r
 }
 
 case class ParagraphDocument(override val parentOpt: Option[Document], contentTextRange: TextRange, separatorTextRange: TextRange)

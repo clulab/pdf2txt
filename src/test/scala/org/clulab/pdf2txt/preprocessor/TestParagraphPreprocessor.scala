@@ -15,11 +15,17 @@ class TestParagraphPreprocessor extends Test {
     }
   }
 
-//  test("p1p2", "p1p2 .")
-//  test("p1 p2", "p1 p2 .")
-//  test("p1  p2", "p1  p2 .")
-//  test("p1\np2", "p1\np2 .")
-  test("p1\n\np2", "p1 .\n\np2 .")
-//  test("p1\n \np2", "p1\n \np2 .")
+  test("p1p2", "p1p2 .")
+  test("p1 p2", "p1 p2 .")
+  test("p1  p2", "p1  p2 .")
 
+  test("p1\np2", "p1\np2 .")
+  test("p1\n\np2", "p1 .\n\np2 .")
+  test("p1\n \np2", "p1\n \np2 .")
+
+  test("p1\r\np2", "p1\r\np2 .")
+  test("p1\r\n\r\np2", "p1 .\r\n\r\np2 .")
+  test("p1\r\n \r\np2", "p1\r\n \r\np2 .")
+
+  test("p1\r\rp2", "p1\r\rp2 .")
 }

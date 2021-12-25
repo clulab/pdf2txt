@@ -17,7 +17,7 @@ class TestUnicodePreprocessor extends Test {
       val preprocessor = new UnicodePreprocessor(options)
       val actualOutputText = preprocessor.preprocess(inputText).toString
 
-      expectedOutputText shouldBe actualOutputText
+      actualOutputText shouldBe expectedOutputText
     }
   }
 
