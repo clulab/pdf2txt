@@ -15,17 +15,19 @@ class TestLineBreakPreprocessor extends Test {
     }
   }
 
-//  test("1 2 3", "1 2 3")
-//  test("- 2 3", "- 2 3")
-//  test("- 2 -", "- 2 -")
+  test("one two three", "one two three")
+  test("- two three", "- two three")
+  test("- two -", "- two -")
 
-//  test("1\n2\n3", "1\n2\n3")
-//  test("-\n2\n3", "-\n2\n3")
-//  test("-\n2\n-", "-\n2\n-")
+  test("one\ntwo\nthree", "one\ntwo\nthree")
+  test("-\ntwo\nthree", "-\ntwo\nthree")
+  test("-\ntwo\n-", "-\ntwo\n-")
 
-//  test("-1\n2\n3", "-1\n2\n3")
-  test("a pre-\nhensile\ntail", "a prehensile\ntail")
-//  test("1-\n2\n-", "12\n-")
+  test("-one\ntwo\nthree", "-one\ntwo\nthree")
+  test("one-\ntwo\nthree", "onetwo\nthree")
+  test("one-\ntwo\n-", "onetwo\n-")
 
-  // Show 1-\n2-\n3 only does the first hyphen then if go again can get the second one.
+  test("one-\ntwo-\nthree", "onetwothree")
+
+  test("A pre-\nhensile tail is un-\ncommon.", "A prehensile tail is uncommon.")
 }

@@ -14,16 +14,16 @@ class WordBreakPreprocessor(languageModel: LanguageModel = LanguageModel.instanc
   def shouldJoin(left: String, right: String, prevWords: Seq[String]): Boolean =
       languageModel.shouldJoin(left, right, prevWords)
 
-  def preprocessSentence(sentence: SentenceDocument): TextRanges = {
+  protected def preprocessSentence(sentence: SentenceDocument): TextRanges = {
     val processorsWords = sentence.contents.map(_.processorsWord)
-    val prevNextIndexOpt = PairIndexedSeq(sentence.contents.indices).find { case (prevIndex, nextIndex) =>
+    val pairIndexOpt = PairIndexedSeq(sentence.contents.indices).find { case (prevIndex, nextIndex) =>
       val prevWord = sentence.contents(prevIndex)
       val nextWord = sentence.contents(nextIndex)
 
       isSeparatedBySingleSpace(prevWord, nextWord) && shouldJoin(prevWord.processorsWord, nextWord.processorsWord, processorsWords.take(prevIndex))
     }
 
-    prevNextIndexOpt.map { case (prevIndex, nextIndex) =>
+    pairIndexOpt.map { case (prevIndex, nextIndex) =>
       val prevWord = sentence.contents(prevIndex)
       val nextWord = sentence.contents(nextIndex)
       val processorsWord = prevWord.processorsWord + nextWord.processorsWord
