@@ -6,7 +6,7 @@ import org.clulab.pdf2txt.document.logical.{DocumentBySentence, WordDocument}
 
 import scala.collection.mutable
 
-class WordBreakPreprocessor extends Preprocessor {
+class WordBreakPreprocessor(languageModel: LanguageModel = LanguageModel.instance) extends Preprocessor {
 
   def isSpace(textRange: TextRange): Boolean = textRange.matches(" ")
 
@@ -14,7 +14,7 @@ class WordBreakPreprocessor extends Preprocessor {
       prevWordDocument.postSeparatorOpt.exists(isSpace)
 
   def shouldJoin(left: String, right: String, prevWords: Seq[String]): Boolean =
-    WordBreakPreprocessor.languageModel.shouldJoin(left, right, prevWords)
+      languageModel.shouldJoin(left, right, prevWords)
 
   def preprocess(textRange: TextRange): TextRanges = {
     val document = new DocumentBySentence(None, textRange)
@@ -27,7 +27,8 @@ class WordBreakPreprocessor extends Preprocessor {
 
       textRanges += sentence.preSeparatorOpt
       sentence.byWordPairOpt.foreach {
-        case (None, Some(_)) => // Skip this because we don't know if there are more words.
+        case (None, Some(prevWord)) => // Skip this because we don't know if there are more words.
+          prevProcessorWords += prevWord.processorsWord
         case (Some(prevWord), Some(nextWord)) =>
           if (joined) joined = false // Skip next word, but just once.
           else {
