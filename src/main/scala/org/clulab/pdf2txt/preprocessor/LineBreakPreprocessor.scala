@@ -24,12 +24,10 @@ class LineBreakPreprocessor extends Preprocessor {
       val nextWord = sentence.contents(nextIndex)
       val textRanges = new TextRanges()
 
-      textRanges += sentence.before(prevWord.preSeparator)
-      textRanges += prevWord.preSeparator
+      textRanges += sentence.andBefore(prevWord.preSeparator)
       textRanges += prevWord.contents.head
       textRanges += nextWord.contents.head
-      textRanges += nextWord.postSeparator
-      textRanges += sentence.after(nextWord.postSeparator)
+      textRanges += sentence.andAfter(nextWord.postSeparator)
 
       preprocess(TextRange(textRanges.toString))
     }.getOrElse(TextRanges(sentence))

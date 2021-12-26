@@ -62,6 +62,8 @@ class TextRange(val text: String, val range: Range) extends IndexedSeq[Char] {
         string.indices.forall { index => string(index) == text(offset + index) }
   }
 
+  def andBefore(textRange: TextRange): TextRange = before(textRange.end)
+
   def before(pos: Int): TextRange = subRange(start, pos)
 
   def before(textRange: TextRange): TextRange = before(textRange.start)
@@ -69,6 +71,8 @@ class TextRange(val text: String, val range: Range) extends IndexedSeq[Char] {
   def after(pos: Int): TextRange = subRange(pos, end)
 
   def after(textRange: TextRange): TextRange = after(textRange.end)
+
+  def andAfter(textRange: TextRange): TextRange = after(textRange.start)
 
   def all: TextRange = this
 

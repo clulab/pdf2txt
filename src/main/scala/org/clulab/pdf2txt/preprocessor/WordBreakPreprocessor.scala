@@ -27,11 +27,9 @@ class WordBreakPreprocessor(languageModel: LanguageModel = LanguageModel.instanc
       val processorsWord = prevWord.processorsWord + nextWord.processorsWord
       val textRanges = new TextRanges()
 
-      textRanges += sentence.before(prevWord.preSeparator)
-      textRanges += prevWord.preSeparator
+      textRanges += sentence.andBefore(prevWord.preSeparator)
       textRanges += TextRange(processorsWord)
-      textRanges += nextWord.postSeparator
-      textRanges += sentence.after(nextWord.postSeparator)
+      textRanges += sentence.andAfter(nextWord.postSeparator)
 
       preprocess(TextRange(textRanges.toString))
     }.getOrElse(TextRanges(sentence))
