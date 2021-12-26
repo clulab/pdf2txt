@@ -1,7 +1,7 @@
 package org.clulab.pdf2txt.preprocessor
 
 import org.clulab.pdf2txt.LanguageModel
-import org.clulab.pdf2txt.common.utils.{TextRange, TextRanges}
+import org.clulab.pdf2txt.common.utils.{PairOptIndexedSeq, TextRange, TextRanges}
 import org.clulab.pdf2txt.document.logical.{DocumentBySentence, WordDocument}
 
 import scala.collection.mutable
@@ -26,7 +26,7 @@ class WordBreakPreprocessor(languageModel: LanguageModel = LanguageModel.instanc
       var joined = false
 
       textRanges += sentence.preSeparatorOpt
-      sentence.byWordPairOpt.foreach {
+      PairOptIndexedSeq(sentence.contents).foreach {
         case (None, Some(prevWord)) => // Skip this because we don't know if there are more words.
           prevProcessorWords += prevWord.processorsWord
         case (Some(prevWord), Some(nextWord)) =>

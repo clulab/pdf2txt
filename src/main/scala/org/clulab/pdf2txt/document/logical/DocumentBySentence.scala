@@ -1,6 +1,6 @@
 package org.clulab.pdf2txt.document.logical
 
-import org.clulab.pdf2txt.common.utils.{PairIterator, PairOptIterator, StringUtils, TextRange}
+import org.clulab.pdf2txt.common.utils.{PairIndexedSeq, PairOptIndexedSeq, TextRange}
 import org.clulab.pdf2txt.document.physical.CharDocument
 import org.clulab.pdf2txt.document.{Document, Separator}
 import org.clulab.processors.clu.CluProcessor
@@ -15,7 +15,7 @@ case class DocumentBySentence(override val parentOpt: Option[Document], textRang
     val preSeparator =
         if (processorContents.isEmpty) textRange // all of it
         else subRange(start, offset + processorContents.head.startOffsets.head)
-    val interSeparators = PairIterator(processorContents).map { case (prev, next) =>
+    val interSeparators = PairIndexedSeq(processorContents).map { case (prev, next) =>
       subRange(prev.endOffsets.last, next.startOffsets.head) + offset
     }.toArray
     val postSentenceSeparator =
@@ -47,7 +47,7 @@ case class SentenceDocument(override val parentOpt: Option[Document], contentTex
     // Processors works on the entire string, so startOffsets and endOffsets need to be adjusted.
     val offset = processorsOffset
     val contents = processorsSentence.words.indices
-    val interSeparators = PairIterator(processorsSentence.words.indices).map { case (prev, next) =>
+    val interSeparators = PairIndexedSeq(processorsSentence.words.indices).map { case (prev, next) =>
       subRange(offset + processorsSentence.endOffsets(prev), offset + processorsSentence.startOffsets(next))
     }.toArray
     val postWordSeparator = emptyRange(offset + processorsSentence.endOffsets.last)
@@ -61,12 +61,6 @@ case class SentenceDocument(override val parentOpt: Option[Document], contentTex
 
     (None, wordDocuments, newSeparatorOpt(separatorTextRange))
   }
-
-  def byWord: Iterator[WordDocument] = contents.iterator
-
-  def byWordPair: Iterator[(WordDocument, WordDocument)] = new PairIterator(contents)
-
-  def byWordPairOpt: Iterator[(Option[WordDocument], Option[WordDocument])] = new PairOptIterator(contents)
 }
 
 case class WordDocument(override val parentOpt: Option[Document], contentTextRange: TextRange, separatorTextRange: TextRange, processorsWord: String)

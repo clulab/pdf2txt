@@ -1,6 +1,6 @@
 package org.clulab.pdf2txt.preprocessor
 
-import org.clulab.pdf2txt.common.utils.{StringUtils, TextRange, TextRanges}
+import org.clulab.pdf2txt.common.utils.{PairOptIndexedSeq, StringUtils, TextRange, TextRanges}
 import org.clulab.pdf2txt.document.logical.{DocumentBySentence, WordDocument}
 
 class LineBreakPreprocessor extends Preprocessor {
@@ -19,7 +19,7 @@ class LineBreakPreprocessor extends Preprocessor {
     document.contents.foreach { sentence =>
       textRanges += sentence.preSeparatorOpt
 
-      sentence.byWordPairOpt.foreach {
+      PairOptIndexedSeq(sentence.contents).foreach {
         case (None, Some(_)) => // Skip because we don't know if there are more words.
         case (Some(prevWord), Some(_)) =>
         // We have to convert to processor's word here, at least if there is hyphenation.

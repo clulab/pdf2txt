@@ -5,7 +5,8 @@ import org.clulab.pdf2txt.common.utils.StringUtils._
 import scala.collection.mutable
 import scala.util.matching.Regex
 
-class TextRange(val text: String, val range: Range) extends Iterable[Char] {
+class TextRange(val text: String, val range: Range) extends IndexedSeq[Char] {
+  // TODO: Add equality with another text range
 
   def this(textRange: TextRange) = this(textRange.text, textRange.range)
 
@@ -16,8 +17,6 @@ class TextRange(val text: String, val range: Range) extends Iterable[Char] {
   def start: Int = range.start
 
   def end: Int = range.end
-
-  def iterator: Iterator[Char] = new CharIterator(text, range)
 
   def findAll(regex: Regex): Seq[TextRange] = {
     regex.findAllMatchIn(toString).map { found =>
@@ -33,22 +32,24 @@ class TextRange(val text: String, val range: Range) extends Iterable[Char] {
 
   def subRange(range: Range): TextRange = TextRange(text, range)
 
+  def subRange(pos: Int): TextRange = subRange(Range(pos, pos + 1))
+
   def subRange(start: Int, end: Int): TextRange = TextRange(text, Range(start, end))
 
-  def removeAll(textRanges: Seq[TextRange]): Seq[TextRange] = {
+  def removeAll(textRanges: IndexedSeq[TextRange]): IndexedSeq[TextRange] = {
     // The ranges should be pre-sorted and be based on the same text.
     // They should also be inside this text range and not themselves be empty.
-    if (textRanges.isEmpty) Seq(this)
+    if (textRanges.isEmpty) IndexedSeq(this)
     else {
       val preTextRanges =
-          if (start < textRanges.head.start) Seq(subRange(start, textRanges.head.start))
-          else Seq.empty
-      val interTextRanges = PairIterator(textRanges).map { case (leftTextRange, rightTextRange) =>
+          if (start < textRanges.head.start) IndexedSeq(subRange(start, textRanges.head.start))
+          else IndexedSeq.empty
+      val interTextRanges = PairIndexedSeq(textRanges).map { case (leftTextRange, rightTextRange) =>
         subRange(leftTextRange.end, rightTextRange.start)
-      }.toSeq
+      }
       val postTextRanges =
-          if (textRanges.last.end < end) Seq(subRange(textRanges.last.end, end))
-          else Seq.empty
+          if (textRanges.last.end < end) IndexedSeq(subRange(textRanges.last.end, end))
+          else IndexedSeq.empty
 
       preTextRanges ++ interTextRanges ++ postTextRanges
     }
@@ -69,11 +70,19 @@ class TextRange(val text: String, val range: Range) extends Iterable[Char] {
 
   def length: Int = range.length
 
+  // Is dropRight(1)
+  // dropLast
   def withoutLast: TextRange = if (isEmpty) this else subRange(start, end - 1)
 
+  // take()
+  // drop()
   def withoutHead: TextRange = if (isEmpty) this else subRange(1, end)
 
   def +(pos: Int): TextRange = subRange(pos + start, pos + end)
+
+  override def apply(index: Int): Char =
+      if (0 <= index && index < length) text(start + index)
+      else throw new IndexOutOfBoundsException(s"$index is not within interval [0, $length)!")
 }
 
 object TextRange {
@@ -94,7 +103,7 @@ class TextRanges() extends mutable.ArrayBuffer[TextRange]() {
 
   def +=(textRangeOpt: Option[TextRange]): TextRanges = this ++= textRangeOpt.toSeq
 
-  override def toString = foldLeft(new StringBuilder()) { case (stringBuilder, textRange) =>
+  override def toString: String = foldLeft(new StringBuilder()) { case (stringBuilder, textRange) =>
     stringBuilder ++= textRange.toString
   }.toString
 }
@@ -104,4 +113,12 @@ object TextRanges {
   def apply(): TextRanges = new TextRanges()
 
   def apply(textRange: TextRange): TextRanges = new TextRanges() += textRange
+
+  def test: Unit = {
+    val textRange = TextRange("hello")
+
+    textRange.foreach { char =>
+      println(char)
+    }
+  }
 }
