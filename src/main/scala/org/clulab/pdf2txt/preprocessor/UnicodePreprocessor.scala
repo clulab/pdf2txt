@@ -11,10 +11,10 @@ class UnicodePreprocessor(unicodeOptions: UnicodeOptions = UnicodePreprocessor.d
   // Otherwise, there might be a text range for every character.
   def preprocess(textRange: TextRange): TextRanges = {
     val SPACE = ' '
-    val document = new DocumentByChar(None, textRange)
+    val document = DocumentByChar(textRange)
     val stringBuilder = new StringBuilder()
 
-    document.byChar.foreach { char =>
+    document.foreach { char =>
       if (char < 0x80) stringBuilder += char
       else {
         val asciiOpt = UnicodePreprocessor.unicodeMap.get(char)

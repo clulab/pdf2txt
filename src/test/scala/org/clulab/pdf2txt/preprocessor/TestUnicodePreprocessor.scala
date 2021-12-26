@@ -3,13 +3,13 @@ package org.clulab.pdf2txt.preprocessor
 import org.clulab.pdf2txt.common.utils.{Test, TextRange}
 
 class TestUnicodePreprocessor extends Test {
-
-  behavior of "UnicodePreprocessor"
-
   val alpha = "\u03B1"
   val omega = "\u03C9"
   val unknown = "\u0385"
   val accent = "\u00e3"
+
+  behavior of "UnicodePreprocessor"
+
   val inputText = s"The $alpha and the $omega but not the $unknown.  What about $accent?"
 
   def test(options: UnicodeOptions, expectedOutputText: String): Unit = {

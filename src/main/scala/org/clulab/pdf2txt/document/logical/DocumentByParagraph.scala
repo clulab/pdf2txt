@@ -8,47 +8,43 @@ import org.clulab.pdf2txt.document.{Document, Separator}
 import scala.util.matching.Regex
 
 // multiple paragraphs comprising entire document, contents are paragraphs
-case class DocumentByParagraph(override val parentOpt: Option[Document], textRange: TextRange) extends Document(parentOpt, textRange) {
-  override val (preSeparatorOpt, contents, postSeparatorOpt) = {
-    val found = textRange.findAll(DocumentByParagraph.separatorRegex).toArray
-    val contents: Array[TextRange] = textRange.removeAll(found).toArray
+class DocumentByParagraph(parentOpt: Option[Document], textRange: TextRange) extends Document(parentOpt, textRange) {
+  override val (preSeparator, contents, postSeparator) = {
+    val found = textRange.findAll(DocumentByParagraph.separatorRegex).toVector
+    val contents = textRange.removeAll(found)
     val preSeparator =
-        if (contents.isEmpty) textRange.all
-        else textRange.before(contents.head.start)
+        if (contents.isEmpty) all
+        else before(contents.head.start)
     val interSeparators = PairIndexedSeq(contents).map { case (prev, next) =>
-      textRange.subRange(prev.end, next.start)
+      subRange(prev.end, next.start)
     }.toArray
     val postParagraphSeparator =
-        if (contents.isEmpty) textRange.emptyEnd
-        else textRange.after(contents.last.end)
-    val postSeparator = textRange.emptyEnd // it is used by the paragraph
+        if (contents.isEmpty) emptyEnd
+        else after(contents.last.end)
+    val postSeparator = emptyEnd // Tt is used by the paragraph.
     val paragraphDocuments = contents.indices.map { index =>
         val contentTextRange = contents(index)
         val separatorTextRange = interSeparators.lift(index).getOrElse(postParagraphSeparator)
 
-      ParagraphDocument(Some(this), contentTextRange, separatorTextRange)
+      new ParagraphDocument(Some(this), contentTextRange, separatorTextRange)
     }
 
-    (
-      newSeparatorOpt(preSeparator),
-      paragraphDocuments,
-      newSeparatorOpt(postSeparator)
-    )
+    (newSeparator(preSeparator), paragraphDocuments, newSeparator(postSeparator))
   }
-
-  // just do contents, but make sure iterators over paragraph documents
-  def byParagraph: Iterator[ParagraphDocument] = contents.iterator
 }
 
 object DocumentByParagraph {
   val separatorRegex: Regex = StringUtils.PARAGRAPH_BREAK_STRINGS.mkString("(", "|", "){2,}").r
+
+  def apply(text: String): DocumentByParagraph = apply(TextRange(text))
+  def apply(textRange: TextRange): DocumentByParagraph = new DocumentByParagraph(None, textRange)
 }
 
-case class ParagraphDocument(override val parentOpt: Option[Document], contentTextRange: TextRange, separatorTextRange: TextRange)
+class ParagraphDocument(parentOpt: Option[Document], contentTextRange: TextRange, separatorTextRange: TextRange)
     extends Document(parentOpt, TextRange(contentTextRange, separatorTextRange)) {
-  override val postSeparatorOpt = Some(new Separator(Some(this), separatorTextRange))
-  val charDocument = CharDocument(Some(this), contentTextRange)
-  override val contents = Seq(charDocument)
+  override val postSeparator: Separator = newSeparator(separatorTextRange)
+  val charDocument: CharDocument = new CharDocument(Some(this), contentTextRange)
+  override val contents: Seq[CharDocument] = Array(charDocument)
 
   def hasEndOfSentence: Boolean = {
     val reverseText = charDocument.toString.withoutWhitespace.reverse
@@ -58,11 +54,7 @@ case class ParagraphDocument(override val parentOpt: Option[Document], contentTe
     }
   }
 
-  def hasText: Boolean = {
-    !charDocument.forall { char =>
-      StringUtils.WHITESPACE_CHARS.contains(char)
-    }
-  }
+  def hasText: Boolean = charDocument.exists(!StringUtils.WHITESPACE_CHARS.contains(_))
 }
 
 object ParagraphDocument {

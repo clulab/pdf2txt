@@ -7,7 +7,7 @@ class LineBreakPreprocessor extends Preprocessor {
 
   def isHyphen(wordDocument: WordDocument): Boolean = wordDocument.contents.head.matches("-")
 
-  def isSeparatedBySingleLine(wordDocument: WordDocument): Boolean = isSingleNewline(wordDocument.postSeparatorOpt.get)
+  def isSeparatedBySingleLine(wordDocument: WordDocument): Boolean = isSingleNewline(wordDocument.postSeparator)
 
   def isSingleNewline(textRange: TextRange): Boolean = StringUtils.LINE_BREAK_STRINGS.exists(textRange.matches)
 
@@ -16,7 +16,7 @@ class LineBreakPreprocessor extends Preprocessor {
       val prevWord = sentence.contents(prevIndex) // should have no separator before hyphen
       val currWord = sentence.contents(currIndex) // the hyphen followed by a newline
 
-      isHyphen(currWord) && isSeparatedBySingleLine(currWord) && prevWord.postSeparatorOpt.get.isEmpty
+      isHyphen(currWord) && isSeparatedBySingleLine(currWord) && prevWord.postSeparator.isEmpty
     }
 
     tripleIndexOpt.map { case (prevIndex, currIndex, nextIndex) =>
@@ -24,25 +24,25 @@ class LineBreakPreprocessor extends Preprocessor {
       val nextWord = sentence.contents(nextIndex)
       val textRanges = new TextRanges()
 
-      textRanges += sentence.before(prevWord.preSeparatorOpt.get)
-      textRanges += prevWord.preSeparatorOpt.get
+      textRanges += sentence.before(prevWord.preSeparator)
+      textRanges += prevWord.preSeparator
       textRanges += prevWord.contents.head
       textRanges += nextWord.contents.head
-      textRanges += nextWord.postSeparatorOpt.get
-      textRanges += sentence.after(nextWord.postSeparatorOpt.get)
+      textRanges += nextWord.postSeparator
+      textRanges += sentence.after(nextWord.postSeparator)
 
       preprocess(TextRange(textRanges.toString))
     }.getOrElse(TextRanges(sentence))
   }
 
   def preprocess(textRange: TextRange): TextRanges = {
-    val document = new DocumentBySentence(None, textRange)
+    val document = DocumentBySentence(textRange)
     val textRanges = new TextRanges()
 
-    textRanges += document.preSeparatorOpt
+    textRanges += document.preSeparator
     document.contents.foreach { sentence =>
       textRanges ++= preprocessSentence(sentence)
     }
-    textRanges += document.postSeparatorOpt
+    textRanges += document.postSeparator
   }
 }

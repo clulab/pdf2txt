@@ -6,10 +6,8 @@ import org.clulab.pdf2txt.document.logical.{DocumentBySentence, SentenceDocument
 
 class WordBreakPreprocessor(languageModel: LanguageModel = LanguageModel.instance) extends Preprocessor {
 
-  def isSpace(textRange: TextRange): Boolean = textRange.matches(" ")
-
   def isSeparatedBySingleSpace(prevWordDocument: WordDocument, nextWordDocument: WordDocument): Boolean =
-      prevWordDocument.postSeparatorOpt.exists(isSpace)
+      prevWordDocument.postSeparator.matches(" ")
 
   def shouldJoin(left: String, right: String, prevWords: Seq[String]): Boolean =
       languageModel.shouldJoin(left, right, prevWords)
@@ -29,25 +27,25 @@ class WordBreakPreprocessor(languageModel: LanguageModel = LanguageModel.instanc
       val processorsWord = prevWord.processorsWord + nextWord.processorsWord
       val textRanges = new TextRanges()
 
-      textRanges += sentence.before(prevWord.preSeparatorOpt.get)
-      textRanges += prevWord.preSeparatorOpt.get
+      textRanges += sentence.before(prevWord.preSeparator)
+      textRanges += prevWord.preSeparator
       textRanges += TextRange(processorsWord)
-      textRanges += nextWord.postSeparatorOpt.get
-      textRanges += sentence.after(nextWord.postSeparatorOpt.get)
+      textRanges += nextWord.postSeparator
+      textRanges += sentence.after(nextWord.postSeparator)
 
       preprocess(TextRange(textRanges.toString))
     }.getOrElse(TextRanges(sentence))
   }
 
   def preprocess(textRange: TextRange): TextRanges = {
-    val document = new DocumentBySentence(None, textRange)
+    val document = DocumentBySentence(textRange)
     val textRanges = new TextRanges()
 
-    textRanges += document.preSeparatorOpt
+    textRanges += document.preSeparator
     document.contents.foreach { sentence =>
       textRanges ++= preprocessSentence(sentence)
     }
-    textRanges += document.postSeparatorOpt
+    textRanges += document.postSeparator
   }
 }
 

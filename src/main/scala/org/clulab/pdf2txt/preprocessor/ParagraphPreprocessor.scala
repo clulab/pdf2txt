@@ -6,18 +6,18 @@ import org.clulab.pdf2txt.document.logical.DocumentByParagraph
 class ParagraphPreprocessor extends Preprocessor {
 
   def preprocess(textRange: TextRange): TextRanges = {
-    val document = new DocumentByParagraph(None, textRange)
+    val document = DocumentByParagraph(textRange)
     val textRanges = new TextRanges()
 
-    textRanges += document.preSeparatorOpt
+    textRanges += document.preSeparator
     document.contents.foreach { paragraph =>
-      textRanges += paragraph.preSeparatorOpt
+      textRanges += paragraph.preSeparator
       textRanges ++= paragraph.contents
       if (paragraph.hasText && !paragraph.hasEndOfSentence)
         textRanges += TextRange(" .")
-      textRanges += paragraph.postSeparatorOpt
+      textRanges += paragraph.postSeparator
     }
-    textRanges += document.postSeparatorOpt
+    textRanges += document.postSeparator
     textRanges
   }
 }

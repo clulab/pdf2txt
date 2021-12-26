@@ -9,7 +9,7 @@ class TestDocumentByChar extends Test {
   val inputText = "This is a test."
 
   it should "know its content" in {
-    val document = DocumentByChar(None, TextRange(inputText))
+    val document = DocumentByChar(inputText)
     val outputText = document.foldLeft(new StringBuilder()) { case (stringBuilder, char) =>
       stringBuilder += char
     }.toString
@@ -18,7 +18,7 @@ class TestDocumentByChar extends Test {
   }
 
   it should "know its children" in {
-    val document = DocumentByChar(None, TextRange(inputText))
+    val document = DocumentByChar(inputText)
     val outputText = document.getChildren.foldLeft(new StringBuilder()) { case (stringBuilder, textRange) =>
       stringBuilder ++= textRange.toString
     }.toString
@@ -27,12 +27,12 @@ class TestDocumentByChar extends Test {
   }
 
   it should "know its separators and content" in {
-    val document = DocumentByChar(None, TextRange(inputText))
+    val document = DocumentByChar(inputText)
     val textRanges = new TextRanges()
 
-    textRanges += document.preSeparatorOpt
+    textRanges += document.preSeparator
     textRanges ++= document.contents
-    textRanges += document.postSeparatorOpt
+    textRanges += document.postSeparator
 
     val outputText = textRanges.toString
 
