@@ -58,13 +58,17 @@ class TextRange(val text: String, val range: Range) extends IndexedSeq[Char] {
   def matches(string: String): Boolean = {
     val offset = start
 
-    text.length == string.length &&
+    length == string.length &&
         string.indices.forall { index => string(index) == text(offset + index) }
   }
 
   def before(pos: Int): TextRange = subRange(start, pos)
 
+  def before(textRange: TextRange): TextRange = before(textRange.start)
+
   def after(pos: Int): TextRange = subRange(pos, end)
+
+  def after(textRange: TextRange): TextRange = after(textRange.end)
 
   def all: TextRange = this
 

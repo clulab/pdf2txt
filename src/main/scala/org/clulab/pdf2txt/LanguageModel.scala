@@ -10,7 +10,7 @@ class LanguageModel {
     val pCombined = p(left + right, prevWords)
     val pUncombined = p(left, prevWords)
 
-    pCombined >= pUncombined
+    pCombined > pUncombined
   }
 }
 

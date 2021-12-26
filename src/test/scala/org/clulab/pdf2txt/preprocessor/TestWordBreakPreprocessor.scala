@@ -15,12 +15,12 @@ class TestWordBreakPreprocessor extends Test {
     }
   }
 
-  val languageModel = new TestLanguageModel(Seq("into"))
-  val preprocessor = new WordBreakPreprocessor(languageModel)
-
   behavior of "WordBreakPreprocessor"
 
-  def test(inputText: String, expectedOutputText: String): Unit = {
+  def test(inputText: String, expectedOutputText: String, vocab: Seq[String]): Unit = {
+    val languageModel = new TestLanguageModel(vocab)
+    val preprocessor = new WordBreakPreprocessor(languageModel)
+
     it should s"convert $inputText" in {
       val actualOutputText = preprocessor.preprocess(inputText).toString
 
@@ -28,6 +28,11 @@ class TestWordBreakPreprocessor extends Test {
     }
   }
 
-  test("I went in to the store.", "I went into the store.")
-
+  test("I went in to the store.", "I went into the store.", Seq("into"))
+  test("Pre hensile tails are un common.", "Prehensile tails are uncommon.", Seq("Prehensile", "uncommon"))
+  test(
+    "Once upon a time.  He went in to and on to the house.  They lived happily ever after.",
+  "Once upon a time.  He went into and onto the house.  They lived happily ever after.",
+    Seq("into", "onto")
+  )
 }

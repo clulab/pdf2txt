@@ -1,10 +1,8 @@
 package org.clulab.pdf2txt.preprocessor
 
 import org.clulab.pdf2txt.LanguageModel
-import org.clulab.pdf2txt.common.utils.{PairOptIndexedSeq, TextRange, TextRanges}
-import org.clulab.pdf2txt.document.logical.{DocumentBySentence, WordDocument}
-
-import scala.collection.mutable
+import org.clulab.pdf2txt.common.utils.{PairIndexedSeq, TextRange, TextRanges}
+import org.clulab.pdf2txt.document.logical.{DocumentBySentence, SentenceDocument, WordDocument}
 
 class WordBreakPreprocessor(languageModel: LanguageModel = LanguageModel.instance) extends Preprocessor {
 
@@ -16,43 +14,38 @@ class WordBreakPreprocessor(languageModel: LanguageModel = LanguageModel.instanc
   def shouldJoin(left: String, right: String, prevWords: Seq[String]): Boolean =
       languageModel.shouldJoin(left, right, prevWords)
 
+  def preprocessSentence(sentence: SentenceDocument): TextRanges = {
+    val processorsWords = sentence.contents.map(_.processorsWord)
+    val prevNextIndexOpt = PairIndexedSeq(sentence.contents.indices).find { case (prevIndex, nextIndex) =>
+      val prevWord = sentence.contents(prevIndex)
+      val nextWord = sentence.contents(nextIndex)
+
+      isSeparatedBySingleSpace(prevWord, nextWord) && shouldJoin(prevWord.processorsWord, nextWord.processorsWord, processorsWords.take(prevIndex))
+    }
+
+    prevNextIndexOpt.map { case (prevIndex, nextIndex) =>
+      val prevWord = sentence.contents(prevIndex)
+      val nextWord = sentence.contents(nextIndex)
+      val processorsWord = prevWord.processorsWord + nextWord.processorsWord
+      val textRanges = new TextRanges()
+
+      textRanges += sentence.before(prevWord.preSeparatorOpt.get)
+      textRanges += prevWord.preSeparatorOpt.get
+      textRanges += TextRange(processorsWord)
+      textRanges += nextWord.postSeparatorOpt.get
+      textRanges += sentence.after(nextWord.postSeparatorOpt.get)
+
+      preprocess(TextRange(textRanges.toString))
+    }.getOrElse(TextRanges(sentence))
+  }
+
   def preprocess(textRange: TextRange): TextRanges = {
     val document = new DocumentBySentence(None, textRange)
     val textRanges = new TextRanges()
 
     textRanges += document.preSeparatorOpt
     document.contents.foreach { sentence =>
-      val prevProcessorWords = new mutable.ArrayBuffer[String]
-      var joined = false
-
-      textRanges += sentence.preSeparatorOpt
-      PairOptIndexedSeq(sentence.contents).foreach {
-        case (None, Some(prevWord)) => // Skip this because we don't know if there are more words.
-          prevProcessorWords += prevWord.processorsWord
-        case (Some(prevWord), Some(nextWord)) =>
-          if (joined) joined = false // Skip next word, but just once.
-          else {
-            val prevProcessorWord = prevWord.processorsWord
-            val nextProcessorWord = nextWord.processorsWord
-
-            if (isSeparatedBySingleSpace(prevWord, nextWord) && shouldJoin(prevProcessorWord, nextProcessorWord, prevProcessorWords)) {
-              val processorWord = prevProcessorWord + nextProcessorWord
-
-              prevProcessorWords += processorWord
-              textRanges += prevWord.preSeparatorOpt
-              textRanges += TextRange(processorWord) // Only joined words are converted to processorWords.
-              textRanges += nextWord.postSeparatorOpt
-              joined = true
-            }
-            else {
-              prevProcessorWords += prevProcessorWord
-              textRanges += prevWord
-            }
-          }
-        case (Some(prevWord), None) => if (!joined) textRanges += prevWord
-        case (None, None) =>
-      }
-      textRanges += sentence.postSeparatorOpt
+      textRanges ++= preprocessSentence(sentence)
     }
     textRanges += document.postSeparatorOpt
   }
