@@ -7,7 +7,7 @@ import org.clulab.pdf2txt.document.logical.{DocumentBySentence, SentenceDocument
 class WordBreakPreprocessor(languageModel: LanguageModel = LanguageModel.instance) extends Preprocessor {
 
   def isSeparatedBySingleSpace(prevWordDocument: WordDocument, nextWordDocument: WordDocument): Boolean =
-      StringUtils.WORD_BREAK_CHARS.exists(prevWordDocument.postSeparator.matches)
+      StringUtils.LETTER_BREAK_CHARS.exists(prevWordDocument.postSeparator.matches)
 
   def shouldJoin(left: String, right: String, prevWords: Seq[String]): Boolean =
       languageModel.shouldJoin(left, right, prevWords)
