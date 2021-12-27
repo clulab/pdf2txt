@@ -6,7 +6,7 @@ import org.clulab.pdf2txt.common.utils.StringUtils._
 import org.clulab.pdf2txt.preprocessor.{LineBreakPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakPreprocessor}
 import org.clulab.pdf2txt.tika.Tika
 
-import java.io.{File, FileInputStream, InputStream, PrintWriter}
+import java.io.{BufferedInputStream, File, FileInputStream, InputStream, PrintWriter}
 
 class Pdf2txt() extends Pdf2txtConfigured {
   val tika = new Tika()
@@ -55,7 +55,9 @@ class Pdf2txt() extends Pdf2txtConfigured {
     files.par.foreach { inputFile =>
       try {
         println(s"Converting ${inputFile.getAbsolutePath}...")
-        new FileInputStream(inputFile).autoClose { inputStream =>
+        // The InputStream must support mark/reset which isn't enforced by the type system.
+        // In other words, a simple FileInputStream will throw an exception at runtime.
+        new BufferedInputStream(new FileInputStream(inputFile)).autoClose { inputStream =>
           val outputFile = new File(inputFile.getAbsolutePath.beforeLast('.', true) + ".txt")
 
           try {
