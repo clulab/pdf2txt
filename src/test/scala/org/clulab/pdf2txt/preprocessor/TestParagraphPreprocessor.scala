@@ -8,7 +8,7 @@ class TestParagraphPreprocessor extends Test {
   behavior of "ParagraphPreprocessor"
 
   def test(inputText: String, expectedOutputText: String): Unit = {
-    it should s"convert $inputText" in {
+    it should s"convert ${escape(inputText)}" in {
       val actualOutputText = preprocessor.preprocess(inputText).toString
 
       actualOutputText shouldBe expectedOutputText

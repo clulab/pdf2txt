@@ -5,7 +5,7 @@ import org.clulab.pdf2txt.document.logical.{DocumentBySentence, SentenceDocument
 
 class LineBreakPreprocessor extends Preprocessor {
 
-  def isHyphen(wordDocument: WordDocument): Boolean = wordDocument.contents.head.matches("-")
+  def isHyphen(wordDocument: WordDocument): Boolean = StringUtils.WORD_BREAK_CHARS.exists(wordDocument.contents.head.matches)
 
   def isSeparatedBySingleLine(wordDocument: WordDocument): Boolean = isSingleNewline(wordDocument.postSeparator)
 
@@ -25,8 +25,8 @@ class LineBreakPreprocessor extends Preprocessor {
       val textRanges = new TextRanges()
 
       textRanges += sentence.andBefore(prevWord.preSeparator)
-      textRanges += prevWord.contents.head
-      textRanges += nextWord.contents.head
+      textRanges ++= prevWord.contents
+      textRanges ++= nextWord.contents
       textRanges += sentence.andAfter(nextWord.postSeparator)
 
       preprocess(TextRange(textRanges.toString))

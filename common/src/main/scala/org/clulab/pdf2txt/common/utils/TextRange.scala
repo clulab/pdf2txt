@@ -55,6 +55,8 @@ class TextRange(val text: String, val range: Range) extends IndexedSeq[Char] {
     }
   }
 
+  def matches(char: Char): Boolean = length == 1 && head == char
+
   def matches(string: String): Boolean = {
     val offset = start
 

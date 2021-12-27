@@ -16,6 +16,7 @@ object StringUtils {
 
   val DASH = '-'
 
+  val PLAIN_HYPHEN = DASH
   val SOFT_HYPHEN = '\u00AD'
   val HARD_HYPHEN = '\u2011' // non-breaking
   val HYPHEN = DASH
@@ -54,8 +55,8 @@ object StringUtils {
 
     endPuncts ++ quotedEndPuncts
   }
-  val WORD_BREAK_CHARS: Array[Char] = Array(SOFT_HYPHEN, HARD_HYPHEN)
-  val LETTER_BREAK_CHARS: Array[Char] = Array(SOFT_SPACE, HARD_SPACE)
+  val WORD_BREAK_CHARS: Array[Char] = Array(PLAIN_HYPHEN, SOFT_HYPHEN) // skip HARD_HYPHEN
+  val LETTER_BREAK_CHARS: Array[Char] = Array(SOFT_SPACE) // skip HARD_SPACE
 
   def before(string: String, index: Int, all: Boolean, keep: Boolean): String = {
     if (index < 0)

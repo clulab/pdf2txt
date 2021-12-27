@@ -1,13 +1,13 @@
 package org.clulab.pdf2txt.preprocessor
 
 import org.clulab.pdf2txt.LanguageModel
-import org.clulab.pdf2txt.common.utils.{PairIndexedSeq, TextRange, TextRanges}
+import org.clulab.pdf2txt.common.utils.{PairIndexedSeq, StringUtils, TextRange, TextRanges}
 import org.clulab.pdf2txt.document.logical.{DocumentBySentence, SentenceDocument, WordDocument}
 
 class WordBreakPreprocessor(languageModel: LanguageModel = LanguageModel.instance) extends Preprocessor {
 
   def isSeparatedBySingleSpace(prevWordDocument: WordDocument, nextWordDocument: WordDocument): Boolean =
-      prevWordDocument.postSeparator.matches(" ")
+      StringUtils.WORD_BREAK_CHARS.exists(prevWordDocument.postSeparator.matches)
 
   def shouldJoin(left: String, right: String, prevWords: Seq[String]): Boolean =
       languageModel.shouldJoin(left, right, prevWords)

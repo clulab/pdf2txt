@@ -8,7 +8,7 @@ class TestLineBreakPreprocessor extends Test {
   behavior of "LineBreakPreprocessor"
 
   def test(inputText: String, expectedOutputText: String): Unit = {
-    it should s"convert $inputText" in {
+    it should s"convert ${escape(inputText)}" in {
       val actualOutputText = preprocessor.preprocess(inputText).toString
 
       actualOutputText shouldBe expectedOutputText
@@ -30,4 +30,5 @@ class TestLineBreakPreprocessor extends Test {
   test("one-\ntwo-\nthree", "onetwothree")
 
   test("A pre-\nhensile tail is un-\ncommon.", "A prehensile tail is uncommon.")
+  test("A pre-\r\nhensile tail is un-\r\ncommon.", "A prehensile tail is uncommon.")
 }
