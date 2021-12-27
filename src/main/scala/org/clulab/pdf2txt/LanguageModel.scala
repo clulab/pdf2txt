@@ -2,7 +2,7 @@ package org.clulab.pdf2txt
 
 class LanguageModel {
 
-  def p(nextWord: String, prevWords: Seq[String]): Float = ???
+  def p(nextWord: String, prevWords: Seq[String]): Float = 0 // TODO
 
   // We should check if P("dis"|"They decided to") is larger than P("disclose"|"They decided to").
   // If not, then the two tokens should be merged into one.

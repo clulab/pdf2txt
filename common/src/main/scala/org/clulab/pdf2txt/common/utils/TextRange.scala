@@ -6,7 +6,6 @@ import scala.collection.mutable
 import scala.util.matching.Regex
 
 class TextRange(val text: String, val range: Range) extends IndexedSeq[Char] {
-  // TODO: Add equality with another text range
 
   def this(textRange: TextRange) = this(textRange.text, textRange.range)
 
