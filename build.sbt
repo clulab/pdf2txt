@@ -15,21 +15,20 @@ ThisBuild / scalaVersion := crossScalaVersions.value.head
 
 resolvers ++= Seq(
 //  Resolvers.localResolver,  // Reserve for Two Six.
-//  Resolvers.clulabResolver, // glove
+  Resolvers.clulabResolver, // glove, processors-models
 //  Resolvers.jitpackResolver // Ontologies
 )
 
 libraryDependencies ++= {
   Seq(
-    // Add dependencies here, for example
-    // "com.typesafe.play" %% "play-json" % playVersion
+    "org.clulab" %% "processors-main" % "8.4.7"// up to 8.4.7 as of 2021-12-21
   )
 }
 
 lazy val core = (project in file("."))
   .enablePlugins(BuildInfoPlugin)
   .disablePlugins(PlayScala, JavaAppPackaging, SbtNativePackager)
-  .dependsOn(common % "compile -> compile; test -> test")
+  .dependsOn(common % "compile -> compile; test -> test", tika)
   .aggregate(common, tika)
   .settings(
     assembly / aggregate := false,

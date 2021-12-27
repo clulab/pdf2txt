@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<properties>
+    <detectors>
+        <!-- Only use these two detectors, and ignore all others -->
+        <detector class="org.apache.tika.mime.MimeTypes"/>
+    </detectors>
+</properties>
