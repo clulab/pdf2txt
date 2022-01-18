@@ -1,10 +1,11 @@
 package org.clulab.pdf2txt
 
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
-import org.clulab.pdf2txt.common.utils.{FileUtils, Logging, Pdf2txtConfigured, TextRange}
+import org.clulab.pdf2txt.common.utils.{Logging, Pdf2txtConfigured, TextRange}
 import org.clulab.pdf2txt.common.utils.StringUtils._
-import org.clulab.pdf2txt.preprocessor.{LineBreakPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakPreprocessor}
+import org.clulab.pdf2txt.preprocessor.{LineBreakPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
 import org.clulab.pdf2txt.tika.Tika
+import org.clulab.utils.FileUtils
 
 import java.io.{BufferedInputStream, File, FileInputStream, InputStream, PrintWriter}
 
@@ -82,7 +83,8 @@ object Pdf2txt extends Logging {
     new ParagraphPreprocessor(),
     new UnicodePreprocessor(),
     new LineBreakPreprocessor(),
-    new WordBreakPreprocessor()
+    new WordBreakByHyphenPreprocessor(),
+    new WordBreakBySpacePreprocessor()
   )
 
   def apply(): Pdf2txt = new Pdf2txt()
