@@ -1,6 +1,6 @@
-package org.clulab.pdf2txt
+package org.clulab.pdf2txt.languageModel
 
-class LanguageModel {
+class ProbabilisticLanguageModel extends LanguageModel {
 
   def p(nextWord: String, prevWords: Seq[String]): Float = 0 // TODO
 
@@ -14,6 +14,6 @@ class LanguageModel {
   }
 }
 
-object LanguageModel {
-  lazy val instance = new LanguageModel()
+object ProbabilisticLanguageModel {
+  lazy val instance = new ProbabilisticLanguageModel()
 }

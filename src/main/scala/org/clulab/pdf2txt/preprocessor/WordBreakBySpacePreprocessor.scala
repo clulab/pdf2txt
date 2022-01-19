@@ -1,10 +1,10 @@
 package org.clulab.pdf2txt.preprocessor
 
-import org.clulab.pdf2txt.LanguageModel
 import org.clulab.pdf2txt.common.utils.{PairIndexedSeq, StringUtils, TextRange, TextRanges}
 import org.clulab.pdf2txt.document.logical.{DocumentBySentence, SentenceDocument, WordDocument}
+import org.clulab.pdf2txt.languageModel.{LanguageModel, ProbabilisticLanguageModel}
 
-class WordBreakPreprocessor(languageModel: LanguageModel = LanguageModel.instance) extends Preprocessor {
+class WordBreakBySpacePreprocessor(languageModel: LanguageModel = WordBreakBySpacePreprocessor.languageModel) extends Preprocessor {
 
   def isSeparatedBySingleSpace(prevWordDocument: WordDocument, nextWordDocument: WordDocument): Boolean =
       StringUtils.LETTER_BREAK_CHARS.exists(prevWordDocument.postSeparator.matches)
@@ -47,6 +47,6 @@ class WordBreakPreprocessor(languageModel: LanguageModel = LanguageModel.instanc
   }
 }
 
-object WordBreakPreprocessor {
-  val languageModel = new LanguageModel()
+object WordBreakBySpacePreprocessor {
+  val languageModel = ProbabilisticLanguageModel.instance
 }
