@@ -1,46 +1,53 @@
 package org.clulab.pdf2txt.apps
 
 import org.clulab.pdf2txt.common.utils.TextRange
-import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, NeverLanguageModel}
-import org.clulab.pdf2txt.preprocessor.{LineBreakPreprocessor, WordBreakByHyphenPreprocessor}
+import org.clulab.pdf2txt.languageModel.AlwaysLanguageModel
+import org.clulab.pdf2txt.preprocessor.LineBreakPreprocessor
+import org.clulab.utils.Closer.AutoCloser
 import org.clulab.utils.FileUtils
 
-import java.io.File
+import java.io.{File, PrintWriter}
 
 object LineBreak2logDir extends App {
 
-  class Logger {
-    var fileOpt: Option[File] = None
+  class Logger(printWriter: PrintWriter) {
+    protected var fileOpt: Option[File] = None
+
+    printWriter.println("file\tleft\tright\tcontext")
 
     def setFile(file: File): Unit = fileOpt = Option(file)
 
-    def log(message: String): Unit = {
-      val name = fileOpt.map(_.getName).getOrElse("")
+    def log(left: String, right: String, context: String): Unit = {
+      val filename = fileOpt.map(_.getName).getOrElse("")
 
-      println(s"$name\t$message")
+      printWriter.println(s"$filename\t$left\t$right\t$context")
     }
   }
 
   class LoggingLanguageModel(logger: Logger) extends AlwaysLanguageModel {
 
     override def shouldJoin(left: String, right: String, prevWords: Seq[String]): Boolean = {
-      val message = prevWords.mkString(" ") + (if (prevWords.nonEmpty) " " else "") + left + "-" + right
+      val context = prevWords.mkString(" ") + (if (prevWords.nonEmpty) " " else "") + left + "-" + right
 
-      logger.log(message)
+      logger.log(left, right, context)
       super.shouldJoin(left, right, prevWords)
     }
   }
 
   val dir = args.lift(0).getOrElse(".")
+  val outputFilename = args.lift(1).getOrElse("output.tsv")
   val files = FileUtils.findFiles(dir, ".txt")
-  val logger = new Logger()
-  val languageModel = new LoggingLanguageModel(logger)
-  val preprocessor = new LineBreakPreprocessor(languageModel)
 
-  files.foreach { inputFile =>
-    val txt = FileUtils.getTextFromFile(inputFile)
+  FileUtils.printWriterFromFile(outputFilename).autoClose { printWriter =>
+    val logger = new Logger(printWriter)
+    val languageModel = new LoggingLanguageModel(logger)
+    val preprocessor = new LineBreakPreprocessor(languageModel)
 
-    logger.setFile(inputFile)
-    preprocessor.preprocess(TextRange(txt))
+    files.foreach { inputFile =>
+      val txt = FileUtils.getTextFromFile(inputFile)
+
+      logger.setFile(inputFile)
+      preprocessor.preprocess(TextRange(txt))
+    }
   }
 }
