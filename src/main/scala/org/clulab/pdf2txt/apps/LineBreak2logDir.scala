@@ -1,7 +1,7 @@
 package org.clulab.pdf2txt.apps
 
 import org.clulab.pdf2txt.common.utils.TextRange
-import org.clulab.pdf2txt.languageModel.AlwaysLanguageModel
+import org.clulab.pdf2txt.languageModel.{DictionaryLanguageModel, LanguageModel}
 import org.clulab.pdf2txt.preprocessor.LineBreakPreprocessor
 import org.clulab.utils.Closer.AutoCloser
 import org.clulab.utils.FileUtils
@@ -13,24 +13,26 @@ object LineBreak2logDir extends App {
   class Logger(printWriter: PrintWriter) {
     protected var fileOpt: Option[File] = None
 
-    printWriter.println("file\tleft\tright\tcontext")
+    printWriter.println("file\tleft\tright\tjoin\tcontext")
 
     def setFile(file: File): Unit = fileOpt = Option(file)
 
-    def log(left: String, right: String, context: String): Unit = {
+    def log(left: String, right: String, join: Boolean, context: String): Unit = {
       val filename = fileOpt.map(_.getName).getOrElse("")
+      val joinString = if (join) "T" else "F"
 
-      printWriter.println(s"$filename\t$left\t$right\t$context")
+      printWriter.println(s"$filename\t$left\t$right\t$joinString\t$context")
     }
   }
 
-  class LoggingLanguageModel(logger: Logger) extends AlwaysLanguageModel {
+  class LoggingLanguageModel(languageModel: LanguageModel, logger: Logger) extends LanguageModel {
 
     override def shouldJoin(left: String, right: String, prevWords: Seq[String]): Boolean = {
       val context = prevWords.mkString(" ") + (if (prevWords.nonEmpty) " " else "") + left + "-" + right
+      val result = languageModel.shouldJoin(left, right, prevWords)
 
-      logger.log(left, right, context)
-      super.shouldJoin(left, right, prevWords)
+      logger.log(left, right, result, context)
+      result
     }
   }
 
@@ -40,8 +42,9 @@ object LineBreak2logDir extends App {
 
   FileUtils.printWriterFromFile(outputFilename).autoClose { printWriter =>
     val logger = new Logger(printWriter)
-    val languageModel = new LoggingLanguageModel(logger)
-    val preprocessor = new LineBreakPreprocessor(languageModel)
+    val innerLanguageModel = new DictionaryLanguageModel()
+    val outerLanguageModel = new LoggingLanguageModel(innerLanguageModel, logger)
+    val preprocessor = new LineBreakPreprocessor(outerLanguageModel)
 
     files.foreach { inputFile =>
       val txt = FileUtils.getTextFromFile(inputFile)
