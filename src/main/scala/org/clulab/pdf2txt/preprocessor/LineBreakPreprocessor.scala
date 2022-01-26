@@ -25,14 +25,20 @@ class LineBreakPreprocessor(languageModel: LanguageModel = LineBreakPreprocessor
 
     tripleIndexOpt.map { case (prevIndex, hyphenIndex, nextIndex) =>
       val prevWord = sentence.contents(prevIndex)
+      val hyphenWord = sentence.contents(hyphenIndex)
       val nextWord = sentence.contents(nextIndex)
       val textRanges = new TextRanges()
 
       textRanges += sentence.andBefore(prevWord.preSeparator)
       textRanges ++= prevWord.contents
       textRanges ++= nextWord.contents
-      textRanges += sentence.andAfter(nextWord.postSeparator)
 
+      // Move the separator from after the prevWord to after the nextWord to preserve as much
+      // formatting as possible.  However, avoid a blank line which would separate paragraphs.
+      if (!StringUtils.LINE_BREAK_STRINGS.exists(nextWord.postSeparator.toString.startsWith(_)))
+        textRanges += hyphenWord.postSeparator
+      textRanges += sentence.andAfter(nextWord.postSeparator)
+      
       preprocess(TextRange(textRanges.toString))
     }.getOrElse(TextRanges(sentence))
   }
