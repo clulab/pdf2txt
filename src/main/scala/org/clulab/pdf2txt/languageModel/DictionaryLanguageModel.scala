@@ -17,6 +17,9 @@ class DictionaryLanguageModel extends LanguageModel {
   }
 
   override def shouldJoin(left: String, right: String, prevWords: Seq[String]): Boolean = {
-    words.contains(left + right)
+    val contains = words.contains(left + right)
+    val betweenDigits = left.last.isDigit && right.head.isDigit
+
+    contains && !betweenDigits
   }
 }
