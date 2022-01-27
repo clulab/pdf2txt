@@ -3,7 +3,7 @@ package org.clulab.pdf2txt
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.{Logging, Pdf2txtConfigured, TextRange}
 import org.clulab.pdf2txt.common.utils.StringUtils._
-import org.clulab.pdf2txt.preprocessor.{LineBreakPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
+import org.clulab.pdf2txt.preprocessor.{LigaturePreprocessor, LineBreakPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
 import org.clulab.pdf2txt.tika.Tika
 import org.clulab.utils.FileUtils
 
@@ -82,6 +82,7 @@ object Pdf2txt extends Logging {
   val preprocessors: Array[Preprocessor] = Array(
     new ParagraphPreprocessor(),
     new UnicodePreprocessor(),
+    new LigaturePreprocessor(),
     new LineBreakPreprocessor(),
     new WordBreakByHyphenPreprocessor(),
     new WordBreakBySpacePreprocessor()

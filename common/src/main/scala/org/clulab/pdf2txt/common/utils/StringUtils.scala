@@ -61,6 +61,13 @@ object StringUtils {
   val WORD_BREAK_CHARS: Array[Char] = Array(PLAIN_HYPHEN, SOFT_HYPHEN) // skip HARD_HYPHEN
   val LETTER_BREAK_CHARS: Array[Char] = Array(SOFT_SPACE) // skip HARD_SPACE
 
+  val ligatures = Set(
+    // f followed by left-side ascender, dot, or cross or two dots
+    "fb", "ff", "fh", "fi", "fj", "fk", "fl", "ft" // , "ii", "ij", "ji", "jj", "Th"
+  )
+
+  def endsWithLigature(string: String): Boolean = ligatures.exists(string.endsWith(_))
+
   def before(string: String, index: Int, all: Boolean, keep: Boolean): String = {
     if (index < 0)
       if (all) string

@@ -2,12 +2,14 @@ package org.clulab.pdf2txt.preprocessor
 
 import org.clulab.pdf2txt.common.utils.{DoubleIndexedSeq, StringUtils, TextRange, TextRanges}
 import org.clulab.pdf2txt.document.logical.{DocumentBySentence, SentenceDocument, WordDocument}
-import org.clulab.pdf2txt.languageModel.{LanguageModel, ProbabilisticLanguageModel}
+import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, LanguageModel}
 
-class WordBreakBySpacePreprocessor(languageModel: LanguageModel = WordBreakBySpacePreprocessor.languageModel) extends Preprocessor {
+class LigaturePreprocessor(languageModel: LanguageModel = LigaturePreprocessor.languageModel) extends Preprocessor {
 
   def isSeparatedBySingleSpace(prevWordDocument: WordDocument, nextWordDocument: WordDocument): Boolean =
       StringUtils.LETTER_BREAK_CHARS.exists(prevWordDocument.postSeparator.matches)
+
+  def isLigature(string: String): Boolean = StringUtils.endsWithLigature(string)
 
   def shouldJoin(left: String, right: String, prevWords: Seq[String]): Boolean =
       languageModel.shouldJoin(left, right, prevWords)
@@ -18,7 +20,8 @@ class WordBreakBySpacePreprocessor(languageModel: LanguageModel = WordBreakBySpa
       val prevWord = sentence.contents(prevIndex)
       val nextWord = sentence.contents(nextIndex)
 
-      isSeparatedBySingleSpace(prevWord, nextWord) && shouldJoin(prevWord.processorsWord, nextWord.processorsWord, processorsWords.take(prevIndex))
+      isSeparatedBySingleSpace(prevWord, nextWord) && isLigature(prevWord.processorsWord) &&
+          shouldJoin(prevWord.processorsWord, nextWord.processorsWord, processorsWords.take(prevIndex))
     }
 
     doubleIndexOpt.map { case (prevIndex, nextIndex) =>
@@ -47,6 +50,6 @@ class WordBreakBySpacePreprocessor(languageModel: LanguageModel = WordBreakBySpa
   }
 }
 
-object WordBreakBySpacePreprocessor {
-  val languageModel = ProbabilisticLanguageModel.instance
+object LigaturePreprocessor {
+  val languageModel = new AlwaysLanguageModel()
 }

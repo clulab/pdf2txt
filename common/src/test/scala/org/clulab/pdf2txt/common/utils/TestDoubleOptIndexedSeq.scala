@@ -1,56 +1,56 @@
 package org.clulab.pdf2txt.common.utils
 
-class TestPairOptIterator extends Test {
+class TestDoubleOptIterator extends Test {
 
-  behavior of "empty PairOptIndexedSeq"
+  behavior of "empty DoubleOptIndexedSeq"
 
   it should "by empty no matter what" in {
     val indexedSeq = IndexedSeq.empty[Int]
 
-    PairOptIndexedSeq(indexedSeq) shouldBe empty
+    DoubleOptIndexedSeq(indexedSeq) shouldBe empty
   }
 
-  behavior of "short PairOptIndexedSeq"
+  behavior of "short DoubleOptIndexedSeq"
 
   it should "have the correct length" in {
     val indexedSeq = IndexedSeq(0)
 
-    PairOptIndexedSeq(indexedSeq) should have length 2
+    DoubleOptIndexedSeq(indexedSeq) should have length 2
   }
 
   it should "have the correct content" in {
     val indexedSeq = IndexedSeq(0)
 
-    PairOptIndexedSeq(indexedSeq).map(value => value) should contain theSameElementsInOrderAs Seq(
+    DoubleOptIndexedSeq(indexedSeq).map(value => value) should contain theSameElementsInOrderAs Seq(
       (None,    Some(0)),
       (Some(0), None)
     )
   }
 
-  behavior of "longer PairOptIndexedSeq"
+  behavior of "longer DoubleOptIndexedSeq"
 
   it should "have the correct length" in {
     val indexedSeq = IndexedSeq(1, 2)
 
-    PairOptIndexedSeq(indexedSeq) should have length 3
+    DoubleOptIndexedSeq(indexedSeq) should have length 3
   }
 
   it should "have the correct content" in {
     val indexedSeq = IndexedSeq(1, 2)
 
-    PairOptIndexedSeq(indexedSeq).map(value => value) should contain theSameElementsInOrderAs Seq(
+    DoubleOptIndexedSeq(indexedSeq).map(value => value) should contain theSameElementsInOrderAs Seq(
       (None,    Some(1)),
       (Some(1), Some(2)),
       (Some(2), None)
     )
   }
 
-  behavior of "long PairOptIndexedSeq"
+  behavior of "long DoubleOptIndexedSeq"
 
   it should "have the correct content" in {
     val indexedSeq = IndexedSeq(1, 2, 3)
 
-    PairOptIndexedSeq(indexedSeq).map(value => value) should contain theSameElementsInOrderAs Seq(
+    DoubleOptIndexedSeq(indexedSeq).map(value => value) should contain theSameElementsInOrderAs Seq(
       (None,    Some(1)),
       (Some(1), Some(2)),
       (Some(2), Some(3)),
