@@ -1,7 +1,7 @@
 package org.clulab.pdf2txt.apps
 
 import org.clulab.pdf2txt.common.utils.TextRange
-import org.clulab.pdf2txt.languageModel.{DictionaryLanguageModel, LanguageModel}
+import org.clulab.pdf2txt.languageModel.{DictionaryLanguageModel, GloveLanguageModel, LanguageModel}
 import org.clulab.pdf2txt.preprocessor.LineBreakPreprocessor
 import org.clulab.utils.Closer.AutoCloser
 import org.clulab.utils.FileUtils
@@ -42,15 +42,21 @@ object LineBreak2logDir extends App {
 
   FileUtils.printWriterFromFile(outputFilename).autoClose { printWriter =>
     val logger = new Logger(printWriter)
-    val innerLanguageModel = new DictionaryLanguageModel()
+    val innerLanguageModel = GloveLanguageModel()
     val outerLanguageModel = new LoggingLanguageModel(innerLanguageModel, logger)
     val preprocessor = new LineBreakPreprocessor(outerLanguageModel)
 
     files.foreach { inputFile =>
-      val txt = FileUtils.getTextFromFile(inputFile)
+      val text = FileUtils.getTextFromFile(inputFile)
 
       logger.setFile(inputFile)
-      preprocessor.preprocess(TextRange(txt))
+
+      val newText = preprocessor.preprocess(TextRange(text)).toString
+      val newFile = "../corpora/LineBreak2logDir/" + inputFile.getName
+
+      FileUtils.printWriterFromFile(newFile).autoClose { printWriter =>
+        printWriter.print(newText)
+      }
     }
   }
 }

@@ -1,10 +1,10 @@
 package org.clulab.pdf2txt.apps
 
 import org.clulab.pdf2txt.common.utils.StringUtils
-import org.clulab.pdf2txt.languageModel.DictionaryLanguageModel
+import org.clulab.pdf2txt.languageModel.{DictionaryLanguageModel, GloveLanguageModel}
 
 object AmbiguousHyphens extends App {
-  val words = new DictionaryLanguageModel().words
+  val words = GloveLanguageModel().words
   var index = 0
 
   def isHyphen(char: Char): Boolean = char == StringUtils.HYPHEN
