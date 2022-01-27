@@ -1,3 +1,62 @@
 package org.clulab.pdf2txt.document.logical
 
-class DocumentByWord
+import org.clulab.pdf2txt.common.utils.{PairIndexedSeq, TextRange}
+import org.clulab.pdf2txt.document.physical.CharDocument
+import org.clulab.pdf2txt.document.{Document, Separator}
+import org.clulab.processors.clu.CluProcessor
+import org.clulab.processors.{Sentence => ProcessorsSentence}
+
+// multiple words comprising entire document, contents are words
+class DocumentByWord(parentOpt: Option[Document], textRange: TextRange) extends Document(parentOpt, textRange) {
+  override val (preSeparator, contents, postSeparator) = {
+    // Processors works on the entire string, so startOffsets and endOffsets need to be adjusted.
+    val offset = start
+    val processorContents = {
+      val sentences = DocumentBySentence.processor.mkDocument(textRange.toString, keepText = false).sentences
+
+      sentences.flatMap { sentence =>
+        sentence.words.indices.map { index =>
+          ContentTextRangeAndProcessorsWord(
+            textRange.subRange(sentence.startOffsets(index), sentence.endOffsets(index)) + offset,
+            sentence.words(index)
+          )
+        }
+      }
+    }
+    val preSeparator =
+      if (processorContents.isEmpty) all
+      else before(processorContents.head.contentTextRange.start)
+    val interSeparators = PairIndexedSeq(processorContents).map { case (prev, next) =>
+      subRange(prev.contentTextRange.end, next.contentTextRange.start)
+    }.toArray
+    val postWordSeparator =
+      if (processorContents.isEmpty) emptyEnd // none of it
+      else after(processorContents.last.contentTextRange.end)
+    val postSeparator = emptyEnd // It is used by the word.
+    val words = processorContents.indices.map { index =>
+      val contentTextRange = processorContents(index).contentTextRange
+      val separatorTextRange = interSeparators.lift(index).getOrElse(postWordSeparator)
+      val processorsWord = processorContents(index).processorsWord
+
+      new WordDocument(Some(this), contentTextRange, separatorTextRange, processorsWord)
+    }
+
+    (newSeparator(preSeparator), words, newSeparator(postSeparator))
+  }
+}
+
+case class ContentTextRangeAndProcessorsWord(contentTextRange: TextRange, processorsWord: String)
+
+object DocumentByWord {
+  lazy val processor = new CluProcessor()
+
+  def apply(text: String): DocumentByWord = apply(TextRange(text))
+  def apply(textRange: TextRange): DocumentByWord = new DocumentByWord(None, textRange)
+}
+
+class WordDocument(parentOpt: Option[Document], contentTextRange: TextRange, separatorTextRange: TextRange, val processorsWord: String)
+  extends Document(parentOpt, TextRange(contentTextRange, separatorTextRange)) {
+  override val postSeparator: Separator = newSeparator(separatorTextRange)
+  val charDocument: CharDocument = new CharDocument(Some(this), contentTextRange)
+  override val contents: Seq[CharDocument] = Array(charDocument)
+}

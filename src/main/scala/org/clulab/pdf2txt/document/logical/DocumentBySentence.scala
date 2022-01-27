@@ -21,7 +21,7 @@ class DocumentBySentence(parentOpt: Option[Document], textRange: TextRange) exte
     val postSentenceSeparator =
         if (processorContents.isEmpty) emptyEnd // none of it
         else after(offset + processorContents.last.endOffsets.last)
-    val postSeparator = emptyEnd // it is used by the sentence.
+    val postSeparator = emptyEnd // It is used by the sentence.
     val sentences = processorContents.indices.map { index =>
       val processorsSentence: ProcessorsSentence = processorContents(index)
       val contentTextRange = subRange(processorsSentence.startOffsets.head, processorsSentence.endOffsets.last) + offset
@@ -62,11 +62,4 @@ class SentenceDocument(parentOpt: Option[Document], contentTextRange: TextRange,
 
     (newSeparator(emptyStart), wordDocuments, newSeparator(separatorTextRange))
   }
-}
-
-class WordDocument(parentOpt: Option[Document], contentTextRange: TextRange, separatorTextRange: TextRange, val processorsWord: String)
-    extends Document(parentOpt, TextRange(contentTextRange, separatorTextRange)) {
-  override val postSeparator: Separator = newSeparator(separatorTextRange)
-  val charDocument: CharDocument = new CharDocument(Some(this), contentTextRange)
-  override val contents: Seq[CharDocument] = Array(charDocument)
 }
