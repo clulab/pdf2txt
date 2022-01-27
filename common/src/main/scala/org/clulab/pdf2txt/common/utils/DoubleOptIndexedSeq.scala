@@ -6,7 +6,7 @@ package org.clulab.pdf2txt.common.utils
 // ...                              if length > 2
 // (Some(last - 1), Some(last))     if length > 1
 // (Some(last),     None)           if length > 0
-class PairOptIndexedSeq[T](indexedSeq: IndexedSeq[T]) extends IndexedSeq[(Option[T], Option[T])] {
+class DoubleOptIndexedSeq[T](indexedSeq: IndexedSeq[T]) extends IndexedSeq[(Option[T], Option[T])] {
   protected val n = 2
 
   override val length: Int =
@@ -17,6 +17,6 @@ class PairOptIndexedSeq[T](indexedSeq: IndexedSeq[T]) extends IndexedSeq[(Option
       (indexedSeq.lift(index - 1), indexedSeq.lift(index - 0))
 }
 
-object PairOptIndexedSeq {
-  def apply[T](indexedSeq: IndexedSeq[T]): PairOptIndexedSeq[T] = new PairOptIndexedSeq(indexedSeq)
+object DoubleOptIndexedSeq {
+  def apply[T](indexedSeq: IndexedSeq[T]): DoubleOptIndexedSeq[T] = new DoubleOptIndexedSeq(indexedSeq)
 }

@@ -1,6 +1,6 @@
 package org.clulab.pdf2txt.preprocessor
 
-import org.clulab.pdf2txt.common.utils.{PairIndexedSeq, StringUtils, TextRange, TextRanges}
+import org.clulab.pdf2txt.common.utils.{DoubleIndexedSeq, StringUtils, TextRange, TextRanges}
 import org.clulab.pdf2txt.document.logical.{DocumentBySentence, SentenceDocument, WordDocument}
 import org.clulab.pdf2txt.languageModel.{LanguageModel, ProbabilisticLanguageModel}
 
@@ -14,7 +14,7 @@ class WordBreakBySpacePreprocessor(languageModel: LanguageModel = WordBreakBySpa
 
   protected def preprocessSentence(sentence: SentenceDocument): TextRanges = {
     val processorsWords = sentence.contents.map(_.processorsWord)
-    val pairIndexOpt = PairIndexedSeq(sentence.contents.indices).find { case (prevIndex, nextIndex) =>
+    val pairIndexOpt = DoubleIndexedSeq(sentence.contents.indices).find { case (prevIndex, nextIndex) =>
       val prevWord = sentence.contents(prevIndex)
       val nextWord = sentence.contents(nextIndex)
 

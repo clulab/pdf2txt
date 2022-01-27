@@ -1,7 +1,7 @@
 package org.clulab.pdf2txt.document.logical
 
 import org.clulab.pdf2txt.common.utils.StringUtils._
-import org.clulab.pdf2txt.common.utils.{PairIndexedSeq, StringUtils, TextRange}
+import org.clulab.pdf2txt.common.utils.{DoubleIndexedSeq, StringUtils, TextRange}
 import org.clulab.pdf2txt.document.physical.CharDocument
 import org.clulab.pdf2txt.document.{Document, Separator}
 
@@ -15,7 +15,7 @@ class DocumentByParagraph(parentOpt: Option[Document], textRange: TextRange) ext
     val preSeparator =
         if (contents.isEmpty) all
         else before(contents.head.start)
-    val interSeparators = PairIndexedSeq(contents).map { case (prev, next) =>
+    val interSeparators = DoubleIndexedSeq(contents).map { case (prev, next) =>
       subRange(prev.end, next.start)
     }.toArray
     val postParagraphSeparator =

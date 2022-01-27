@@ -1,6 +1,6 @@
 package org.clulab.pdf2txt.document.logical
 
-import org.clulab.pdf2txt.common.utils.{PairIndexedSeq, TextRange}
+import org.clulab.pdf2txt.common.utils.{DoubleIndexedSeq, TextRange}
 import org.clulab.pdf2txt.document.physical.CharDocument
 import org.clulab.pdf2txt.document.{Document, Separator}
 import org.clulab.processors.{Sentence => ProcessorsSentence}
@@ -21,7 +21,7 @@ class DocumentByWord(parentOpt: Option[Document], textRange: TextRange, processo
     val preSeparator =
       if (processorContents.isEmpty) all
       else before(processorContents.head.contentTextRange.start)
-    val interSeparators = PairIndexedSeq(processorContents).map { case (prev, next) =>
+    val interSeparators = DoubleIndexedSeq(processorContents).map { case (prev, next) =>
       subRange(prev.contentTextRange.end, next.contentTextRange.start)
     }.toArray
     val postWordSeparator =

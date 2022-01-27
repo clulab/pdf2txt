@@ -1,6 +1,6 @@
 package org.clulab.pdf2txt.document.logical
 
-import org.clulab.pdf2txt.common.utils.{PairIndexedSeq, TextRange}
+import org.clulab.pdf2txt.common.utils.{DoubleIndexedSeq, TextRange}
 import org.clulab.pdf2txt.document.Document
 import org.clulab.processors.{Sentence => ProcessorsSentence}
 
@@ -12,7 +12,7 @@ class DocumentBySentence(parentOpt: Option[Document], textRange: TextRange, proc
     val preSeparator =
         if (processorContents.isEmpty) all
         else before(offset + processorContents.head.startOffsets.head)
-    val interSeparators = PairIndexedSeq(processorContents).map { case (prev, next) =>
+    val interSeparators = DoubleIndexedSeq(processorContents).map { case (prev, next) =>
       subRange(prev.endOffsets.last, next.startOffsets.head) + offset
     }.toArray
     val postSentenceSeparator =
@@ -49,7 +49,7 @@ class SentenceDocument(parentOpt: Option[Document], contentTextRange: TextRange,
     // Processors works on the entire string, so startOffsets and endOffsets need to be adjusted.
     val offset = processorsOffset
     val contents = processorsSentence.words.indices
-    val interSeparators = PairIndexedSeq(processorsSentence.words.indices).map { case (prev, next) =>
+    val interSeparators = DoubleIndexedSeq(processorsSentence.words.indices).map { case (prev, next) =>
       subRange(processorsSentence.endOffsets(prev), processorsSentence.startOffsets(next)) + offset
     }
     val postWordSeparator = emptyRange(offset + processorsSentence.endOffsets.last)
