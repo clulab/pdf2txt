@@ -1,17 +1,14 @@
 package org.clulab.pdf2txt.document.logical
 
 import org.clulab.pdf2txt.common.utils.{PairIndexedSeq, TextRange}
-import org.clulab.pdf2txt.document.physical.CharDocument
-import org.clulab.pdf2txt.document.{Document, Separator}
-import org.clulab.processors.clu.CluProcessor
+import org.clulab.pdf2txt.document.Document
 import org.clulab.processors.{Sentence => ProcessorsSentence}
 
 // multiple sentences comprising entire document, contents are sentences
-class DocumentBySentence(parentOpt: Option[Document], textRange: TextRange) extends Document(parentOpt, textRange) {
+class DocumentBySentence(parentOpt: Option[Document], textRange: TextRange, processorContents: Array[ProcessorsSentence]) extends Document(parentOpt, textRange) {
   override val (preSeparator, contents, postSeparator) = {
     // Processors works on the entire string, so startOffsets and endOffsets need to be adjusted.
     val offset = start
-    val processorContents = DocumentBySentence.processor.mkDocument(textRange.toString, keepText = false).sentences
     val preSeparator =
         if (processorContents.isEmpty) all
         else before(offset + processorContents.head.startOffsets.head)
@@ -35,10 +32,14 @@ class DocumentBySentence(parentOpt: Option[Document], textRange: TextRange) exte
 }
 
 object DocumentBySentence {
-  lazy val processor = new CluProcessor()
+  lazy val processor = Document.processor
 
   def apply(text: String): DocumentBySentence = apply(TextRange(text))
-  def apply(textRange: TextRange): DocumentBySentence = new DocumentBySentence(None, textRange)
+  def apply(textRange: TextRange): DocumentBySentence = {
+    val processorsSentences = processor.mkDocument(textRange.toString, keepText = false).sentences
+
+    new DocumentBySentence(None, textRange, processorsSentences)
+  }
 }
 
 class SentenceDocument(parentOpt: Option[Document], contentTextRange: TextRange, separatorTextRange: TextRange,
