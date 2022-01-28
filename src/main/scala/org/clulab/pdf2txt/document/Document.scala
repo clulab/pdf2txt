@@ -1,6 +1,7 @@
 package org.clulab.pdf2txt.document
 
 import org.clulab.pdf2txt.common.utils.TextRange
+import org.clulab.processors.clu.CluProcessor
 
 abstract class Document(val parentOpt: Option[Document], textRange: TextRange) extends TextRange(textRange) {
   val preSeparator: Separator = newSeparator(emptyStart)
@@ -12,6 +13,10 @@ abstract class Document(val parentOpt: Option[Document], textRange: TextRange) e
   def getChildren: Seq[TextRange] = preSeparator +: contents :+ postSeparator
 
   def newSeparator(textRange: TextRange): Separator = new Separator(this, textRange)
+}
+
+object Document {
+  lazy val processor = new CluProcessor()
 }
 
 // The Separator is another document and could have its own separators.  In order to stop the

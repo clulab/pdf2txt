@@ -1,33 +1,30 @@
 package org.clulab.pdf2txt.preprocessor
 
-import org.clulab.pdf2txt.common.utils.{StringUtils, TextRange, TextRanges, TripleIndexedSeq}
+import org.clulab.pdf2txt.common.utils.{DoubleIndexedSeq, StringUtils, TextRange, TextRanges}
 import org.clulab.pdf2txt.document.logical.{DocumentBySentence, SentenceDocument, WordDocument}
-import org.clulab.pdf2txt.languageModel.{LanguageModel, NeverLanguageModel, ProbabilisticLanguageModel}
+import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, LanguageModel}
 
-class WordBreakByHyphenPreprocessor(languageModel: LanguageModel = WordBreakByHyphenPreprocessor.languageModel) extends Preprocessor {
-
-  def isHyphen(wordDocument: WordDocument): Boolean = StringUtils.WORD_BREAK_CHARS.exists(wordDocument.contents.head.matches)
-
-  def isSeparated(wordDocument: WordDocument): Boolean = wordDocument.postSeparator.nonEmpty
+class LigaturePreprocessor(languageModel: LanguageModel = LigaturePreprocessor.languageModel) extends Preprocessor {
 
   def isSeparatedBySingleSpace(prevWordDocument: WordDocument, nextWordDocument: WordDocument): Boolean =
       StringUtils.LETTER_BREAK_CHARS.exists(prevWordDocument.postSeparator.matches)
+
+  def isLigature(string: String): Boolean = StringUtils.endsWithLigature(string)
 
   def shouldJoin(left: String, right: String, prevWords: Seq[String]): Boolean =
       languageModel.shouldJoin(left, right, prevWords)
 
   protected def preprocessSentence(sentence: SentenceDocument): TextRanges = {
     val processorsWords = sentence.contents.map(_.processorsWord)
-    val tripleIndexOpt = TripleIndexedSeq(sentence.contents.indices).find { case (prevIndex, hyphenIndex, nextIndex) =>
+    val doubleIndexOpt = DoubleIndexedSeq(sentence.contents.indices).find { case (prevIndex, nextIndex) =>
       val prevWord = sentence.contents(prevIndex)
-      val hyphenWord = sentence.contents(hyphenIndex)
       val nextWord = sentence.contents(nextIndex)
 
-      isHyphen(hyphenWord) && !isSeparated(prevWord) && isSeparatedBySingleSpace(hyphenWord, nextWord) &&
+      isSeparatedBySingleSpace(prevWord, nextWord) && isLigature(prevWord.processorsWord) &&
           shouldJoin(prevWord.processorsWord, nextWord.processorsWord, processorsWords.take(prevIndex))
     }
 
-    tripleIndexOpt.map { case (prevIndex, currIndex, nextIndex) =>
+    doubleIndexOpt.map { case (prevIndex, nextIndex) =>
       val prevWord = sentence.contents(prevIndex)
       val nextWord = sentence.contents(nextIndex)
       val processorsWord = prevWord.processorsWord + nextWord.processorsWord
@@ -53,6 +50,6 @@ class WordBreakByHyphenPreprocessor(languageModel: LanguageModel = WordBreakByHy
   }
 }
 
-object WordBreakByHyphenPreprocessor {
-  val languageModel = new NeverLanguageModel()
+object LigaturePreprocessor {
+  val languageModel = new AlwaysLanguageModel()
 }

@@ -6,6 +6,9 @@ object StringUtils {
   val LF = '\n' // line feed
   val CR = '\r' // carriage return
 
+  val LF_STRING = LF.toString
+  val CR_STRING = CR.toString
+
   val HTAB = '\t' // horizontal
   val VTAB = '\u000B' // vertical
   val TAB = HTAB
@@ -41,7 +44,7 @@ object StringUtils {
 
   val WHITESPACE_CHARS: Array[Char] = Array(SOFT_SPACE, HARD_SPACE, LF, CR, HTAB, VTAB)
   val WHITESPACE_STRINGS: Array[String] = WHITESPACE_CHARS.map(_.toString)
-  val PARAGRAPH_BREAK_STRINGS: Array[String] = Array(CR.toString + LF.toString, LF.toString)
+  val PARAGRAPH_BREAK_STRINGS: Array[String] = Array(CR_STRING + LF_STRING, LF_STRING)
   val LINE_BREAK_STRINGS: Array[String] = PARAGRAPH_BREAK_STRINGS
   val SENTENCE_BREAK_CHARS: Array[Char] = Array(PERIOD, UPRIGHT_EXCLAMATION, INVERTED_EXCLAMATION, UPRIGHT_QUESTION, INVERTED_QUESTION)
   val SENTENCE_BREAK_STRINGS: Array[String] = {
@@ -57,6 +60,13 @@ object StringUtils {
   }
   val WORD_BREAK_CHARS: Array[Char] = Array(PLAIN_HYPHEN, SOFT_HYPHEN) // skip HARD_HYPHEN
   val LETTER_BREAK_CHARS: Array[Char] = Array(SOFT_SPACE) // skip HARD_SPACE
+
+  val ligatures = Set(
+    // f followed by left-side ascender, dot, or cross or two dots
+    "fb", "ff", "fh", "fi", "fj", "fk", "fl", "ft" // , "ii", "ij", "ji", "jj", "Th"
+  )
+
+  def endsWithLigature(string: String): Boolean = ligatures.exists(string.endsWith(_))
 
   def before(string: String, index: Int, all: Boolean, keep: Boolean): String = {
     if (index < 0)

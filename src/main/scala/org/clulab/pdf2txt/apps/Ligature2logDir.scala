@@ -1,14 +1,14 @@
 package org.clulab.pdf2txt.apps
 
 import org.clulab.pdf2txt.common.utils.TextRange
-import org.clulab.pdf2txt.languageModel.{DictionaryLanguageModel, GloveLanguageModel, LanguageModel}
-import org.clulab.pdf2txt.preprocessor.LineBreakPreprocessor
+import org.clulab.pdf2txt.languageModel.{GloveLanguageModel, LanguageModel}
+import org.clulab.pdf2txt.preprocessor.{LigaturePreprocessor, LineBreakPreprocessor}
 import org.clulab.utils.Closer.AutoCloser
 import org.clulab.utils.FileUtils
 
 import java.io.{File, PrintWriter}
 
-object LineBreak2logDir extends App {
+object Ligature2logDir extends App {
 
   class Logger(printWriter: PrintWriter) {
     protected var fileOpt: Option[File] = None
@@ -28,7 +28,7 @@ object LineBreak2logDir extends App {
   class LoggingLanguageModel(languageModel: LanguageModel, logger: Logger) extends LanguageModel {
 
     override def shouldJoin(left: String, right: String, prevWords: Seq[String]): Boolean = {
-      val context = prevWords.mkString(" ") + (if (prevWords.nonEmpty) " " else "") + left + "-" + right
+      val context = prevWords.mkString(" ") + (if (prevWords.nonEmpty) " " else "") + left + right
       val result = languageModel.shouldJoin(left, right, prevWords)
 
       logger.log(left, right, result, context)
@@ -44,7 +44,7 @@ object LineBreak2logDir extends App {
     val logger = new Logger(printWriter)
     val innerLanguageModel = GloveLanguageModel()
     val outerLanguageModel = new LoggingLanguageModel(innerLanguageModel, logger)
-    val preprocessor = new LineBreakPreprocessor(outerLanguageModel)
+    val preprocessor = new LigaturePreprocessor(outerLanguageModel)
 
     files.foreach { inputFile =>
       val text = FileUtils.getTextFromFile(inputFile)
@@ -52,7 +52,7 @@ object LineBreak2logDir extends App {
       logger.setFile(inputFile)
 
       val newText = preprocessor.preprocess(TextRange(text)).toString
-      val newFile = "../corpora/LineBreak2logDir/" + inputFile.getName
+      val newFile = "../corpora/Ligature2logDir/" + inputFile.getName
 
       FileUtils.printWriterFromFile(newFile).autoClose { printWriter =>
         printWriter.print(newText)

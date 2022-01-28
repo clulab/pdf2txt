@@ -1,16 +1,15 @@
 package org.clulab.pdf2txt
 
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
-import org.clulab.pdf2txt.common.utils.{Logging, Pdf2txtConfigured, TextRange}
-import org.clulab.pdf2txt.common.utils.StringUtils._
-import org.clulab.pdf2txt.preprocessor.{LineBreakPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
-import org.clulab.pdf2txt.tika.Tika
+import org.clulab.pdf2txt.common.utils.{Logging, Pdf2txtConfigured}
+import org.clulab.pdf2txt.languageModel.GloveLanguageModel
+import org.clulab.pdf2txt.pdf.{PdfConverter, TikaConverter}
+import org.clulab.pdf2txt.preprocessor.{LigaturePreprocessor, LineBreakPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
 import org.clulab.utils.FileUtils
 
 import java.io.{BufferedInputStream, File, FileInputStream, InputStream, PrintWriter}
 
-class Pdf2txt() extends Pdf2txtConfigured {
-  val tika = new Tika()
+class Pdf2txt(pdfConverter: PdfConverter) extends Pdf2txtConfigured {
   val preprocessors = Pdf2txt.preprocessors
 
   def logError(throwable: Throwable, message: String): String = {
@@ -21,7 +20,7 @@ class Pdf2txt() extends Pdf2txtConfigured {
 
   def read(inputStream: InputStream): String = {
     try {
-      tika.read(inputStream)
+      pdfConverter.convert(inputStream)
     }
     catch {
       case throwable: Throwable => logError(throwable, s"Tika failed to read.")
@@ -36,7 +35,7 @@ class Pdf2txt() extends Pdf2txtConfigured {
 
   def write(printWriter: PrintWriter, text: String): Unit = {
     try {
-      printWriter.println(text)
+      printWriter.print(text)
     }
     catch {
       case throwable: Throwable => logError(throwable, s"PrintWriter failed to write.")
@@ -50,8 +49,8 @@ class Pdf2txt() extends Pdf2txtConfigured {
     write(printWriter, cookedText)
   }
 
-  def dir(dir: String): Unit = {
-    val files = FileUtils.findFiles(dir, ".pdf")
+  def dir(inputDirName: String, outputDirName: String, inputExtension: String = ".pdf", outputExtension: String = ".txt"): Unit = {
+    val files = FileUtils.findFiles(inputDirName, inputExtension)
 
     files.par.foreach { inputFile =>
       try {
@@ -59,7 +58,7 @@ class Pdf2txt() extends Pdf2txtConfigured {
         // The InputStream must support mark/reset which isn't enforced by the type system.
         // In other words, a simple FileInputStream will throw an exception at runtime.
         new BufferedInputStream(new FileInputStream(inputFile)).autoClose { inputStream =>
-          val outputFile = new File(inputFile.getAbsolutePath.beforeLast('.', true) + ".txt")
+          val outputFile = new File(outputDirName + "/" + inputFile.getName.dropRight(inputExtension.length) + outputExtension)
 
           try {
             FileUtils.printWriterFromFile(outputFile).autoClose { printWriter =>
@@ -79,13 +78,18 @@ class Pdf2txt() extends Pdf2txtConfigured {
 }
 
 object Pdf2txt extends Logging {
-  val preprocessors: Array[Preprocessor] = Array(
-    new ParagraphPreprocessor(),
-    new UnicodePreprocessor(),
-    new LineBreakPreprocessor(),
-    new WordBreakByHyphenPreprocessor(),
-    new WordBreakBySpacePreprocessor()
-  )
+  val preprocessors: Array[Preprocessor] = {
+    val languageModel = GloveLanguageModel()
 
-  def apply(): Pdf2txt = new Pdf2txt()
+    Array(
+      //    new ParagraphPreprocessor(),
+      //    new UnicodePreprocessor(),
+      new LigaturePreprocessor(languageModel),
+      new LineBreakPreprocessor(languageModel),
+      new WordBreakByHyphenPreprocessor(),
+      new WordBreakBySpacePreprocessor()
+    )
+  }
+
+  def apply(pdfConverter: PdfConverter = new TikaConverter()): Pdf2txt = new Pdf2txt(pdfConverter)
 }

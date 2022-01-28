@@ -43,7 +43,7 @@ class TextRange(val text: String, val range: Range) extends IndexedSeq[Char] {
       val preTextRanges =
           if (start < textRanges.head.start) IndexedSeq(subRange(start, textRanges.head.start))
           else IndexedSeq.empty
-      val interTextRanges = PairIndexedSeq(textRanges).map { case (leftTextRange, rightTextRange) =>
+      val interTextRanges = DoubleIndexedSeq(textRanges).map { case (leftTextRange, rightTextRange) =>
         subRange(leftTextRange.end, rightTextRange.start)
       }
       val postTextRanges =

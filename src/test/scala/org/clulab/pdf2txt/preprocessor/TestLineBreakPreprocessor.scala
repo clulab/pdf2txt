@@ -1,34 +1,54 @@
 package org.clulab.pdf2txt.preprocessor
 
-import org.clulab.pdf2txt.common.utils.Test
+import org.clulab.pdf2txt.common.utils.{Test, TextRange}
+import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, DocumentLanguageModel, NeverLanguageModel}
 
 class TestLineBreakPreprocessor extends Test {
-  val preprocessor = new LineBreakPreprocessor()
 
-  behavior of "LineBreakPreprocessor"
+  behavior of "LineBreakPreprocessor with AlwaysLanguageModel"
 
-  def test(inputText: String, expectedOutputText: String): Unit = {
+  val preprocessorAlways = new LineBreakPreprocessor(new AlwaysLanguageModel())
+
+  def testAlways(inputText: String, expectedOutputText: String): Unit = {
     it should s"convert ${escape(inputText)}" in {
-      val actualOutputText = preprocessor.preprocess(inputText).toString
+      val actualOutputText = preprocessorAlways.preprocess(inputText).toString
 
       actualOutputText shouldBe expectedOutputText
     }
   }
 
-  test("one two three", "one two three")
-  test("- two three", "- two three")
-  test("- two -", "- two -")
+  testAlways("one two three", "one two three")
+  testAlways("- two three", "- two three")
+  testAlways("- two -", "- two -")
 
-  test("one\ntwo\nthree", "one\ntwo\nthree")
-  test("-\ntwo\nthree", "-\ntwo\nthree")
-  test("-\ntwo\n-", "-\ntwo\n-")
+  testAlways("one\ntwo\nthree", "one\ntwo\nthree")
+  testAlways("-\ntwo\nthree", "-\ntwo\nthree")
+  testAlways("-\ntwo\n-", "-\ntwo\n-")
 
-  test("-one\ntwo\nthree", "-one\ntwo\nthree")
-  test("one-\ntwo\nthree", "onetwo\nthree")
-  test("one-\ntwo\n-", "onetwo\n-")
+  testAlways("-one\ntwo\nthree", "-one\ntwo\nthree")
+  testAlways("one-\ntwo\nthree", "onetwo\nthree")
+  testAlways("one-\ntwo\n-", "onetwo\n-")
 
-  test("one-\ntwo-\nthree", "onetwothree")
+  testAlways("one-\ntwo-\nthree", "onetwothree")
 
-  test("A pre-\nhensile tail is un-\ncommon.", "A prehensile tail is uncommon.")
-  test("A pre-\r\nhensile tail is un-\r\ncommon.", "A prehensile tail is uncommon.")
+  testAlways("A pre-\nhensile tail is un-\ncommon.", "A prehensile tail is uncommon.")
+  testAlways("A pre-\r\nhensile tail is un-\r\ncommon.", "A prehensile tail is uncommon.")
+
+  behavior of "LineBreakPreprocessor with NeverLanguageModel"
+
+  val preprocessorNever = new LineBreakPreprocessor(new NeverLanguageModel())
+
+  def testNever(inputText: String, expectedOutputText: String): Unit = {
+    it should s"convert ${escape(inputText)}" in {
+      val actualOutputText = preprocessorNever.preprocess(inputText).toString
+
+      actualOutputText shouldBe expectedOutputText
+    }
+  }
+
+  testNever("abc-\nxyz", "abc-\nxyz")
+  // Some depend on the language model from the local document.
+  testNever("abcxyz abc-\nxyz", "abcxyz abcxyz")
+  testNever("abc-\nxyz abcxyz", "abcxyz abcxyz")
+  testNever("abcAxyz abc-\nxyz", "abcAxyz abc-\nxyz")
 }
