@@ -7,6 +7,7 @@ class TestUnicodePreprocessor extends Test {
   val omega = "\u03C9"
   val unknown = "\u0385"
   val accent = "\u00e3"
+  val fi_ligature = "\ufb01"
 
   behavior of "UnicodePreprocessor"
 
@@ -40,4 +41,14 @@ class TestUnicodePreprocessor extends Test {
       s"The   and the   but not the  .  What about  ?")
   test(UnicodeOptions(unknownToSpace = true, knownToSpace = true, keepKnownAccent = true),
       s"The   and the   but not the  .  What about  ?")
+
+  it should "process ligatures" in {
+    val options = UnicodeOptions(unknownToSpace = true, knownToSpace = false, keepKnownAccent = true)
+    val preprocessor = new UnicodePreprocessor(options)
+    val inputText = s"Go ${fi_ligature}gure!"
+    val expectedOutputText = "Go figure!"
+    val actualOutputText = preprocessor.preprocess(inputText).toString
+
+    actualOutputText shouldBe expectedOutputText
+  }
 }
