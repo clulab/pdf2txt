@@ -2,7 +2,7 @@ package org.clulab.pdf2txt.preprocessor
 
 import org.clulab.pdf2txt.common.utils.{DoubleIndexedSeq, StringUtils, TextRange, TextRanges}
 import org.clulab.pdf2txt.document.logical.{DocumentBySentence, SentenceDocument, WordDocument}
-import org.clulab.pdf2txt.languageModel.{LanguageModel, ProbabilisticLanguageModel}
+import org.clulab.pdf2txt.languageModel.{LanguageModel, NeverLanguageModel, ProbabilisticLanguageModel}
 
 class WordBreakBySpacePreprocessor(languageModel: LanguageModel = WordBreakBySpacePreprocessor.languageModel) extends Preprocessor {
 
@@ -48,5 +48,5 @@ class WordBreakBySpacePreprocessor(languageModel: LanguageModel = WordBreakBySpa
 }
 
 object WordBreakBySpacePreprocessor {
-  val languageModel = ProbabilisticLanguageModel.instance
+  val languageModel = new NeverLanguageModel()
 }

@@ -9,7 +9,7 @@ class DictionaryLanguageModel(val words: Set[String]) extends LanguageModel {
 
   override def shouldJoin(left: String, right: String, prevWords: Seq[String]): Boolean = {
     lazy val contains = words.contains(left + right)
-    lazy val betweenDigits = left.last.isDigit && right.head.isDigit
+    lazy val betweenDigits = left.last.isDigit || right.head.isDigit
     lazy val containsBetweenHyphens = {
       val leftAfterHyphen = StringUtils.afterLast(left, StringUtils.HYPHEN, all = true)
       val rightBeforeHyphen = StringUtils.beforeFirst(right, StringUtils.HYPHEN, all = true)
