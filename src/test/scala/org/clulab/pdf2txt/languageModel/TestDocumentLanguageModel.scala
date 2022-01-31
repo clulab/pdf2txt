@@ -8,7 +8,7 @@ class TestDocumentLanguageModel extends Test {
 
   it should "know its own words" in {
     val word = "abcxyz"
-    val words = DocumentLanguageModel(TextRange(word)).words
+    val words = LocalSetLanguageModel(TextRange(word)).words
 
     words should contain (word)
   }

@@ -1,7 +1,7 @@
 package org.clulab.pdf2txt.apps
 
 import org.clulab.pdf2txt.common.utils.TextRange
-import org.clulab.pdf2txt.languageModel.{DictionaryLanguageModel, GloveLanguageModel, LanguageModel}
+import org.clulab.pdf2txt.languageModel.{SetLanguageModel, GloveLanguageModel, LanguageModel}
 import org.clulab.pdf2txt.preprocessor.LineBreakPreprocessor
 import org.clulab.utils.Closer.AutoCloser
 import org.clulab.utils.FileUtils

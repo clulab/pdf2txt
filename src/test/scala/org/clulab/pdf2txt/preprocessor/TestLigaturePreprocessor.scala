@@ -31,5 +31,11 @@ class TestLigaturePreprocessor extends Test {
   test(
     "fl our is not fl avored ij s but waffl es are, go fi gure, said at the cliff side.",
     "flour is not flavored ij s but waffles are, go fi gure, said at the cliffside.",
-    Map("flour" -> 1, "flavored" -> 1, "ijs" -> 1, "waffles" -> 1, "cliffside" ->1))
+    Map("flour" -> 1, "flavored" -> 1, "ijs" -> 1, "waffles" -> 1, "cliffside" ->1)
+  )
+  test (
+    "A coe ffi cient is not dif fi cult to defi ne.",
+    "A coefficient is not difficult to define.",
+    Map("coefficient" -> 1, "difficult" ->1, "define" -> 1)
+  )
 }
