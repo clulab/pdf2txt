@@ -1,6 +1,6 @@
 package org.clulab.pdf2txt.languageModel
 
-import org.clulab.pdf2txt.common.utils.{StringUtils, TextRange, TripleIndexedSeq, TripleOptIndexedSeq}
+import org.clulab.pdf2txt.common.utils.{StringUtils, TextRange, TripleOptIndexedSeq}
 import org.clulab.pdf2txt.document.logical.{DocumentByWord, WordDocument}
 import org.clulab.utils.ClassLoaderObjectInputStream
 import org.clulab.utils.Closer.AutoCloser
@@ -39,7 +39,7 @@ object GloveLanguageModel {
 
   def apply(): SetLanguageModel = {
     val words: Set[String] = {
-      val resource = "org/clulab/pdf2txt/dict.ser"
+      val resource = "org/clulab/pdf2txt/glove.ser"
       val classLoader = this.getClass.getClassLoader
 
       new ClassLoaderObjectInputStream(classLoader, classLoader.getResourceAsStream(resource)).autoClose { objectInputStream =>
