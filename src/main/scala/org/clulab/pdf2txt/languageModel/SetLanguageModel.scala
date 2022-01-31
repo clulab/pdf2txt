@@ -5,7 +5,7 @@ import org.clulab.pdf2txt.document.logical.{DocumentByWord, WordDocument}
 import org.clulab.utils.ClassLoaderObjectInputStream
 import org.clulab.utils.Closer.AutoCloser
 
-class DictionaryLanguageModel(val words: Set[String]) extends LanguageModel {
+class SetLanguageModel(val words: Set[String]) extends LanguageModel {
 
   override def shouldJoin(left: String, right: String, prevWords: Seq[String]): Boolean = {
     lazy val contains = words.contains(left + right)
@@ -19,11 +19,25 @@ class DictionaryLanguageModel(val words: Set[String]) extends LanguageModel {
 
     (contains || containsBetweenHyphens) && !betweenDigits
   }
+
+  // This is used for ligatures like "coe ffi cient".
+  override def shouldJoin(left: String, middle: String, right: String, prevWords: Seq[String]): Boolean = {
+    lazy val contains = words.contains(left + middle + right)
+    lazy val betweenDigits = left.last.isDigit || middle.head.isDigit || middle.last.isDigit || right.head.isDigit
+    lazy val containsBetweenHyphens = !middle.exists(_ == StringUtils.HYPHEN) && {
+      val leftAfterHyphen = StringUtils.afterLast(left, StringUtils.HYPHEN, all = true)
+      val rightBeforeHyphen = StringUtils.beforeFirst(right, StringUtils.HYPHEN, all = true)
+
+      words.contains(leftAfterHyphen + middle + rightBeforeHyphen)
+    }
+
+    (contains || containsBetweenHyphens) && !betweenDigits
+  }
 }
 
 object GloveLanguageModel {
 
-  def apply(): DictionaryLanguageModel = {
+  def apply(): SetLanguageModel = {
     val words: Set[String] = {
       val resource = "org/clulab/pdf2txt/dict.ser"
       val classLoader = this.getClass.getClassLoader
@@ -35,15 +49,15 @@ object GloveLanguageModel {
       }
     }
 
-    new DictionaryLanguageModel(words)
+    new SetLanguageModel(words)
   }
 }
 
-object DocumentLanguageModel {
+object LocalSetLanguageModel {
 
   def isHyphen(wordDocument: WordDocument): Boolean = StringUtils.WORD_BREAK_CHARS.exists(wordDocument.contents.head.matches)
 
-  def apply(textRange: TextRange): DictionaryLanguageModel = {
+  def apply(textRange: TextRange): SetLanguageModel = {
     val documentByWord = DocumentByWord(textRange)
     val hyphenIndexes = TripleOptIndexedSeq(documentByWord.contents.indices).flatMap { tripleOpt =>
       tripleOpt match {
@@ -68,6 +82,6 @@ object DocumentLanguageModel {
         .map(documentByWord.contents(_).processorsWord)
         .toSet
 
-    new DictionaryLanguageModel(words)
+    new SetLanguageModel(words)
   }
 }

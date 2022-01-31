@@ -2,7 +2,7 @@ package org.clulab.pdf2txt.preprocessor
 
 import org.clulab.pdf2txt.common.utils.{StringUtils, TextRange, TextRanges, TripleIndexedSeq}
 import org.clulab.pdf2txt.document.logical.{DocumentBySentence, SentenceDocument, WordDocument}
-import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, DocumentLanguageModel, LanguageModel}
+import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, LocalSetLanguageModel, LanguageModel}
 
 class LineBreakPreprocessor(globalLanguageModel: LanguageModel = LineBreakPreprocessor.languageModel) extends Preprocessor {
 
@@ -47,7 +47,7 @@ class LineBreakPreprocessor(globalLanguageModel: LanguageModel = LineBreakPrepro
 
   def preprocess(textRange: TextRange): TextRanges = {
     val document = DocumentBySentence(textRange)
-    val documentLanguageModel = DocumentLanguageModel(textRange)
+    val documentLanguageModel = LocalSetLanguageModel(textRange)
     val languageModel = DoubleLanguageModel(globalLanguageModel, documentLanguageModel)
     val textRanges = new TextRanges()
 
