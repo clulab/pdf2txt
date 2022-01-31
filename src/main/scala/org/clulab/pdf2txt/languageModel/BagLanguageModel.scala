@@ -59,7 +59,7 @@ object GigawordLanguageModel {
         val string = objectInputStream.readObject().asInstanceOf[String].split(' ')
         val counts = objectInputStream.readObject().asInstanceOf[Array[Int]]
 
-        string.zip(counts).toMap
+        string.zip(counts).toMap.withDefaultValue(0)
       }
     }
 
@@ -72,7 +72,6 @@ object LocalBagLanguageModel {
   def isHyphen(wordDocument: WordDocument): Boolean = StringUtils.WORD_BREAK_CHARS.exists(wordDocument.contents.head.matches)
 
   def apply(textRange: TextRange): BagLanguageModel = {
-    val defaultValue = 0
     val documentByWord = DocumentByWord(textRange)
     val hyphenIndexes = TripleOptIndexedSeq(documentByWord.contents.indices).flatMap { tripleOpt =>
       tripleOpt match {
@@ -96,12 +95,12 @@ object LocalBagLanguageModel {
         }
         .map(documentByWord.contents(_).processorsWord)
     val wordFrequencies = {
-      val wordFrequencies = new mutable.HashMap[String, Int]().withDefaultValue(defaultValue)
+      val wordFrequencies = new mutable.HashMap[String, Int]().withDefaultValue(0)
 
       words.foreach { word =>
         wordFrequencies.update(word, wordFrequencies(word) + 1)
       }
-      wordFrequencies.toMap.withDefaultValue(defaultValue)
+      wordFrequencies.toMap.withDefaultValue(0)
     }
     new BagLanguageModel(wordFrequencies, lowercase = false, lowerLimit = 1)
   }

@@ -10,5 +10,7 @@ class TestGloveLanguageModel extends Test {
     val glove = GloveLanguageModel()
 
     glove.words.size should be (2196016)
+    glove.words("a") should be (true)
+    glove.words("") should be (false)
   }
 }

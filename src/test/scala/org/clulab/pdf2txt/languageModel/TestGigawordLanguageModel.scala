@@ -9,7 +9,10 @@ class TestGigawordLanguageModel extends Test {
   it should "load" in {
     val gigaword = GigawordLanguageModel()
 
-    gigaword.wordFrequencies.size should be (3692062)
-    gigaword.wordFrequencies.values.sum should be (2066074345)
+    gigaword.wordFrequencies.size should be (3692061)
+    gigaword.wordFrequencies.values.sum should be (2066073892)
+
+    gigaword.wordFrequencies("a") should be > (1)
+    gigaword.wordFrequencies("") should be (0)
   }
 }

@@ -2,7 +2,7 @@ package org.clulab.pdf2txt
 
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.{Logging, Pdf2txtConfigured}
-import org.clulab.pdf2txt.languageModel.GloveLanguageModel
+import org.clulab.pdf2txt.languageModel.{GigawordLanguageModel, GloveLanguageModel}
 import org.clulab.pdf2txt.pdf.{PdfConverter, TikaConverter}
 import org.clulab.pdf2txt.preprocessor.{LigaturePreprocessor, LineBreakPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
 import org.clulab.utils.FileUtils
@@ -79,7 +79,8 @@ class Pdf2txt(pdfConverter: PdfConverter) extends Pdf2txtConfigured {
 
 object Pdf2txt extends Logging {
   val preprocessors: Array[Preprocessor] = {
-    val languageModel = GloveLanguageModel()
+//    val languageModel = GloveLanguageModel()
+    val languageModel = GigawordLanguageModel()
 
     Array(
       //    new ParagraphPreprocessor(),

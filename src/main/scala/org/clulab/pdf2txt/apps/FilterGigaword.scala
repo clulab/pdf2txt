@@ -26,7 +26,7 @@ object FilterGigaword extends App {
 
           cookedWord -> freq.toInt
         }
-        .filter(_._2 >= lowerLimit)
+        .filter { pair => pair._1.nonEmpty && !pair._1.contains(" ") && pair._2 >= lowerLimit }
         .toVector
   }
   val string = wordFrequencies.map(_._1).mkString(" ")
