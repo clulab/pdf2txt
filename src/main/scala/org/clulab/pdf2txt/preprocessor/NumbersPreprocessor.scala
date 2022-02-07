@@ -9,21 +9,28 @@ class NumbersPreprocessor(loggerOpt: Option[NumbersLogger] = None) extends Prepr
 
   def preprocess(textRange: TextRange): TextRanges = {
     val matcher = NumbersPreprocessor.pattern.matcher(textRange.text)
-    val newText = matcher.replaceAll(NumbersPreprocessor.replacement)
 
+    val buffer = new StringBuffer()
+    while (matcher.find()) {
+        matcher.appendReplacement(buffer, NumbersPreprocessor.replacement(matcher.group(1)))
+    }
+    matcher.appendTail(buffer)
+
+    val newText = buffer.toString()
+    val left = textRange.text.trim()
+    val right = newText.trim()
     // Maybe do the above one at a time for the sake of logging?
     loggerOpt.foreach { logger =>
-      logger.log("left", "right")
+      logger.log(left, right)
     }
     TextRanges(TextRange(newText))
   }
 }
-
 object NumbersPreprocessor {
-  val pattern = Pattern.compile("(hello)")
-  val replacement = "$1 there"
-}
+  val pattern = Pattern.compile("(\\d+\\s+,\\d+)")
+  def replacement(groupText: String): String = groupText.filterNot(_.isWhitespace)
 
+}
 class NumbersLogger(printWriter: PrintWriter) {
   protected var fileOpt: Option[File] = None
 
@@ -33,7 +40,6 @@ class NumbersLogger(printWriter: PrintWriter) {
 
   def log(left: String, right: String): Unit = {
     val filename = fileOpt.map(_.getName).getOrElse("")
-
     printWriter.println(s"$filename\t$left\t$right")
   }
 }

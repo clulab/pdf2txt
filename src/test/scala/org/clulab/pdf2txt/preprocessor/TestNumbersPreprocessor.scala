@@ -15,14 +15,16 @@ class TestNumbersPreprocessor extends Test {
     }
   }
 
-// test("one hello two hello three", "one hello there two hello there three")
-//  test("at 42 ,807 ha", "at 42,807 ha")
-//  test(
-//    "To date , the seedlings are evaluated at 42 ,807 ha  for this current campaign against 49,356 ha in SSC 2020 at the same period , a decrease of 6,549 ha in cultivated areas .",
-//    "To date , the seedlings are evaluated at 42,807 ha  for this current campaign against 49,356 ha in SSC 2020 at the same period , a decrease of 6,549 ha in cultivated areas ."
-//  )
+//  test("one hello two hello three", "one hello there two hello there three")
+ test("at 42 ,807 ha", "at 42,807 ha")
+ test(
+   "To date , the seedlings are evaluated at 42 ,807 ha  for this current campaign against 49,356 ha in SSC 2020 at the same period , a decrease of 6,549 ha in cultivated areas .",
+   "To date , the seedlings are evaluated at 42,807 ha  for this current campaign against 49,356 ha in SSC 2020 at the same period , a decrease of 6,549 ha in cultivated areas ."
+ )
   test("at 42, 807 ha", "at 42, 807 ha")
   test("at 42 , 807 ha", "at 42 , 807 ha")
-  test("at 4d2 ,807 ha", "at 4d2 ,807 ha")
-  test("at 42 ,8h07 ha", "at 42 ,8h07 ha")
+  
+  // TODO:
+  // test("at 4d2 ,807 ha", "at 4d2 ,807 ha")
+  // test("at 42 ,8h07 ha", "at 42 ,8h07 ha")
 }
