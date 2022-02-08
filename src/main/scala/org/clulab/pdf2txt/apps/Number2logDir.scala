@@ -15,7 +15,7 @@ object Number2logDir extends App {
 
   FileUtils.printWriterFromFile(outputFilename).autoClose { printWriter =>
     val logger = new NumbersLogger(printWriter)
-    val preprocessor = new NumbersPreprocessor(Some(logger))
+    val preprocessor = new NumbersPreprocessor(loggerOpt = Some(logger))
 
     files.foreach { inputFile =>
       val text = FileUtils.getTextFromFile(inputFile)
