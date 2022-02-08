@@ -61,6 +61,8 @@ object NumbersPreprocessor {
   val commaPattern = Pattern.compile("(\\d+)\\s+(,\\d+)")
   val commaReplacement = "$1$2"
 
+  // This could probably be "(^|\\s)(\\d+)(\\s+(\\d+))" to match multiple number groups
+  // at the same time, but then a filter might be required to remove the \\s+ parts.
   val spacePattern = Pattern.compile("(^|\\s)(\\d+)\\s+(\\d+)") // no comma here
   val spaceReplacement = "$1$2$3"
 
