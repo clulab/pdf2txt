@@ -1,6 +1,6 @@
 package org.clulab.pdf2txt.preprocessor
 
-import org.clulab.pdf2txt.common.utils.{TextRange, TextRanges}
+import org.clulab.pdf2txt.common.utils.{StringUtils, TextRange, TextRanges}
 
 import java.io.{File, PrintWriter}
 import java.util.regex.Pattern
@@ -14,17 +14,13 @@ class NumbersPreprocessor(hyperparameters: NumbersPreprocessor.Hyperparameters =
 
     while (matcher.find()) {
       val before = matcher.group(0).toString
-      val after = {
-        val buffer = new StringBuffer() // TODO: This is a hack!
-
-        matcher.appendReplacement(buffer, replacement)
-        buffer.toString
-      }
+      // TODO: This is a hack that will not work in all cases, because ^ and $ can change.
+      val after = pattern.matcher(before).replaceFirst(replacement)
 
       loggerOpt.foreach { logger =>
         logger.log(before, after)
       }
-      buffer.append(after)
+      matcher.appendReplacement(buffer, replacement)
     }
     matcher.appendTail(buffer)
     buffer.toString()
@@ -78,6 +74,10 @@ class NumbersLogger(printWriter: PrintWriter) {
 
   def log(before: String, after: String): Unit = {
     val filename = fileOpt.map(_.getName).getOrElse("")
-    printWriter.println(s"$filename\t$before\t$after")
+    val escapedBefore = StringUtils.escape(before)
+    val escapedAfter = StringUtils.escape(after)
+
+    // TODO: Make this a read TSV writer because of \n and the like.
+    printWriter.println(s"$filename\t$escapedBefore\t$escapedAfter")
   }
 }

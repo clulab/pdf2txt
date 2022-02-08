@@ -14,7 +14,7 @@ class TestNumbersPreprocessor extends Test {
     val preprocessor = new NumbersPreprocessor(hyperparameters, Some(logger))
 
     def test(inputText: String, expectedOutputText: String): Unit = {
-      ignore should s"convert ${escape(inputText)}" in {
+      it should s"convert ${escape(inputText)}" in {
         val actualOutputText = preprocessor.preprocess(inputText).toString
 
         actualOutputText shouldBe expectedOutputText
