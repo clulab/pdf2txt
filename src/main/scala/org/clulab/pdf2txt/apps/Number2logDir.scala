@@ -1,12 +1,9 @@
 package org.clulab.pdf2txt.apps
 
 import org.clulab.pdf2txt.common.utils.TextRange
-import org.clulab.pdf2txt.languageModel.{GloveLanguageModel, LanguageModel}
-import org.clulab.pdf2txt.preprocessor.{LigaturePreprocessor, NumbersLogger, NumbersPreprocessor}
+import org.clulab.pdf2txt.preprocessor.{NumbersLogger, NumbersPreprocessor}
 import org.clulab.utils.Closer.AutoCloser
 import org.clulab.utils.FileUtils
-
-import java.io.{File, PrintWriter}
 
 object Number2logDir extends App {
   val dir = args.lift(0).getOrElse(".")
