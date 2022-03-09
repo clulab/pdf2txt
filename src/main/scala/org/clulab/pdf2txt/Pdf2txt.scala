@@ -79,12 +79,12 @@ class Pdf2txt(pdfConverter: PdfConverter) extends Pdf2txtConfigured {
 
 object Pdf2txt extends Logging {
   val preprocessors: Array[Preprocessor] = {
-//    val languageModel = GloveLanguageModel()
+    // val languageModel = GloveLanguageModel()
     val languageModel = GigawordLanguageModel()
 
     Array(
-      //    new ParagraphPreprocessor(),
-      //    new UnicodePreprocessor(),
+      new ParagraphPreprocessor(),
+      new UnicodePreprocessor(),
       new LigaturePreprocessor(languageModel),
       new LineBreakPreprocessor(languageModel),
       new WordBreakByHyphenPreprocessor(),
