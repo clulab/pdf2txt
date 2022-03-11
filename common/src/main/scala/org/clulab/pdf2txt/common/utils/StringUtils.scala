@@ -126,6 +126,15 @@ object StringUtils {
 
     def toIterator(range: Range): Iterator[Char] = StringUtils.iterator(string, range)
   }
+
+  def escape(string: String): String = string.flatMap { char =>
+    char match {
+      case '\n' => "\\n"
+      case '\r' => "\\r"
+      case '\t' => "\\t"
+      case _ => char.toString
+    }
+  }
 }
 
 class CharIterator(string: String, range: Range) extends Iterator[Char] {

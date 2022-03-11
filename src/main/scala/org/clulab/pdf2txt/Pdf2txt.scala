@@ -4,7 +4,7 @@ import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.{Logging, Pdf2txtConfigured}
 import org.clulab.pdf2txt.languageModel.{GigawordLanguageModel, GloveLanguageModel}
 import org.clulab.pdf2txt.pdf.{PdfConverter, TikaConverter}
-import org.clulab.pdf2txt.preprocessor.{LigaturePreprocessor, LineBreakPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
+import org.clulab.pdf2txt.preprocessor.{LigaturePreprocessor, LineBreakPreprocessor, NumbersPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
 import org.clulab.utils.FileUtils
 
 import java.io.{BufferedInputStream, File, FileInputStream, InputStream, PrintWriter}
@@ -85,6 +85,7 @@ object Pdf2txt extends Logging {
     Array(
       new ParagraphPreprocessor(),
       new UnicodePreprocessor(),
+      new NumbersPreprocessor(),
       new LigaturePreprocessor(languageModel),
       new LineBreakPreprocessor(languageModel),
       new WordBreakByHyphenPreprocessor(),
