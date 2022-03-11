@@ -11,5 +11,5 @@ object Txt2txtDir extends Pdf2txtApp {
   val outputDirName = args.lift(1).getOrElse(inputDirName + "/txt")
 
   new File(outputDirName).mkdirs()
-  Pdf2txt(new TextConverter()).dir(inputDirName, outputDirName, ".txt", ".txt")
+  Pdf2txt(new TextConverter()).dir(inputDirName, outputDirName, inputExtension = ".txt")
 }

@@ -2,9 +2,14 @@ package org.clulab.pdf2txt.pdftotext
 
 import org.clulab.pdf2txt.common.process.ExternalProcess
 
-class PdfToTextProcess(zip: String, archive: String, file: String, cdOpt: Option[String] = None) extends ExternalProcess() {
-	cdOpt.map(directory)
-	command.add(zip)
-	command.add(archive)
-	command.add(file)
+import java.io.File
+
+class PdfToTextProcess(inputFile: File, outputFile: File) extends ExternalProcess() {
+	command.add("pdftotext")
+	command.add("-eol")
+	command.add("unix")
+	command.add("-enc")
+	command.add("UTF-8")
+	command.add(inputFile.getAbsolutePath) // Convert to OS style
+	command.add(outputFile.getAbsolutePath)
 }
