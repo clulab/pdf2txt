@@ -1,6 +1,6 @@
 package org.clulab.pdf2txt.common.utils
 
-class TestDoubleOptIterator extends Test {
+class DoubleOptIteratorTest extends Test {
 
   behavior of "empty DoubleOptIndexedSeq"
 

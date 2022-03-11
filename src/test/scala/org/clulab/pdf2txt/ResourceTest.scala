@@ -4,7 +4,7 @@ import org.clulab.pdf2txt.common.utils.BuildUtils
 import org.clulab.pdf2txt.common.utils.Sourcer
 import org.clulab.pdf2txt.common.utils.Test
 
-class TestResource extends Test {
+class ResourceTest extends Test {
 
   def getTextFromResource(path: String): String = {
     val source = Sourcer.sourceFromResource(path)

@@ -2,7 +2,7 @@ package org.clulab.pdf2txt.languageModel
 
 import org.clulab.pdf2txt.common.utils.{Test, TextRange}
 
-class TestBagLanguageModel extends Test {
+class BagLanguageModelTest extends Test {
 
   behavior of "BagLanguageModel"
 

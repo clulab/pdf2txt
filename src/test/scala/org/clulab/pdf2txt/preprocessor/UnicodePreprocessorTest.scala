@@ -2,7 +2,7 @@ package org.clulab.pdf2txt.preprocessor
 
 import org.clulab.pdf2txt.common.utils.{Test, TextRange}
 
-class TestUnicodePreprocessor extends Test {
+class UnicodePreprocessorTest extends Test {
   val alpha = "\u03B1"
   val omega = "\u03C9"
   val unknown = "\u0385"

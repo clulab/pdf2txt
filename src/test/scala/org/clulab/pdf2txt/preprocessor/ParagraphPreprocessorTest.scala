@@ -2,7 +2,7 @@ package org.clulab.pdf2txt.preprocessor
 
 import org.clulab.pdf2txt.common.utils.{Test, TextRange}
 
-class TestParagraphPreprocessor extends Test {
+class ParagraphPreprocessorTest extends Test {
   val preprocessor = new ParagraphPreprocessor()
 
   behavior of "ParagraphPreprocessor"

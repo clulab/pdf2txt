@@ -1,6 +1,6 @@
 package org.clulab.pdf2txt.common.utils
 
-class TestTripleOptIndexedSeq extends Test {
+class TripleOptIndexedSeqTest extends Test {
 
   behavior of "empty TripleOptIndexedSeq"
 

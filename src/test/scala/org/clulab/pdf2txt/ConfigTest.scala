@@ -2,7 +2,7 @@ package org.clulab.pdf2txt
 
 import org.clulab.pdf2txt.common.utils.Test
 
-class TestConfig extends Test {
+class ConfigTest extends Test {
 
   behavior of "config"
 

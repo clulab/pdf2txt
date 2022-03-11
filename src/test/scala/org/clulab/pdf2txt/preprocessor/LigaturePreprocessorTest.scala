@@ -3,7 +3,7 @@ package org.clulab.pdf2txt.preprocessor
 import org.clulab.pdf2txt.common.utils.Test
 import org.clulab.pdf2txt.languageModel.ProbabilisticLanguageModel
 
-class TestWordBreakByHyphenPreprocessor extends Test {
+class LigaturePreprocessorTest extends Test {
 
   class TestLanguageModel(vocab: Map[String, Float]) extends ProbabilisticLanguageModel {
 
@@ -15,11 +15,11 @@ class TestWordBreakByHyphenPreprocessor extends Test {
     }
   }
 
-  behavior of "WordBreakByHyphenPreprocessor"
+  behavior of "LigaturePreprocessor"
 
   def test(inputText: String, expectedOutputText: String, vocab: Map[String, Float]): Unit = {
     val languageModel = new TestLanguageModel(vocab)
-    val preprocessor = new WordBreakByHyphenPreprocessor(languageModel)
+    val preprocessor = new LigaturePreprocessor(languageModel)
 
     it should s"convert $inputText" in {
       val actualOutputText = preprocessor.preprocess(inputText).toString
@@ -28,16 +28,14 @@ class TestWordBreakByHyphenPreprocessor extends Test {
     }
   }
 
-  test("I went in- to the store.", "I went into the store.", Map("into" -> 1))
-  test("Pre- hensile tails are un- common.", "Prehensile tails are uncommon.", Map("Prehensile" -> 1, "uncommon" -> 2))
   test(
-    "Once upon a time.  He went in- to and on- to the house.  They lived happily ever after.",
-    "Once upon a time.  He went into and onto the house.  They lived happily ever after.",
-    Map("into" -> 1f, "onto" -> 2f)
+    "fl our is not fl avored ij s but waffl es are, go fi gure, said at the cliff side.",
+    "flour is not flavored ij s but waffles are, go fi gure, said at the cliffside.",
+    Map("flour" -> 1, "flavored" -> 1, "ijs" -> 1, "waffles" -> 1, "cliffside" ->1)
   )
-  test(
-    "It is a double- triple- quadruple threat.",
-    "It is a doubletriplequadruple threat.",
-    Map("doubletriple" -> 1f, "doubletriplequadruple" -> 2f)
+  test (
+    "A coe ffi cient is not dif fi cult to defi ne.",
+    "A coefficient is not difficult to define.",
+    Map("coefficient" -> 1, "difficult" ->1, "define" -> 1)
   )
 }

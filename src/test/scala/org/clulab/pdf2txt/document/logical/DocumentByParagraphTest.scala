@@ -1,15 +1,15 @@
-package org.clulab.pdf2txt.document.physical
+package org.clulab.pdf2txt.document.logical
 
-import org.clulab.pdf2txt.common.utils.{Test, TextRange, TextRanges}
+import org.clulab.pdf2txt.common.utils.{Test, TextRanges}
 
-class TestDocumentByChar extends Test {
+class DocumentByParagraphTest extends Test {
 
-  behavior of "DocumentByChar"
+  behavior of "DocumentByParagraph"
 
-  val inputText = "This is a test."
+  val inputText = "This is a paragraph.\n\nThis is another paragraph."
 
   it should "know its content" in {
-    val document = DocumentByChar(inputText)
+    val document = DocumentByParagraph(inputText)
     val outputText = document.foldLeft(new StringBuilder()) { case (stringBuilder, char) =>
       stringBuilder += char
     }.toString
@@ -18,7 +18,7 @@ class TestDocumentByChar extends Test {
   }
 
   it should "know its children" in {
-    val document = DocumentByChar(inputText)
+    val document = DocumentByParagraph(inputText)
     val outputText = document.getChildren.foldLeft(new StringBuilder()) { case (stringBuilder, textRange) =>
       stringBuilder ++= textRange.toString
     }.toString
@@ -27,7 +27,7 @@ class TestDocumentByChar extends Test {
   }
 
   it should "know its separators and content" in {
-    val document = DocumentByChar(inputText)
+    val document = DocumentByParagraph(inputText)
     val textRanges = new TextRanges()
 
     textRanges += document.preSeparator

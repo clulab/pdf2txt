@@ -2,7 +2,7 @@ package org.clulab.pdf2txt.languageModel
 
 import org.clulab.pdf2txt.common.utils.Test
 
-class TestGigawordLanguageModel extends Test {
+class GigawordLanguageModelTest extends Test {
 
   behavior of "GigawordLanguageModel"
 

@@ -2,7 +2,7 @@ package org.clulab.pdf2txt.languageModel
 
 import org.clulab.pdf2txt.common.utils.Test
 
-class TestGloveLanguageModel extends Test {
+class GloveLanguageModelTest extends Test {
 
   behavior of "GloveLanguageModel"
 

@@ -3,7 +3,7 @@ package org.clulab.pdf2txt.preprocessor
 import org.clulab.pdf2txt.common.utils.Test
 import org.clulab.pdf2txt.languageModel.ProbabilisticLanguageModel
 
-class TestWordBreakBySpacePreprocessor extends Test {
+class WordBreakBySpacePreprocessorTest extends Test {
 
   class TestLanguageModel(vocab: Map[String, Float]) extends ProbabilisticLanguageModel {
 

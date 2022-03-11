@@ -2,7 +2,7 @@ package org.clulab.pdf2txt.document.logical
 
 import org.clulab.pdf2txt.common.utils.{Test, TextRange, TextRanges}
 
-class TestDocumentBySentence extends Test {
+class DocumentBySentenceTest extends Test {
 
   behavior of "DocumentBySentence"
 

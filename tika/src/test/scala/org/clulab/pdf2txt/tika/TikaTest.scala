@@ -5,7 +5,7 @@ import org.clulab.pdf2txt.common.utils.Test
 
 import java.io.InputStream
 
-class TestTika extends Test {
+class TikaTest extends Test {
   val pdfFilename = "/org/clulab/pdf2txt/tika/clulab.pdf"
   val htmlFilename = "/org/clulab/pdf2txt/tika/clulab.html"
 

@@ -2,7 +2,7 @@ package org.clulab.pdf2txt.languageModel
 
 import org.clulab.pdf2txt.common.utils.{Test, TextRange}
 
-class TestSetLanguageModel extends Test {
+class SetLanguageModelTest extends Test {
 
   behavior of "SetLanguageModel"
 

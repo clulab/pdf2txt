@@ -3,7 +3,7 @@ package org.clulab.pdf2txt.preprocessor
 import org.clulab.pdf2txt.common.utils.{Test, TextRange}
 import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, LocalSetLanguageModel, NeverLanguageModel}
 
-class TestLineBreakPreprocessor extends Test {
+class LineBreakPreprocessorTest extends Test {
 
   behavior of "LineBreakPreprocessor with AlwaysLanguageModel"
 

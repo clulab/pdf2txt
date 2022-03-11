@@ -4,7 +4,7 @@ import org.clulab.pdf2txt.common.utils.Test
 
 import java.io.PrintWriter
 
-class TestNumbersPreprocessor extends Test {
+class NumbersPreprocessorTest extends Test {
   val logger = new NumbersLogger(new PrintWriter(System.out))
 
   behavior of "NumbersPreprocessor on texts with commas"
