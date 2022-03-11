@@ -1,16 +1,16 @@
 package org.clulab.pdf2txt.tika
 
-import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
-
 import org.apache.tika.config.TikaConfig
 import org.apache.tika.detect.Detector
 import org.apache.tika.metadata.Metadata
 import org.apache.tika.parser.AutoDetectParser
 import org.apache.tika.sax.BodyContentHandler
+import org.clulab.pdf2txt.common.pdf.PdfConverter
+import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 
-import java.io.InputStream
+import java.io.{BufferedInputStream, File, FileInputStream, InputStream}
 
-class Tika(config: TikaConfig = new TikaConfig()) {
+class TikaConverter(config: TikaConfig = new TikaConfig()) extends PdfConverter {
   val detector: Detector = config.getDetector
   val parser = new AutoDetectParser(config)
 
@@ -32,5 +32,13 @@ class Tika(config: TikaConfig = new TikaConfig()) {
     }
     else
       throw new RuntimeException("Not PDF!")
+  }
+
+  override def convert(file: File): String = {
+    // The InputStream must support mark/reset which isn't enforced by the type system.
+    // In other words, a simple FileInputStream will throw an exception at runtime.
+    new BufferedInputStream(new FileInputStream(file)).autoClose { inputStream =>
+      read(inputStream)
+    }
   }
 }

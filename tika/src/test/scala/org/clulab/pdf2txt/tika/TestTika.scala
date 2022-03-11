@@ -11,7 +11,7 @@ class TestTika extends Test {
 
   def getInputStream(filename: String): InputStream = getClass.getResourceAsStream(filename)
 
-  val tika = new Tika()
+  val tika = new TikaConverter()
 
   behavior of "Tika"
 

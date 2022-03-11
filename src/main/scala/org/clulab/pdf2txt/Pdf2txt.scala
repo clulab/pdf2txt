@@ -1,13 +1,14 @@
 package org.clulab.pdf2txt
 
+import org.clulab.pdf2txt.common.pdf.PdfConverter
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.{Logging, Pdf2txtConfigured}
 import org.clulab.pdf2txt.languageModel.{GigawordLanguageModel, GloveLanguageModel}
-import org.clulab.pdf2txt.pdf.{PdfConverter, TikaConverter}
 import org.clulab.pdf2txt.preprocessor.{LigaturePreprocessor, LineBreakPreprocessor, NumbersPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
+import org.clulab.pdf2txt.tika.TikaConverter
 import org.clulab.utils.FileUtils
 
-import java.io.{BufferedInputStream, File, FileInputStream, InputStream, PrintWriter}
+import java.io.File
 
 class Pdf2txt(pdfConverter: PdfConverter) extends Pdf2txtConfigured {
   val preprocessors = Pdf2txt.preprocessors
@@ -18,61 +19,57 @@ class Pdf2txt(pdfConverter: PdfConverter) extends Pdf2txtConfigured {
     message
   }
 
-  def read(inputStream: InputStream): String = {
+  def read(inputFile: File): String = {
     try {
-      pdfConverter.convert(inputStream)
+      pdfConverter.convert(inputFile)
     }
     catch {
-      case throwable: Throwable => logError(throwable, s"Tika failed to read.")
+      case throwable: Throwable => logError(throwable, s"Could not read input file.")
     }
   }
 
   def process(rawText: String): String = {
-    preprocessors.foldLeft(rawText) { (rawText, preprocessor) =>
-      preprocessor.preprocess(rawText).toString
-    }
-  }
-
-  def write(printWriter: PrintWriter, text: String): Unit = {
     try {
-      printWriter.print(text)
+      preprocessors.foldLeft(rawText) { (rawText, preprocessor) =>
+        preprocessor.preprocess(rawText).toString
+      }
     }
     catch {
-      case throwable: Throwable => logError(throwable, s"PrintWriter failed to write.")
+      case throwable: Throwable => logError(throwable, s"Could not process text.")
     }
   }
 
-  def convert(inputStream: InputStream, printWriter: PrintWriter): Unit = {
-    val rawText = read(inputStream)
-    val cookedText = process(rawText)
+  def write(outputFile: File, text: String): Unit = {
+    try {
+      FileUtils.printWriterFromFile(outputFile).autoClose { printWriter =>
+        printWriter.print(text)
+      }
+    }
+    catch {
+      case throwable: Throwable => logError(throwable, s"Could not write output file.")
+    }
+  }
 
-    write(printWriter, cookedText)
+  def convert(inputFile: File, outputFile: File): Unit = {
+    try {
+      println(s"Converting ${inputFile.getAbsolutePath}...")
+
+      val rawText = read(inputFile)
+      val cookedText = process(rawText)
+      write(outputFile, cookedText)
+    }
+    catch {
+      case throwable: Throwable => logError(throwable, s"Could not convert ${inputFile.getAbsolutePath} to ${outputFile.getAbsolutePath}.")
+    }
   }
 
   def dir(inputDirName: String, outputDirName: String, inputExtension: String = ".pdf", outputExtension: String = ".txt"): Unit = {
     val files = FileUtils.findFiles(inputDirName, inputExtension)
 
     files.par.foreach { inputFile =>
-      try {
-        println(s"Converting ${inputFile.getAbsolutePath}...")
-        // The InputStream must support mark/reset which isn't enforced by the type system.
-        // In other words, a simple FileInputStream will throw an exception at runtime.
-        new BufferedInputStream(new FileInputStream(inputFile)).autoClose { inputStream =>
-          val outputFile = new File(outputDirName + "/" + inputFile.getName.dropRight(inputExtension.length) + outputExtension)
+      val outputFile = new File(outputDirName + "/" + inputFile.getName.dropRight(inputExtension.length) + outputExtension)
 
-          try {
-            FileUtils.printWriterFromFile(outputFile).autoClose { printWriter =>
-              convert(inputStream, printWriter)
-            }
-          }
-          catch {
-            case throwable: Throwable => logError(throwable, s"Could not process output file ${inputFile.getAbsolutePath}.")
-          }
-        }
-      }
-      catch {
-        case throwable: Throwable => logError(throwable, s"Could not process input file ${inputFile.getAbsolutePath}.")
-      }
+      convert(inputFile, outputFile)
     }
   }
 }
