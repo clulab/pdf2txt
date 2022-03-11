@@ -54,7 +54,7 @@ class NumbersPreprocessor(hyperparameters: NumbersPreprocessor.Hyperparameters =
 }
 
 object NumbersPreprocessor {
-  val commaPattern = Pattern.compile("(\\d+)\\s+(,\\d+)")
+  val commaPattern = Pattern.compile("(\\d+)[ \t]+(,\\d+)")
   val commaReplacement = "$1$2"
 
   // This could probably be "(^|\\s)(\\d+)(\\s+(\\d+))" to match multiple number groups
