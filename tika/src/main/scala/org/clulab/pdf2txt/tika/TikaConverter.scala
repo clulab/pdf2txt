@@ -2,6 +2,7 @@ package org.clulab.pdf2txt.tika
 
 import org.apache.tika.config.TikaConfig
 import org.apache.tika.detect.Detector
+import org.apache.tika.exception.WriteLimitReachedException
 import org.apache.tika.metadata.Metadata
 import org.apache.tika.parser.AutoDetectParser
 import org.apache.tika.sax.BodyContentHandler
@@ -23,12 +24,20 @@ class TikaConverter(config: TikaConfig = new TikaConfig()) extends PdfConverter 
   }
 
   def read(inputStream: InputStream): String = {
-    val handler = new BodyContentHandler()
+    val handler = new BodyContentHandler(-1)
     val metadata = new Metadata()
 
     if (isPdf(inputStream)) {
-      parser.parse(inputStream, handler, metadata)
-      handler.toString()
+      try {
+        parser.parse(inputStream, handler, metadata)
+        handler.toString()
+      }
+      catch {
+        case exception: WriteLimitReachedException =>
+          throw exception
+        case exception: NoClassDefFoundError =>
+          throw exception
+      }
     }
     else
       throw new RuntimeException("Not PDF!")
