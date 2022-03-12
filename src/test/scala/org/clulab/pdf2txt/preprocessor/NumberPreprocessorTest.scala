@@ -4,14 +4,14 @@ import org.clulab.pdf2txt.common.utils.Test
 
 import java.io.PrintWriter
 
-class NumbersPreprocessorTest extends Test {
+class NumberPreprocessorTest extends Test {
   val logger = new NumbersLogger(new PrintWriter(System.out))
 
   behavior of "NumbersPreprocessor on texts with commas"
 
   {
-    val hyperparameters = NumbersPreprocessor.Hyperparameters()
-    val preprocessor = new NumbersPreprocessor(hyperparameters, Some(logger))
+    val hyperparameters = NumberPreprocessor.Hyperparameters()
+    val preprocessor = new NumberPreprocessor(hyperparameters, Some(logger))
 
     def test(inputText: String, expectedOutputText: String): Unit = {
       it should s"convert ${escape(inputText)}" in {
@@ -37,8 +37,8 @@ class NumbersPreprocessorTest extends Test {
   behavior of "NumbersPreprocessor on texts with spaces"
 
   {
-    val hyperparameters = NumbersPreprocessor.Hyperparameters(joinWithSpaces = true)
-    val preprocessor = new NumbersPreprocessor(hyperparameters, Some(logger))
+    val hyperparameters = NumberPreprocessor.Hyperparameters(joinWithSpaces = true)
+    val preprocessor = new NumberPreprocessor(hyperparameters, Some(logger))
 
     def test(inputText: String, expectedOutputText: String): Unit = {
       it should s"convert ${escape(inputText)}" in {

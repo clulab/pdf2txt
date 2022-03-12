@@ -11,38 +11,39 @@ import scala.collection.JavaConverters._
  * Last Modified: Update for Scala 2.12: java converters.
  */
 trait Configured {
-  def getConf:Config
+
+  def getConfig: Config
 
   def getArgBoolean (argPath: String, defaultValue: Option[Boolean]): Boolean =
-    if (getConf.hasPath(argPath)) getConf.getBoolean(argPath)
+    if (getConfig.hasPath(argPath)) getConfig.getBoolean(argPath)
     else if(defaultValue.nonEmpty) defaultValue.get
     else throw new RuntimeException(s"ERROR: parameter $argPath must be defined!")
 
   def getArgInt (argPath: String, defaultValue: Option[Int]): Int =
-    if (getConf.hasPath(argPath)) getConf.getInt(argPath)
+    if (getConfig.hasPath(argPath)) getConfig.getInt(argPath)
     else if(defaultValue.nonEmpty) defaultValue.get
     else throw new RuntimeException(s"ERROR: parameter $argPath must be defined!")
 
   def getArgFloat (argPath: String, defaultValue: Option[Float]): Float =
-    if (getConf.hasPath(argPath)) getConf.getDouble(argPath).toFloat
+    if (getConfig.hasPath(argPath)) getConfig.getDouble(argPath).toFloat
     else if(defaultValue.nonEmpty) defaultValue.get
     else throw new RuntimeException(s"ERROR: parameter $argPath must be defined!")
 
   def getArgString (argPath: String, defaultValue: Option[String]): String =
-    if (getConf.hasPath(argPath)) getConf.getString(argPath)
+    if (getConfig.hasPath(argPath)) getConfig.getString(argPath)
     else if(defaultValue.nonEmpty) defaultValue.get
     else throw new RuntimeException(s"ERROR: parameter $argPath must be defined!")
 
   def getArgStrings (argPath: String, defaultValue: Option[Seq[String]]): Seq[String] =
-    if (getConf.hasPath(argPath)) getConf.getStringList(argPath).asScala
+    if (getConfig.hasPath(argPath)) getConfig.getStringList(argPath).asScala
     else if(defaultValue.nonEmpty) defaultValue.get
     else throw new RuntimeException(s"ERROR: parameter $argPath must be defined!")
 
-  def contains(argPath:String):Boolean = getConf.hasPath(argPath)
+  def contains(argPath:String):Boolean = getConfig.hasPath(argPath)
 }
 
 class ConfigWithDefaults(config:Config) extends Configured {
-  override def getConf: Config = config
+  override def getConfig: Config = config
 }
 
 object ConfigWithDefaults {

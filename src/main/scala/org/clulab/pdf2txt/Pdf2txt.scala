@@ -1,17 +1,19 @@
 package org.clulab.pdf2txt
 
+import com.typesafe.config.Config
 import org.clulab.pdf2txt.common.pdf.PdfConverter
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
-import org.clulab.pdf2txt.common.utils.{Logging, Pdf2txtConfigured}
-import org.clulab.pdf2txt.languageModel.{GigawordLanguageModel, GloveLanguageModel}
-import org.clulab.pdf2txt.preprocessor.{LigaturePreprocessor, LineBreakPreprocessor, NumbersPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
+import org.clulab.pdf2txt.common.utils.FileUtils
+import org.clulab.pdf2txt.common.utils.Logging
+import org.clulab.pdf2txt.common.utils.Pdf2txtConfigured
+import org.clulab.pdf2txt.common.utils.Pdf2txtException
+import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, GigawordLanguageModel, GloveLanguageModel, NeverLanguageModel}
+import org.clulab.pdf2txt.preprocessor.{LigaturePreprocessor, LineBreakPreprocessor, NumberPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
 import org.clulab.pdf2txt.tika.TikaConverter
-import org.clulab.utils.FileUtils
 
 import java.io.File
 
-class Pdf2txt(pdfConverter: PdfConverter) extends Pdf2txtConfigured {
-  val preprocessors = Pdf2txt.preprocessors
+class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) extends Pdf2txtConfigured {
 
   def logError(throwable: Throwable, message: String): String = {
     Pdf2txt.logger.error(message, throwable)
@@ -52,7 +54,7 @@ class Pdf2txt(pdfConverter: PdfConverter) extends Pdf2txtConfigured {
 
   def convert(inputFile: File, outputFile: File): Unit = {
     try {
-      println(s"Converting ${inputFile.getAbsolutePath}...")
+      println(s"Converting ${inputFile.getCanonicalPath}...")
 
       val rawText = read(inputFile)
       val cookedText = process(rawText)
@@ -74,21 +76,35 @@ class Pdf2txt(pdfConverter: PdfConverter) extends Pdf2txtConfigured {
   }
 }
 
-object Pdf2txt extends Logging {
-  val preprocessors: Array[Preprocessor] = {
-    // val languageModel = GloveLanguageModel()
-    val languageModel = GigawordLanguageModel()
+class ConfigError(config: Config, key: String, value: String, message: String) extends Pdf2txtException(message, null)
+
+object Pdf2txt extends Logging with Pdf2txtConfigured {
+
+  def apply(pdfConverter: PdfConverter = new TikaConverter()): Pdf2txt =
+      new Pdf2txt(pdfConverter, getPreprocessors(config))
+
+  def getPreprocessors(config: Config): Array[Preprocessor] = {
+    val key = "languageModel"
+    val value = config.getString(key)
+    val languageModel = value match {
+      case "always" => new AlwaysLanguageModel()
+      case "gigaWord" => GigawordLanguageModel()
+      case "glove" => GloveLanguageModel()
+      case "never" => new NeverLanguageModel()
+      case _ => throw new ConfigError(config, key, value, s"""The $key "$value" is not recognized.""")
+    }
+
+    def map(key: String, value: => Preprocessor): Option[Preprocessor] =
+        if (config.getBoolean(key)) Some(value) else None
 
     Array(
-      new ParagraphPreprocessor(),
-      new UnicodePreprocessor(),
-      new NumbersPreprocessor(),
-      new LigaturePreprocessor(languageModel),
-      new LineBreakPreprocessor(languageModel),
-      new WordBreakByHyphenPreprocessor(),
-      new WordBreakBySpacePreprocessor()
-    )
+      map("paragraph", new ParagraphPreprocessor()),
+      map("unicode", new UnicodePreprocessor()),
+      map("number", new NumberPreprocessor()),
+      map("ligature", new LigaturePreprocessor(languageModel)),
+      map("lineBreak", new LineBreakPreprocessor(languageModel)),
+      map("wordBreakByHyphen", new WordBreakByHyphenPreprocessor()),
+      map("wordBreakBySpace", new WordBreakBySpacePreprocessor())
+    ).flatten
   }
-
-  def apply(pdfConverter: PdfConverter = new TikaConverter()): Pdf2txt = new Pdf2txt(pdfConverter)
 }

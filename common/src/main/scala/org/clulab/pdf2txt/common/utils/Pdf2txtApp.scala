@@ -9,7 +9,7 @@ trait Pdf2txtConfiguredApp extends Configured {
   // This line doesn't work if there is a leading / in the resource name.  I tried.
   lazy val config = ConfigFactory.parseResourcesAnySyntax(BuildUtils.pkgToDir("org.clulab.pdf2txt") + "/apps")
 
-  def getConf: Config = config
+  def getConfig: Config = config
 }
 
 trait Pdf2txtApp extends App with Logging with Pdf2txtConfiguredApp

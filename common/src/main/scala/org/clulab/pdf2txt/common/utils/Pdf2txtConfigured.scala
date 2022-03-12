@@ -5,7 +5,7 @@ import com.typesafe.config.ConfigFactory
 
 trait Pdf2txtConfigured extends Configured {
   // This line doesn't work if there is a leading / in the resource name.  I tried.
-  lazy val config = ConfigFactory.parseResourcesAnySyntax("Pdf2txt")
+  lazy val config = ConfigFactory.parseResourcesAnySyntax("Pdf2txt").getConfig("Pdf2txt")
 
-  override def getConf: Config = config
+  override def getConfig: Config = config
 }

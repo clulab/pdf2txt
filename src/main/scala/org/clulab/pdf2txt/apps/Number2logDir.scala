@@ -1,7 +1,7 @@
 package org.clulab.pdf2txt.apps
 
 import org.clulab.pdf2txt.common.utils.TextRange
-import org.clulab.pdf2txt.preprocessor.{NumbersLogger, NumbersPreprocessor}
+import org.clulab.pdf2txt.preprocessor.{NumbersLogger, NumberPreprocessor}
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.FileUtils
 
@@ -14,7 +14,7 @@ object Number2logDir extends App {
 
   FileUtils.printWriterFromFile(new File(outputFilename)).autoClose { printWriter =>
     val logger = new NumbersLogger(printWriter)
-    val preprocessor = new NumbersPreprocessor(loggerOpt = Some(logger))
+    val preprocessor = new NumberPreprocessor(loggerOpt = Some(logger))
 
     files.foreach { inputFile =>
       val text = FileUtils.getTextFromFile(inputFile)

@@ -4,7 +4,7 @@ import org.clulab.pdf2txt.common.utils.FileUtils
 
 import java.io.File
 
-class TextConverter extends PdfConverter {
+class TextConverter() extends PdfConverter() {
 
   override def convert(file: File): String = FileUtils.getTextFromFile(file)
 }

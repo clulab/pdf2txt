@@ -6,7 +6,7 @@ import java.io.{File, PrintWriter}
 import java.util.regex.Pattern
 import scala.annotation.tailrec
 
-class NumbersPreprocessor(hyperparameters: NumbersPreprocessor.Hyperparameters = NumbersPreprocessor.Hyperparameters(), loggerOpt: Option[NumbersLogger] = None) extends Preprocessor {
+class NumberPreprocessor(hyperparameters: NumberPreprocessor.Hyperparameters = NumberPreprocessor.Hyperparameters(), loggerOpt: Option[NumbersLogger] = None) extends Preprocessor {
 
   def process(text: String, pattern: Pattern, replacement: String): String = {
     val matcher = pattern.matcher(text)
@@ -27,13 +27,13 @@ class NumbersPreprocessor(hyperparameters: NumbersPreprocessor.Hyperparameters =
   }
 
   def preprocessWithComma(text: String): String =
-      process(text, NumbersPreprocessor.commaPattern, NumbersPreprocessor.commaReplacement)
+      process(text, NumberPreprocessor.commaPattern, NumberPreprocessor.commaReplacement)
 
   def preprocessWithSpace(text: String): String = {
 
     @tailrec
     def loop(before: String): String = {
-      val after = process(before, NumbersPreprocessor.spacePattern, NumbersPreprocessor.spaceReplacement)
+      val after = process(before, NumberPreprocessor.spacePattern, NumberPreprocessor.spaceReplacement)
 
       if (before == after) after
       else loop(after)
@@ -53,7 +53,7 @@ class NumbersPreprocessor(hyperparameters: NumbersPreprocessor.Hyperparameters =
   }
 }
 
-object NumbersPreprocessor {
+object NumberPreprocessor {
   val commaPattern = Pattern.compile("(\\d+)[ \t]+(,\\d+)")
   val commaReplacement = "$1$2"
 
