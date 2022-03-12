@@ -7,7 +7,4 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= {
-  Seq(
-  )
 }
-

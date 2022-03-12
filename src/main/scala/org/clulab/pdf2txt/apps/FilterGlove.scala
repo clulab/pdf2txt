@@ -1,7 +1,7 @@
 package org.clulab.pdf2txt.apps
 
 import org.clulab.pdf2txt.common.utils.StringUtils
-import org.clulab.utils.Closer.AutoCloser
+import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 
 import java.io.{BufferedOutputStream, FileOutputStream, ObjectOutputStream}
 import java.nio.charset.StandardCharsets

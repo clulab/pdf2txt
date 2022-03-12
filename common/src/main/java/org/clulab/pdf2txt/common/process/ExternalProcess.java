@@ -35,12 +35,12 @@ public class ExternalProcess {
 		return processBuilder;
 	}
 	
-	public void execute() throws AppException, IOException, InterruptedException {
+	public void execute() throws ProcessException, IOException, InterruptedException {
 		Process process = processBuilder.start();
 		
 		int result = process.waitFor();
 		if (result != 0)
-			throw new AppException("Process " + (command.size() > 0 ? "\"" + command.get(0) + "\"" : "") + " terminated abnormally!");
+			throw new ProcessException("Process " + (command.size() > 0 ? "\"" + command.get(0) + "\"" : "") + " terminated abnormally!");
 	}
 	
 	// See https://stackoverflow.com/questions/16714127/how-to-redirect-process-builders-output-to-a-string

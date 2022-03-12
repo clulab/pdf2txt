@@ -10,6 +10,8 @@ class PdfToTextProcess(inputFile: File, outputFile: File) extends ExternalProces
 	command.add("unix")
 	command.add("-enc")
 	command.add("UTF-8")
-	command.add(inputFile.getAbsolutePath) // Convert to OS style
+	// These should already be in OS-specific style, because the input comes from
+	// searching a directory and the output comes from a temporary file.
+	command.add(inputFile.getAbsolutePath)
 	command.add(outputFile.getAbsolutePath)
 }

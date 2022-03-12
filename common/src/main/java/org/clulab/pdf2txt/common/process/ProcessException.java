@@ -9,24 +9,24 @@ Imports
 /* ***************************************************************************
 Class
 *****************************************************************************/
-public class AppException extends Exception {
+public class ProcessException extends Exception {
 	private static final long serialVersionUID = 1L;
 
-	public AppException() {
+	public ProcessException() {
 		super();
 	}
 	
-	public AppException(String message) {
+	public ProcessException(String message) {
 		super(message);
 	}
 
 	// This is Exception for a reason.  We want to catch unchecked exceptions
 	// and roll back the database even for null pointers and out of range indexes.
-	public AppException(String message, Exception cause) {
+	public ProcessException(String message, Exception cause) {
 		super(message, cause);
 	}
 	
-	public AppException(Exception cause) {
+	public ProcessException(Exception cause) {
 		super(cause);
 	}
 }

@@ -19,7 +19,8 @@ $ sbt "runMain org.clulab.pdf2txt.apps.PdfToTextApp <input directory> <output di
 
 ```shell
 # Use the PdfMiner Python library for the conversion.
-# This library and the python3 command must be available.
+# The python command must be available on the $PATH and invoke version 3.
+# The pdfminer project needs to have been installed a la "pip install pdfminer".
 $ sbt "runMain org.clulab.pdf2txt.apps.PdfMinerApp <input directory> <output directory>"
 ```
 
