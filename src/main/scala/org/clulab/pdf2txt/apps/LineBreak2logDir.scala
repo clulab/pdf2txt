@@ -3,8 +3,8 @@ package org.clulab.pdf2txt.apps
 import org.clulab.pdf2txt.common.utils.TextRange
 import org.clulab.pdf2txt.languageModel.{SetLanguageModel, GloveLanguageModel, LanguageModel}
 import org.clulab.pdf2txt.preprocessor.LineBreakPreprocessor
-import org.clulab.utils.Closer.AutoCloser
-import org.clulab.utils.FileUtils
+import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
+import org.clulab.pdf2txt.common.utils.FileUtils
 
 import java.io.{File, PrintWriter}
 
@@ -40,7 +40,7 @@ object LineBreak2logDir extends App {
   val outputFilename = args.lift(1).getOrElse("output.tsv")
   val files = FileUtils.findFiles(dir, ".txt")
 
-  FileUtils.printWriterFromFile(outputFilename).autoClose { printWriter =>
+  FileUtils.printWriterFromFile(new File(outputFilename)).autoClose { printWriter =>
     val logger = new Logger(printWriter)
     val innerLanguageModel = GloveLanguageModel()
     val outerLanguageModel = new LoggingLanguageModel(innerLanguageModel, logger)
@@ -54,7 +54,7 @@ object LineBreak2logDir extends App {
       val newText = preprocessor.preprocess(TextRange(text)).toString
       val newFile = "../corpora/LineBreak2logDir/" + inputFile.getName
 
-      FileUtils.printWriterFromFile(newFile).autoClose { printWriter =>
+      FileUtils.printWriterFromFile(new File(newFile)).autoClose { printWriter =>
         printWriter.print(newText)
       }
     }

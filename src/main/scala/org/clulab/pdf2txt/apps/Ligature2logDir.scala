@@ -3,7 +3,7 @@ package org.clulab.pdf2txt.apps
 import org.clulab.pdf2txt.common.utils.TextRange
 import org.clulab.pdf2txt.languageModel.{GloveLanguageModel, LanguageModel}
 import org.clulab.pdf2txt.preprocessor.{LigaturePreprocessor, LineBreakPreprocessor}
-import org.clulab.utils.Closer.AutoCloser
+import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.utils.FileUtils
 
 import java.io.{File, PrintWriter}

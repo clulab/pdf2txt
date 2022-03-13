@@ -3,7 +3,7 @@ package org.clulab.pdf2txt.apps
 import org.clulab.pdf2txt.common.utils.TextRange
 import org.clulab.pdf2txt.languageModel.NeverLanguageModel
 import org.clulab.pdf2txt.preprocessor.WordBreakByHyphenPreprocessor
-import org.clulab.utils.FileUtils
+import org.clulab.pdf2txt.common.utils.FileUtils
 
 import java.io.File
 

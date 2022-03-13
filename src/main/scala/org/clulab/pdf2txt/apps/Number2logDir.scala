@@ -1,18 +1,20 @@
 package org.clulab.pdf2txt.apps
 
 import org.clulab.pdf2txt.common.utils.TextRange
-import org.clulab.pdf2txt.preprocessor.{NumbersLogger, NumbersPreprocessor}
-import org.clulab.utils.Closer.AutoCloser
-import org.clulab.utils.FileUtils
+import org.clulab.pdf2txt.preprocessor.{NumbersLogger, NumberPreprocessor}
+import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
+import org.clulab.pdf2txt.common.utils.FileUtils
+
+import java.io.File
 
 object Number2logDir extends App {
   val dir = args.lift(0).getOrElse(".")
   val outputFilename = args.lift(1).getOrElse("output.tsv")
   val files = FileUtils.findFiles(dir, ".txt")
 
-  FileUtils.printWriterFromFile(outputFilename).autoClose { printWriter =>
+  FileUtils.printWriterFromFile(new File(outputFilename)).autoClose { printWriter =>
     val logger = new NumbersLogger(printWriter)
-    val preprocessor = new NumbersPreprocessor(loggerOpt = Some(logger))
+    val preprocessor = new NumberPreprocessor(loggerOpt = Some(logger))
 
     files.foreach { inputFile =>
       val text = FileUtils.getTextFromFile(inputFile)
@@ -22,7 +24,7 @@ object Number2logDir extends App {
       val newText = preprocessor.preprocess(TextRange(text)).toString
       val newFile = "../corpora/Numbers2logDir/" + inputFile.getName
 
-      FileUtils.printWriterFromFile(newFile).autoClose { printWriter =>
+      FileUtils.printWriterFromFile(new File(newFile)).autoClose { printWriter =>
         printWriter.print(newText)
       }
     }
