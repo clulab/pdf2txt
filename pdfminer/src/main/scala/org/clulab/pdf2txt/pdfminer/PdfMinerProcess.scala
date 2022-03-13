@@ -5,7 +5,7 @@ import org.clulab.pdf2txt.common.process.ExternalProcess
 import java.io.File
 
 class PdfMinerProcess(pythonFile: File, inputFile: File, outputFile: File) extends ExternalProcess() {
-	command.add("python")
+	command.add("python3")
 	command.add(pythonFile.getAbsolutePath)
 	command.add(inputFile.getAbsolutePath)
 	command.add(outputFile.getAbsolutePath)
