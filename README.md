@@ -12,6 +12,11 @@ $ sbt "runMain org.clulab.pdf2txt.apps.TikaApp <input directory> <output directo
 ```
 
 ```shell
+# Use the ScienceParse library from Allen AI for the conversion.
+$ sbt "runMain org.clulab.pdf2txt.apps.ScienceParseApp <input directory> <output directory>"
+```
+
+```shell
 # Use the pdftotext program for the conversion.
 # It should be available on the $PATH.
 $ sbt "runMain org.clulab.pdf2txt.apps.PdfToTextApp <input directory> <output directory>"

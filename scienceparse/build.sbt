@@ -6,6 +6,15 @@ resolvers ++= Seq(
 //  Resolvers.clulabResolver // processors-models, transitive dependency
 )
 
+unmanagedBase := {
+  val suffix = CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((major, minor)) => s"-$major.$minor"
+    case None => ""
+  }
+
+  baseDirectory.value / ("lib" + suffix)
+}
+
 libraryDependencies ++= {
   Seq(
     // science-parse-core_2.12 3.0.1
