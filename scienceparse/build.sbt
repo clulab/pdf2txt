@@ -29,7 +29,7 @@ libraryDependencies ++= {
     "org.apache.opennlp"      % "opennlp-tools"      % "1.7.2",
 
     // These are already automatically included in a Scala project.
-    // "org.scala-lang" % scala-library" % "2.12.9",
+    // "org.scala-lang" % scala-library" % "2.12.9", // or "2.11.12"
     // "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
     // These next two are included in the lib directory and their dependencies are listed in this file.
     // "org.allenai.common" %% "common-core" % "2.0.0" exclude("org.apache.common", "commons-math3"),
@@ -51,7 +51,7 @@ libraryDependencies ++= {
     "com.typesafe"       % "config"          % "1.2.1",
 
     // This is already automatically included in a Scala project.
-    // "org.scala-lang" % scala-library" % "2.12.9",
+    // "org.scala-lang" % scala-library" % "2.12.9", // or "2.11.12"
     // This is for internal testing only.
     // "org.allenai.common" %% "common-testkit" % "2.0.0" % Test,
     // This is ruled out by an exclude().
@@ -66,7 +66,7 @@ libraryDependencies ++= {
     "org.slf4j"      % "jcl-over-slf4j"  % "1.7.28",
 
     // This is already automatically included in a Scala project.
-    // "org.scala-lang" % scala-library" % "2.12.9",
+    // "org.scala-lang" % scala-library" % "2.12.9", // or "2.11.12"
     // This is included in the lib directory and its dependencies are listed in this file.    
     // "org.allenai.common" %% "common-core" % "2.0.0",
     // This is for internal testing only.
@@ -85,7 +85,7 @@ libraryDependencies ++= {
     "org.bouncycastle"  % "bcpkix-jdk15on"  % "1.54",
     
     // This is already automatically included in a Scala project.
-    // "org.scala-lang" % scala-library" % "2.12.9",
+    // "org.scala-lang" % scala-library" % "2.12.9", // or "2.11.12"
     
     // word2vecjava_2.12 2.0.0
     "org.apache.commons" % "commons-lang3" % "3.9",
@@ -97,7 +97,7 @@ libraryDependencies ++= {
     "org.apache.commons" % "commons-math3" % "3.6.1",
 
     // This is already automatically included in a Scala project.
-    // "org.scala-lang" % scala-library" % "2.12.9",
+    // "org.scala-lang" % scala-library" % "2.12.9", // or "2.11.12"
     // These are for internal testing only.
     // "org.scalacheck" %% "scalacheck" % "1.14.0" % Test,
     // "com.novocode" % "junit-interface<" % "0.11" % Test,
