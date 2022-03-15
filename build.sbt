@@ -28,8 +28,8 @@ libraryDependencies ++= {
 lazy val core = (project in file("."))
   .enablePlugins(BuildInfoPlugin)
   .disablePlugins(PlayScala, JavaAppPackaging, SbtNativePackager)
-  .dependsOn(common % "compile -> compile; test -> test", tika, pdfminer, pdftotext)
-  .aggregate(common, tika, pdfminer, pdftotext)
+  .dependsOn(common % "compile -> compile; test -> test", pdfminer, pdftotext, tika, scienceparse)
+  .aggregate(common, pdfminer, pdftotext, tika, scienceparse)
   .settings(
     assembly / aggregate := false,
     assembly / mainClass := Some("org.clulab.pdf2txt.apps.HelloWorldApp")
@@ -37,11 +37,14 @@ lazy val core = (project in file("."))
 
 lazy val common = project
 
-lazy val tika = project
-  .dependsOn(common % "compile -> compile; test -> test")
-
 lazy val pdfminer = project
   .dependsOn(common % "compile -> compile; test -> test")
 
 lazy val pdftotext = project
+  .dependsOn(common % "compile -> compile; test -> test")
+
+lazy val scienceparse = project
+  .dependsOn(common % "compile -> compile; test -> test")
+
+lazy val tika = project
   .dependsOn(common % "compile -> compile; test -> test")
