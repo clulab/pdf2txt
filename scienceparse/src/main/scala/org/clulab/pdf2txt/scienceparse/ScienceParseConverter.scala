@@ -26,7 +26,9 @@ class ScienceParseConverter() extends PdfConverter {
       }
     }
 
-    extractedMetadata.sections.asScala.foreach { section =>
+    append(extractedMetadata.title)
+    append(extractedMetadata.abstractText)
+    Option(extractedMetadata.sections).map(_.asScala).getOrElse(List.empty).foreach { section =>
       append(section.heading)
       append(section.text)
     }
@@ -34,9 +36,9 @@ class ScienceParseConverter() extends PdfConverter {
   }
 
   def read(inputStream: InputStream): String = {
-    val extractedMetadata = parser.doParse(inputStream)
+    val extractedMetadataOpt = Option(parser.doParse(inputStream))
 
-    toString(extractedMetadata)
+    extractedMetadataOpt.map(toString).getOrElse("")
   }
 
   override def convert(file: File): String = {
