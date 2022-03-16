@@ -10,7 +10,7 @@ class ScienceParseTest extends Test {
 
   def getInputStream(filename: String): InputStream = getClass.getResourceAsStream(filename)
 
-  val scienceParse = new ScienceParseConverter()
+  lazy val scienceParse = new ScienceParseConverter()
 
   behavior of "ScienceParse"
 
