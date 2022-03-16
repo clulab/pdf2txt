@@ -20,7 +20,6 @@ libraryDependencies ++= {
     // science-parse-core_2.12 3.0.1
     "org.apache.pdfbox"       % "pdfbox"             % "2.0.9"    exclude("commons-logging", "commons-logging"),
     "org.apache.pdfbox"       % "fontbox"            % "2.0.9"    exclude("commons-logging", "commons-logging"),
-    "org.slf4j"               % "jcl-over-slf4j"     % "1.7.7",
     "org.projectlombok"       % "lombok"             % "1.16.20",
     "com.goldmansachs"        % "gs-collections"     % "6.1.0",
     "org.bouncycastle"        % "bcprov-jdk15on"     % "1.54",
@@ -50,11 +49,12 @@ libraryDependencies ++= {
     // "org.scalatest" %% "scalatest" % "3.0.9" % Test,
     // "org.testng" % "testng" % "6.8.1" % Test,
     // "org.allenai.common" %% "common-testkit" % "2.0.0" % Test,
+    // Logging is arranged elsewhere.
+    // "org.slf4j" % "jcl-over-slf4j" % "1.7.7",
 
     // common-core_2.12 2.0.0
     "ch.qos.logback"     % "logback-classic" % "1.2.3",
     "ch.qos.logback"     % "logback-core"    % "1.2.3",
-    "org.slf4j"          % "slf4j-api"       % "1.7.28",
     "net.sf.opencsv"     % "opencsv"         % "2.1",
     "io.spray"          %% "spray-json"      % "1.3.5",
     "com.typesafe"       % "config"          % "1.2.1",
@@ -65,14 +65,14 @@ libraryDependencies ++= {
     // "org.allenai.common" %% "common-testkit" % "2.0.0" % Test,
     // This is ruled out by an exclude().
     // "org.apache.commons" % "commons-lang3"   % "3.4",
+    // Logging is arranged elsewhere.
+    // "org.slf4j" % "slf4j-api" % "1.7.28",
 
     // datastore_2.12 2.0.0
     "com.amazonaws"  % "aws-java-sdk-s3" % "1.10.29" exclude("commons-logging", "commons-logging"),
     "commons-io"     % "commons-io"      % "2.4",
     "ch.qos.logback" % "logback-classic" % "1.2.3",
     "ch.qos.logback" % "logback-core"    % "1.2.3",
-    "org.slf4j"      % "slf4j-api"       % "1.7.28",
-    "org.slf4j"      % "jcl-over-slf4j"  % "1.7.28",
 
     // This is already automatically included in a Scala project.
     // "org.scala-lang" % scala-library" % "2.12.9", // or "2.11.12"
@@ -80,12 +80,14 @@ libraryDependencies ++= {
     // "org.allenai.common" %% "common-core" % "2.0.0",
     // This is for internal testing only.
     // "org.allenai.common" %% "common-testkit" % "2.0.0" % Test,
+    // Logging is arranged elsewhere.
+    // "org.slf4j" % "slf4j-api" % "1.7.28",
+    // "org.slf4j" % "jcl-over-slf4j" % "1.7.7",
 
     // pdffigures2_2.12 0.1.0
     "io.spray"         %% "spray-json"      % "1.3.5",
     "com.github.scopt" %% "scopt"           % "3.7.1",
     "ch.qos.logback"    % "logback-classic" % "1.1.7",
-    "org.slf4j"         % "jcl-over-slf4j"  % "1.7.21",
     "org.apache.pdfbox" % "pdfbox"          % "2.0.1",
     "org.apache.pdfbox" % "fontbox"         % "2.0.1",
     "com.typesafe"      % "config"          % "1.3.0",
@@ -95,7 +97,9 @@ libraryDependencies ++= {
     
     // This is already automatically included in a Scala project.
     // "org.scala-lang" % scala-library" % "2.12.9", // or "2.11.12"
-    
+    // Logging is arranged elsewhere.
+    // "org.slf4j" % "jcl-over-slf4j" % "1.7.7",
+
     // word2vecjava_2.12 2.0.0
     "org.apache.commons" % "commons-lang3" % "3.9",
     "com.google.guava"   % "guava"         % "18.0",
@@ -112,12 +116,13 @@ libraryDependencies ++= {
     // "com.novocode" % "junit-interface<" % "0.11" % Test,
 
     // ml 0.16
-    "org.slf4j"          % "slf4j-simple"   % "1.7.7",
     "com.goldmansachs"   % "gs-collections" % "6.1.0",
     "de.ruedigermoeller" % "fst"            % "2.47"
 
     // This is ruled out by an exclude().
     // "args4j" % "args4j" % "2.32",
+    // Logging is arranged elsewhere.
+    // "org.slf4j" % "slf4j-simple" % "1.7.7",
   )
 }
 
