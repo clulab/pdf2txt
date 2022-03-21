@@ -78,6 +78,12 @@
         <appender-ref ref="clulab:Pdf2txt"/>
     </logger>
 
+    <!-- PDFBox and FontBox are extremely verbose so for STOUT keep them quiet -->
+    <logger name="org.apache.pdfbox" level="error" additivity="false" />
+    <logger name="org.apache.fontbox" level="error" additivity="false" />
+    <!-- This accounts for anything coming from the scienceparse project. -->
+    <logger name="org.allenai" level="error" additivity="false" />
+
     <!-- This handles anything from outside of clulab that isn't configured otherwise. -->
     <root level="all">
         <appender-ref ref="clulab:stderr"/>

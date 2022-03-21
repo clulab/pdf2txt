@@ -36,7 +36,8 @@ class TikaTest extends Test {
       tika.read(inputStream)
     }
 
-    text should not be empty
+    text should include ("The Computational Language Understanding")
+    text should include ("please see our NLP")
   }
 
   it should "not read an HTML file" in {
