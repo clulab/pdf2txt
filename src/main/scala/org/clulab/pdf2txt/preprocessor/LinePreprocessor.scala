@@ -1,6 +1,6 @@
 package org.clulab.pdf2txt.preprocessor
 
-import org.clulab.pdf2txt.common.utils.{TextRange, TextRanges}
+import org.clulab.pdf2txt.common.utils.{StringUtils, TextRange, TextRanges}
 import org.clulab.pdf2txt.document.physical.{DocumentByLine, LineDocument}
 
 import scala.annotation.tailrec
@@ -46,7 +46,10 @@ object LineQualifier {
     val firstTrimmed = charDocument.findFirstTrimmed
     val lastTrimmed = charDocument.findLastTrimmed
 
-    val top = lastTrimmed.nonEmpty && !lastTrimmed.matches('.')
+    val top = lastTrimmed.nonEmpty && {
+      val char = lastTrimmed.firstChar
+      !StringUtils.SENTENCE_BREAK_CHARS.contains(char)
+    }
     val mid = charDocument.trimmedIsEmpty
     val bot = firstTrimmed.nonEmpty && {
       val char = firstTrimmed.firstChar
