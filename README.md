@@ -48,10 +48,10 @@ Pdf2txt(pdfConverter).convert(inputFile, outputFile)
 ## Preprocessors
 
 * line - Remove extraneous blank lines within a paragraph.
-* paragraph = Make sure paragraphs end with complete sentences.
-* unicode = Clean up some unicode characters.
-* number = Remove extra spaces around commas within numbers.
-* ligature = Remove extra spaces around ligatures if it makes sense.
-* lineBreak = Join lines that end with hyphens (if it makes sense).
-* wordBreakByHyphen = Join word parts that have been hyphenated.
-* wordBreakBySpace = Join word parts separated by spaces.
+* paragraph - Make sure paragraphs end with complete sentences.
+* unicode - Clean up some unicode characters.
+* number - Remove extra spaces around commas within numbers.
+* ligature - Remove extra spaces around ligatures if it makes sense.
+* lineBreak - Join lines that end with hyphens (if it makes sense).
+* wordBreakByHyphen - Join word parts that have been hyphenated.
+* wordBreakBySpace - Join word parts separated by spaces.
