@@ -17,6 +17,8 @@ object StringUtils {
   val HARD_SPACE = '\u00A0' // non-breaking
   val SPACE = ' '
 
+  val FORM_FEED = '\f'
+
   val DASH = '-'
 
   val PLAIN_HYPHEN = DASH

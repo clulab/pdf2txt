@@ -8,7 +8,7 @@ import org.clulab.pdf2txt.common.utils.Logging
 import org.clulab.pdf2txt.common.utils.Pdf2txtConfigured
 import org.clulab.pdf2txt.common.utils.Pdf2txtException
 import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, GigawordLanguageModel, GloveLanguageModel, NeverLanguageModel}
-import org.clulab.pdf2txt.preprocessor.{LigaturePreprocessor, LineBreakPreprocessor, NumberPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
+import org.clulab.pdf2txt.preprocessor.{LigaturePreprocessor, LineBreakPreprocessor, LinePreprocessor, NumberPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
 import org.clulab.pdf2txt.tika.TikaConverter
 
 import java.io.File
@@ -98,6 +98,7 @@ object Pdf2txt extends Logging with Pdf2txtConfigured {
         if (config.getBoolean(key)) Some(value) else None
 
     Array(
+      map("line", new LinePreprocessor()),
       map("paragraph", new ParagraphPreprocessor()),
       map("unicode", new UnicodePreprocessor()),
       map("number", new NumberPreprocessor()),
