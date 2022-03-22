@@ -1,7 +1,7 @@
 package org.clulab.pdf2txt.preprocessor
 
 import org.clulab.pdf2txt.common.utils.{TextRange, TextRanges}
-import org.clulab.pdf2txt.document.physical.DocumentByLine
+import org.clulab.pdf2txt.document.physical.{DocumentByLine, LineDocument}
 
 import scala.annotation.tailrec
 
@@ -12,6 +12,25 @@ class LinePreprocessor extends Preprocessor {
     val textRanges = new TextRanges()
     val contents = document.contents
 
+    def topQualifies(lineDocument: LineDocument): Boolean = {
+      val string = lineDocument.contents.head.toString.trim
+
+      string.nonEmpty && !string.endsWith(".")
+    }
+
+    def midQualifies(lineDocument: LineDocument): Boolean = {
+      lineDocument.contents.head.toString.trim.isEmpty
+    }
+
+    def botQualifies(lineDocument: LineDocument): Boolean = {
+      val string = lineDocument.contents.head.toString.trim
+
+      string.nonEmpty && {
+        val char = string.head
+        char.isLetter && char.isLower
+      }
+    }
+
     @tailrec
     def loop(index: Int): Unit = {
       if (index < contents.length) {
@@ -21,18 +40,8 @@ class LinePreprocessor extends Preprocessor {
         if (index + 2 < contents.length) {
           val mid = contents(index + 1)
           val bot = contents(index + 2)
-
-          val qualifies0 = true
-          val qualifies1 = qualifies0 && !top.contents.head.toString.trim.endsWith(".") // add not empty
-          val qualifies2 = qualifies1 && mid.contents.head.toString.trim.isEmpty
-          val qualifies3 = qualifies2 && {
-            val charOpt = bot.contents.head.toString.trim.headOption // already has not empty, but do the same
-
-            charOpt.map { char =>
-              char.isLetter && char.isLower
-            }.getOrElse(false)
-          }
-          val qualifies = qualifies3
+          // Order these for efficiency.
+          val qualifies = midQualifies(mid) && topQualifies(top) && botQualifies(bot)
 
           if (qualifies) loop(index + 2) // skip middle
           else loop(index + 1)
