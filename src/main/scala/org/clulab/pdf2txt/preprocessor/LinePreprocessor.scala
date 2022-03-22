@@ -9,27 +9,9 @@ class LinePreprocessor extends Preprocessor {
 
   def preprocess(textRange: TextRange): TextRanges = {
     val document = DocumentByLine(textRange)
-    val textRanges = new TextRanges()
     val contents = document.contents
-
-    def topQualifies(lineDocument: LineDocument): Boolean = {
-      val string = lineDocument.contents.head.toString.trim
-
-      string.nonEmpty && !string.endsWith(".")
-    }
-
-    def midQualifies(lineDocument: LineDocument): Boolean = {
-      lineDocument.contents.head.toString.trim.isEmpty
-    }
-
-    def botQualifies(lineDocument: LineDocument): Boolean = {
-      val string = lineDocument.contents.head.toString.trim
-
-      string.nonEmpty && {
-        val char = string.head
-        char.isLetter && char.isLower
-      }
-    }
+    val lineQualifiers = contents.map(new LineQualifier(_))
+    val textRanges = new TextRanges()
 
     @tailrec
     def loop(index: Int): Unit = {
@@ -37,15 +19,11 @@ class LinePreprocessor extends Preprocessor {
         val top = contents(index)
         textRanges += top
 
-        if (index + 2 < contents.length) {
-          val mid = contents(index + 1)
-          val bot = contents(index + 2)
-          // Order these for efficiency.
-          val qualifies = midQualifies(mid) && topQualifies(top) && botQualifies(bot)
-
-          if (qualifies) loop(index + 2) // skip middle
-          else loop(index + 1)
-        }
+        if (index + 2 < contents.length &&
+            lineQualifiers(index).top &&
+            lineQualifiers(index + 1).mid &&
+            lineQualifiers(index + 2).bot)
+          loop(index + 2) // skip mid
         else
           loop(index + 1)
       }
@@ -55,5 +33,20 @@ class LinePreprocessor extends Preprocessor {
     loop(0)
     textRanges += document.postSeparator
     textRanges
+  }
+}
+
+class LineQualifier(lineDocument: LineDocument) {
+  val (top, mid, bot) = {
+    // Convert each line to a string only once and don't even save it.
+    val string = lineDocument.contents.head.toString.trim
+    val top = string.nonEmpty && !string.endsWith(".")
+    val mid = string.isEmpty
+    val bot = string.nonEmpty && {
+      val char = string.head
+      char.isLetter && char.isLower
+    }
+
+    (top, mid, bot)
   }
 }
