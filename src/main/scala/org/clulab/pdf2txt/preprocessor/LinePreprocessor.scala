@@ -10,7 +10,7 @@ class LinePreprocessor extends Preprocessor {
   def preprocess(textRange: TextRange): TextRanges = {
     val document = DocumentByLine(textRange)
     val contents = document.contents
-    val lineQualifiers = contents.map(new LineQualifier(_))
+    val lineQualifiers = contents.map(LineQualifier(_))
     val textRanges = new TextRanges()
 
     @tailrec
@@ -36,9 +36,11 @@ class LinePreprocessor extends Preprocessor {
   }
 }
 
-class LineQualifier(lineDocument: LineDocument) {
-  val (top, mid, bot) = {
-    // Convert each line to a string only once and don't even save it.
+case class LineQualifier(top: Boolean, mid: Boolean, bot: Boolean)
+
+object LineQualifier {
+
+  def apply(lineDocument: LineDocument): LineQualifier = {
     val string = lineDocument.contents.head.toString.trim
     val top = string.nonEmpty && !string.endsWith(".")
     val mid = string.isEmpty
@@ -46,7 +48,6 @@ class LineQualifier(lineDocument: LineDocument) {
       val char = string.head
       char.isLetter && char.isLower
     }
-
-    (top, mid, bot)
+    LineQualifier(top, mid, bot)
   }
 }
