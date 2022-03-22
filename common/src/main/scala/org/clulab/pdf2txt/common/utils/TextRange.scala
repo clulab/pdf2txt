@@ -92,6 +92,26 @@ class TextRange(val text: String, val range: Range) extends IndexedSeq[Char] {
   override def apply(index: Int): Char =
       if (0 <= index && index < length) text(start + index)
       else throw new IndexOutOfBoundsException(s"$index is not within interval [0, $length)!")
+
+  def findFirst(f: Char => Boolean): TextRange = range
+      .find { pos => f(text(pos)) }
+      .map(subRange)
+      .getOrElse(emptyEnd)
+
+  def findLast(f: Char => Boolean): TextRange = range.reverse
+      .find { pos => f(text(pos)) }
+      .map(subRange)
+      .getOrElse(emptyStart)
+
+  def findFirstTrimmed: TextRange = findFirst { char: Char => char > ' ' }
+
+  def findLastTrimmed: TextRange = findLast { char: Char => char > ' ' }
+
+  def firstChar: Char = text(start) // assuming nonEmpty
+
+  def lastChar: Char = text(end - 1) // assuming nonEmpty
+
+  def trimmedIsEmpty: Boolean = findFirstTrimmed.isEmpty
 }
 
 object TextRange {

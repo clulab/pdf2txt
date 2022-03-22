@@ -41,11 +41,15 @@ case class LineQualifier(top: Boolean, mid: Boolean, bot: Boolean)
 object LineQualifier {
 
   def apply(lineDocument: LineDocument): LineQualifier = {
-    val string = lineDocument.contents.head.toString.trim
-    val top = string.nonEmpty && !string.endsWith(".")
-    val mid = string.isEmpty
-    val bot = string.nonEmpty && {
-      val char = string.head
+    // Avoid converting to string.
+    val charDocument = lineDocument.contents.head
+    val firstTrimmed = charDocument.findFirstTrimmed
+    val lastTrimmed = charDocument.findLastTrimmed
+
+    val top = lastTrimmed.nonEmpty && !lastTrimmed.matches('.')
+    val mid = charDocument.trimmedIsEmpty
+    val bot = firstTrimmed.nonEmpty && {
+      val char = firstTrimmed.firstChar
       char.isLetter && char.isLower
     }
     LineQualifier(top, mid, bot)
