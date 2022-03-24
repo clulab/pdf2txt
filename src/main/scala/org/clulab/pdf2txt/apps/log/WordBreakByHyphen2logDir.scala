@@ -1,9 +1,8 @@
-package org.clulab.pdf2txt.apps
+package org.clulab.pdf2txt.apps.log
 
-import org.clulab.pdf2txt.common.utils.TextRange
+import org.clulab.pdf2txt.common.utils.{FileUtils, TextRange}
 import org.clulab.pdf2txt.languageModel.NeverLanguageModel
 import org.clulab.pdf2txt.preprocessor.WordBreakByHyphenPreprocessor
-import org.clulab.pdf2txt.common.utils.FileUtils
 
 import java.io.File
 

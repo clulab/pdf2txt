@@ -1,4 +1,4 @@
-package org.clulab.pdf2txt.apps
+package org.clulab.pdf2txt.apps.dir
 
 import org.clulab.pdf2txt.Pdf2txt
 import org.clulab.pdf2txt.common.pdf.TextConverter

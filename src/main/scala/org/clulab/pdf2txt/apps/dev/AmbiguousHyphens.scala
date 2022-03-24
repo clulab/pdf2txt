@@ -1,7 +1,7 @@
-package org.clulab.pdf2txt.apps
+package org.clulab.pdf2txt.apps.dev
 
 import org.clulab.pdf2txt.common.utils.StringUtils
-import org.clulab.pdf2txt.languageModel.{SetLanguageModel, GloveLanguageModel}
+import org.clulab.pdf2txt.languageModel.GloveLanguageModel
 
 object AmbiguousHyphens extends App {
   val words = GloveLanguageModel().words

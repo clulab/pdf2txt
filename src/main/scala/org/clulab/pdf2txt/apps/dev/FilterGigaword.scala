@@ -1,4 +1,4 @@
-package org.clulab.pdf2txt.apps
+package org.clulab.pdf2txt.apps.dev
 
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 
@@ -14,20 +14,20 @@ object FilterGigaword extends App {
   val substitutions = Seq(
     ("-lrb-", "("), ("-rrb-", ")"), // round
     ("-lsb-", "["), ("-rsb-", "]"), // square
-    ("-lcb-", "{"), ("-rcb-", "}")  // curvy
+    ("-lcb-", "{"), ("-rcb-", "}") // curvy
   )
   val wordFrequencies = Source.fromFile(inFilename)(new Codec(StandardCharsets.UTF_8)).autoClose { source =>
     source.getLines()
-        .map { line =>
-          val Array(rawWord, freq) = line.split('\t')
-          val cookedWord = substitutions.foldLeft(rawWord) { case (word, (remove, insert)) =>
-            word.replace(remove, insert)
-          }
-
-          cookedWord -> freq.toInt
+      .map { line =>
+        val Array(rawWord, freq) = line.split('\t')
+        val cookedWord = substitutions.foldLeft(rawWord) { case (word, (remove, insert)) =>
+          word.replace(remove, insert)
         }
-        .filter { pair => pair._1.nonEmpty && !pair._1.contains(" ") && pair._2 >= lowerLimit }
-        .toVector
+
+        cookedWord -> freq.toInt
+      }
+      .filter { pair => pair._1.nonEmpty && !pair._1.contains(" ") && pair._2 >= lowerLimit }
+      .toVector
   }
   val string = wordFrequencies.map(_._1).mkString(" ")
   val frequencies = wordFrequencies.map(_._2).toArray

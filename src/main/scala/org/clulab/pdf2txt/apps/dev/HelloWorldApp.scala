@@ -1,4 +1,4 @@
-package org.clulab.pdf2txt.apps
+package org.clulab.pdf2txt.apps.dev
 
 import org.clulab.pdf2txt.Pdf2txt
 import org.clulab.pdf2txt.common.utils.Pdf2txtAppish
