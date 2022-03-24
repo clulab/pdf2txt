@@ -17,7 +17,7 @@ case class MapAndConfig(map: Map[String, String], config: Config) {
     value match {
       case "true" => true
       case "false" => false
-      case _ => throw new ConfigError(s"""For key "$key" the value is "$value", but it should be "true" or "false".""")
+      case _ => throw new ConfigError(s"""For argument "$key" the value is "$value", but it should be "true" or "false".""")
     }
   }
 

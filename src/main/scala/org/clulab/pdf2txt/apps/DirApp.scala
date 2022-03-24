@@ -16,6 +16,7 @@ import java.io.File
 class DirApp(args: Array[String], params: Map[String, String] = Map.empty) {
   type PdfConverterConstructor = () => PdfConverter
   type LanguageModelConstructor = () => LanguageModel
+  type PreprocessorConstructor = () => Preprocessor
   type PreprocessorsConstructor = () => Array[Preprocessor]
 
   val (pdfConverterConstructor, preprocessors, inFileOrDirectory, outFileOrDirectory, isFileMode) = processArgs()
@@ -57,23 +58,22 @@ class DirApp(args: Array[String], params: Map[String, String] = Map.empty) {
         }
       }
       val preprocessorsConstructor = {
-        def map(key: String, value: => Preprocessor): Option[Preprocessor] =
-          if (mapAndConfig.getBoolean(key)) Some(value) else None
+        def map(key: String, preprocessorConstructor: PreprocessorConstructor): Option[PreprocessorConstructor] =
+          if (mapAndConfig.getBoolean(key)) Some(preprocessorConstructor) else None
 
-        () => {
-          val languageModel = languageModelConstructor()
+        lazy val languageModel = languageModelConstructor()
+        val preprocessorConstructors = Array(
+          map(DirApp.LINE, () => new LinePreprocessor()),
+          map(DirApp.PARAGRAPH, () => new ParagraphPreprocessor()),
+          map(DirApp.UNICODE, () => new UnicodePreprocessor()),
+          map(DirApp.NUMBER, () => new NumberPreprocessor()),
+          map(DirApp.LIGATURE, () => new LigaturePreprocessor(languageModel)),
+          map(DirApp.LINE_BREAK, () => new LineBreakPreprocessor(languageModel)),
+          map(DirApp.WORD_BREAK_BY_HYPHEN, () => new WordBreakByHyphenPreprocessor()),
+          map(DirApp.WORD_BREAK_BY_SPACE, () => new WordBreakBySpacePreprocessor())
+        ).flatten
 
-          Array(
-            map(DirApp.LINE, new LinePreprocessor()),
-            map(DirApp.PARAGRAPH, new ParagraphPreprocessor()),
-            map(DirApp.UNICODE, new UnicodePreprocessor()),
-            map(DirApp.NUMBER, new NumberPreprocessor()),
-            map(DirApp.LIGATURE, new LigaturePreprocessor(languageModel)),
-            map(DirApp.LINE_BREAK, new LineBreakPreprocessor(languageModel)),
-            map(DirApp.WORD_BREAK_BY_HYPHEN, new WordBreakByHyphenPreprocessor()),
-            map(DirApp.WORD_BREAK_BY_SPACE, new WordBreakBySpacePreprocessor())
-          ).flatten
-        }
+        () => preprocessorConstructors.map(_())
       }
       val inFileOrDirectory = mapAndConfig(DirApp.IN)
       val outFileOrDirectory = mapAndConfig(DirApp.OUT)
