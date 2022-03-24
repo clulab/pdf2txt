@@ -1,0 +1,37 @@
+  Syntax: <command> [-help | --help | <arguments>]
+ Whereby: <command> could be
+              scala -jar pdf2txt.jar
+          if you have the "skinny" jar file, or
+              java -jar pdf2txt.jar
+          if you have the "fat" jar file, or if you are running from the GitHub project
+              sbt "runMain org.clulab.pdf2txt.apps.DirApp"
+          <arguments> include the following, all optional, with the last duplicate given precendence
+          -conf confFile, meaning to read other arguments from the file confFile.conf
+          -converter (pdfminer | pdftotext | scienceparse | text | tika)
+          -languageModel (always | gigaWord | glove | never)
+          -line              (true | false), to activate the line preprocessor
+          -paragraph         (true | false), for the paragraph preprocessor
+          -unicode           (true | false), and so on
+          -number            (true | false)
+          -ligature          (true | false)
+          -lineBreak         (true | false)
+          -wordBreakByHyphen (true | false)
+          -wordBreakBySpace  (true | false)
+          -in   <inputFileOrDirectory>
+          -out <outputFileOrDirectory>
+Defaults: with all preprocessors defaulting to true and otherwise
+          -converter tika
+          -languageModel gigaWord
+          -in  .
+          -out .
+Examples: Explain the syntax
+              java -jar pdf2txt.jar -help
+          Convert all PDFs in the current directory to text files
+              java -jar pdf2txt.jar
+          Convert all PDFs in .pdfs to text files in ./txts
+              java -jar pdf2txt.jar -in ./pdfs -out ./txts
+          Convert all doc.pdf to doc.txt using pdftotxt without the wordBreakBySpace preprocessor
+              java -jar pdf2txt.jar -converter pdftotext -wordBreakBySpace false -in doc.pdf -out doc.txt
+          Preprocess file.txt resulting in file.out.txt
+              java -jar pdf2txt.jar -converter text -in file.txt -out file.out.txt
+See also: http://github.com/clulab/pdf2txt

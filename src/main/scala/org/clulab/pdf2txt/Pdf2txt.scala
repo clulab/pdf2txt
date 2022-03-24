@@ -3,10 +3,7 @@ package org.clulab.pdf2txt
 import com.typesafe.config.Config
 import org.clulab.pdf2txt.common.pdf.PdfConverter
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
-import org.clulab.pdf2txt.common.utils.FileUtils
-import org.clulab.pdf2txt.common.utils.Logging
-import org.clulab.pdf2txt.common.utils.Pdf2txtConfigured
-import org.clulab.pdf2txt.common.utils.Pdf2txtException
+import org.clulab.pdf2txt.common.utils.{ConfigError, FileUtils, Logging, Pdf2txtConfigured, Pdf2txtException}
 import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, GigawordLanguageModel, GloveLanguageModel, NeverLanguageModel}
 import org.clulab.pdf2txt.preprocessor.{LigaturePreprocessor, LineBreakPreprocessor, LinePreprocessor, NumberPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
 import org.clulab.pdf2txt.tika.TikaConverter
@@ -65,7 +62,16 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
     }
   }
 
-  def dir(inputDirName: String, outputDirName: String, inputExtension: String = ".pdf", outputExtension: String = ".txt"): Unit = {
+  def file(inputFileName: String, outputFileName: String): Unit = {
+    val inputFile = new File(inputFileName)
+    val outputFile = new File(outputFileName)
+
+    convert(inputFile, outputFile)
+  }
+
+  def dir(inputDirName: String, outputDirName: String): Unit = {
+    val  inputExtension = pdfConverter.inputExtension
+    val outputExtension = pdfConverter.outputExtension
     val files = FileUtils.findFiles(inputDirName, inputExtension)
 
     files.par.foreach { inputFile =>
@@ -75,8 +81,6 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
     }
   }
 }
-
-class ConfigError(config: Config, key: String, value: String, message: String) extends Pdf2txtException(message, null)
 
 object Pdf2txt extends Logging with Pdf2txtConfigured {
 
@@ -91,7 +95,7 @@ object Pdf2txt extends Logging with Pdf2txtConfigured {
       case "gigaWord" => GigawordLanguageModel()
       case "glove" => GloveLanguageModel()
       case "never" => new NeverLanguageModel()
-      case _ => throw new ConfigError(config, key, value, s"""The $key "$value" is not recognized.""")
+      case _ => throw ConfigError(key, value)
     }
 
     def map(key: String, value: => Preprocessor): Option[Preprocessor] =
