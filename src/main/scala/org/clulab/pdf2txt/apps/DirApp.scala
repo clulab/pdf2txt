@@ -3,7 +3,7 @@ package org.clulab.pdf2txt.apps
 import org.clulab.pdf2txt.Pdf2txt
 import org.clulab.pdf2txt.common.pdf.{PdfConverter, TextConverter}
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
-import org.clulab.pdf2txt.common.utils.{AppUtils, ConfigError, Pdf2txtApp, Pdf2txtException}
+import org.clulab.pdf2txt.common.utils.{AppUtils, ConfigError, Pdf2txtAppish, Pdf2txtException}
 import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, GigawordLanguageModel, GloveLanguageModel, LanguageModel, NeverLanguageModel}
 import org.clulab.pdf2txt.pdfminer.PdfMinerConverter
 import org.clulab.pdf2txt.pdftotext.PdfToTextConverter
@@ -142,7 +142,7 @@ class DirApp(args: Array[String], params: Map[String, String] = Map.empty) {
   }
 }
 
-object DirApp extends Pdf2txtApp {
+object DirApp extends Pdf2txtAppish {
   val CONF = "conf"
   val HELP = "help"
   val CONVERTER = "converter"
