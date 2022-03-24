@@ -17,7 +17,7 @@
           -lineBreak         (true | false)
           -wordBreakByHyphen (true | false)
           -wordBreakBySpace  (true | false)
-          -in   <inputFileOrDirectory>
+          -in  <inputFileOrDirectory>
           -out <outputFileOrDirectory>
 Defaults: with all preprocessors defaulting to true and otherwise
           -converter tika

@@ -66,6 +66,8 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
     val inputFile = new File(inputFileName)
     val outputFile = new File(outputFileName)
 
+    if (outputFile.exists)
+      println() // TODO Log this along with all conversions?
     convert(inputFile, outputFile)
   }
 
@@ -77,7 +79,10 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
     files.par.foreach { inputFile =>
       val outputFile = new File(outputDirName + "/" + inputFile.getName.dropRight(inputExtension.length) + outputExtension)
 
-      convert(inputFile, outputFile)
+      if (outputFile.exists)
+        println() // TODO Log this along with all conversions?
+      else
+        convert(inputFile, outputFile)
     }
   }
 }

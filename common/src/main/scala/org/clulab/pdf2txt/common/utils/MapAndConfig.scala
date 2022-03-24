@@ -17,9 +17,15 @@ case class MapAndConfig(map: Map[String, String], config: Config) {
     value match {
       case "true" => true
       case "false" => false
-      case other => throw new ConfigError(s"""For key "$key" the value is "$value", but it should be "true" or "false".""")
+      case _ => throw new ConfigError(s"""For key "$key" the value is "$value", but it should be "true" or "false".""")
     }
   }
 
   def contains(key: String): Boolean = map.contains(key) || config.hasPath(key)
+
+  def get(key: String): Option[String] = {
+    if (map.contains(key)) Some(map(key))
+    else if (config.hasPath(key)) Some(config.getString(key))
+    else None
+  }
 }

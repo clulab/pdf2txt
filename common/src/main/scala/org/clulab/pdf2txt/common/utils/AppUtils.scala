@@ -21,10 +21,31 @@ object AppUtils {
     System.exit(-1)
   }
 
-  def argsToMap(args: Array[String]): Map[String, String] = null
+  def checkArgs(args: Array[String], mapAndConfig: MapAndConfig): Unit = {
+    val badArgOpt = mapAndConfig.map.keySet.find { key =>
+      !args.contains(key)
+    }
 
-  def mkMapAndConfig(args: Array[String], params: Map[String, String], resourceConfig: Config, conf: String, configPath: String): MapAndConfig = {
-    val argsMap = argsToMap(args)
+    badArgOpt.foreach { badArg =>
+      System.err.println(s"""The command line argument "$badArg" is unexpected.  Use -help for assistance.""")
+      System.exit(-1)
+    }
+  }
+
+  def showArgs(args: Array[String], mapAndConfig: MapAndConfig): Unit = {
+    System.out.println()
+    System.out.println("Configuration:")
+    args.foreach { arg =>
+      val valueOpt = mapAndConfig.get(arg)
+
+      valueOpt.foreach { value =>
+        System.out.println(s"\t$arg = $value")
+      }
+    }
+    System.out.println()
+  }
+
+  def mkMapAndConfig(argsMap: Map[String, String], paramsMap: Map[String, String], resourceConfig: Config, conf: String, configPath: String): MapAndConfig = {
     val fileConfigOpt = {
       val configNameOpt = argsMap.get(conf)
       val configOpt = configNameOpt.map { configName =>
@@ -32,7 +53,7 @@ object AppUtils {
       }
       configOpt
     }
-    val map = argsMap ++ params // The second will overwrite the first.
+    val map = argsMap ++ paramsMap // The second will overwrite the first.
     val config = fileConfigOpt.map(_.withFallback(resourceConfig)).getOrElse(resourceConfig)
     val mapAndConfig = MapAndConfig(map, config)
 
