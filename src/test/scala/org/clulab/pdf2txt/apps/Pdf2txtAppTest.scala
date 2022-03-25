@@ -225,4 +225,15 @@ class Pdf2txtAppTest extends Test {
     errString should include ("existing output file")
     system.statusOpt should be (Some(-1))
   }
+
+  it should "read threads from command line strings" in {
+    val system = TestSystem()
+    newPdf2txtApp(Array("-threads", "7"), system)
+    val outString = system.getOutString
+    val errString = system.getErrString
+
+    outString should include ("threads = 7")
+    errString should be (empty)
+    system.statusOpt should be (None)
+  }
 }
