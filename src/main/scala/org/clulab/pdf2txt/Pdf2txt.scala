@@ -52,7 +52,7 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
 
   def convert(inputFile: File, outputFile: File): Unit = {
     try {
-      println(s"Converting ${inputFile.getCanonicalPath}...")
+      Pdf2txt.logger.info(s"Converting ${inputFile.getCanonicalPath}...")
 
       val rawText = read(inputFile)
       val cookedText = process(rawText)
@@ -68,7 +68,7 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
     val outputFile = new File(outputFileName)
 
     if (outputFile.exists && !overwrite)
-      Pdf2txt.logger.info(s"""For input file "${inputFile.getPath}" the output file "${outputFile.getPath}" already exists.""")
+      Pdf2txt.logger.warn(s"""For input file "${inputFile.getPath}" the output file "${outputFile.getPath}" already exists.""")
     else
       convert(inputFile, outputFile)
   }
@@ -87,7 +87,7 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
       val outputFile = new File(outputDirName + "/" + inputFile.getName.dropRight(inputExtension.length) + outputExtension)
 
       if (outputFile.exists && !overwrite)
-        Pdf2txt.logger.info(s"""For input file "${inputFile.getPath}" the output file "${outputFile.getPath}" already exists.""")
+        Pdf2txt.logger.warn(s"""For input file "${inputFile.getPath}" the output file "${outputFile.getPath}" already exists.""")
       else
         convert(inputFile, outputFile)
     }
