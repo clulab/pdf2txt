@@ -8,7 +8,7 @@
           <arguments> include the following, all optional, with the last duplicate given precendence
           -conf confFile, meaning to read other arguments from the file confFile.conf
           -converter (pdfminer | pdftotext | scienceparse | text | tika)
-          -languageModel (always | gigaWord | glove | never)
+          -languageModel (always | gigaword | glove | never)
           -line              (true | false), to activate the line preprocessor
           -paragraph         (true | false), for the paragraph preprocessor
           -unicode           (true | false), and so on

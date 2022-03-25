@@ -16,39 +16,42 @@ object AppUtils {
     printStream.println() // extra line below
   }
 
-  def syntaxError(resourceName: String, args: Any*): Unit = {
-    showSyntax(resourceName, System.err, args)
-    System.exit(-1)
+  def syntaxError(resourceName: String, system: Systemish, args: Any*): Unit = {
+    showSyntax(resourceName, system.err, args)
+    system.exit(-1)
   }
 
-  def checkArgs(args: Array[String], mapAndConfig: MapAndConfig): Unit = {
+  def checkArgs(args: Array[String], mapAndConfig: MapAndConfig, system: Systemish): Unit = {
     val badArgOpt = mapAndConfig.map.keySet.find { key =>
       !args.contains(key)
     }
 
     badArgOpt.foreach { badArg =>
-      System.err.println(s"""The command line argument "$badArg" is unexpected.  Use -help for assistance.""")
-      System.exit(-1)
+      system.err.println(s"""The command line argument "$badArg" is unexpected.  Use -help for assistance.""")
+      system.exit(-1)
     }
   }
 
-  def showArgs(args: Array[String], mapAndConfig: MapAndConfig): Unit = {
-    System.out.println()
-    System.out.println("Configuration:")
+  def showArgs(args: Array[String], mapAndConfig: MapAndConfig, printStream: PrintStream): Unit = {
+    printStream.println()
+    printStream.println("Configuration:")
     args.foreach { arg =>
       val valueOpt = mapAndConfig.get(arg)
 
       valueOpt.foreach { value =>
-        System.out.println(s"\t$arg = $value")
+        printStream.println(s"\t$arg = $value")
       }
     }
-    System.out.println()
+    printStream.println()
   }
 
   def mkMapAndConfig(argsMap: Map[String, String], paramsMap: Map[String, String], resourceConfig: Config, conf: String, configPath: String): MapAndConfig = {
     val fileConfigOpt = {
       val configNameOpt = argsMap.get(conf)
       val configOpt = configNameOpt.map { configName =>
+        val configFileName = configName + ".conf"
+        if (!new File(configFileName).exists)
+          throw new ConfigError(s"""Configuration file "$configFileName" does not exist.""")
         ConfigFactory.parseFileAnySyntax(new File(configName)).getConfig(configPath)
       }
       configOpt
