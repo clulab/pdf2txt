@@ -27,7 +27,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
       val mapAndConfig = AppUtils.mkMapAndConfig(map, params, Pdf2txt.config, Pdf2txtArgs.CONF, "Pdf2txt")
 
       AppUtils.checkArgs(Pdf2txtArgs.argKeys, mapAndConfig, system)
-      if (mapAndConfig.contains(Pdf2txtArgs.HELP)) {
+      if (Pdf2txtArgs.helps.exists(mapAndConfig.contains)) {
         AppUtils.showSyntax("/org/clulab/pdf2txt/Pdf2txtApp.syntax.txt", system.out)
         system.exit(0)
       }
@@ -155,7 +155,8 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
 
 object Pdf2txtArgs {
   val CONF = "conf"
-  val HELP = "help"
+  val HELP1 = "help"
+  val HELP2 = "h"
   val CONVERTER = "converter"
   val LANGUAGE_MODEL = "languageModel"
   val LINE = "line"
@@ -171,9 +172,11 @@ object Pdf2txtArgs {
   val THREADS = "threads"
   val OVERWRITE = "overwrite"
 
+  val helps: Array[String] = Array(HELP1, HELP2)
   val argKeys: Array[String] = Array(
     CONF,
-    HELP,
+    HELP1,
+    HELP2,
     CONVERTER,
     LANGUAGE_MODEL,
     LINE,

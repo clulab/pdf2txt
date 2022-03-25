@@ -3,6 +3,7 @@ import org.clulab.sbt.Resolvers
 
 name := "pdf2txt"
 description := "The pdf2txt project implements the org.clulab.pdf2txt package including the Pdf2txt class."
+maintainer := "clulab.org"
 
 // Last checked 2021-08-23
 val scala11 = "2.11.12" // up to 2.11.12
@@ -25,14 +26,19 @@ libraryDependencies ++= {
   )
 }
 
+val mainClassOpt = Some("org.clulab.pdf2txt.apps.Pdf2txtApp")
+
 lazy val core = (project in file("."))
-  .enablePlugins(BuildInfoPlugin)
-  .disablePlugins(PlayScala, JavaAppPackaging, SbtNativePackager)
+  .enablePlugins(BuildInfoPlugin, JavaAppPackaging)
+  .disablePlugins(PlayScala)
   .dependsOn(common % "compile -> compile; test -> test", pdfminer, pdftotext, tika, scienceparse)
   .aggregate(common, pdfminer, pdftotext, tika, scienceparse)
   .settings(
     assembly / aggregate := false,
-    assembly / mainClass := Some("org.clulab.pdf2txt.apps.HelloWorldApp")
+    assembly / mainClass := mainClassOpt,
+    Compile / run / mainClass := mainClassOpt,
+    trapExit := false, // Avoid sbt.TrapExitSecurityException on System.exit().
+    run / fork := true // Avoid shutting down sbt on untrapped System.exit().
   )
 
 lazy val common = project

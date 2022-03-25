@@ -9,7 +9,7 @@ object AppUtils {
   def showSyntax(resourceName: String, printStream: PrintStream, args: Any*): Unit = {
     val rawText = FileUtils.getTextFromResource(resourceName)
     val cookedText = rawText.format(args: _*)
-    val splitTexts = cookedText.split("\n")
+    val splitTexts = cookedText.split("\r?\n")
 
     printStream.println() // extra line above
     splitTexts.foreach(printStream.println)

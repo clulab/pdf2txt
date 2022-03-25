@@ -61,15 +61,27 @@ class Pdf2txtAppTest extends Test {
     system.statusOpt should be (Some(-1))
   }
 
-  it should "show help" in {
+  def testHelp(arg: String): Unit = {
     val system = TestSystem()
-    newPdf2txtApp(Array("-help"), system)
+    newPdf2txtApp(Array(arg), system)
     val outString = system.getOutString
     val errString = system.getErrString
 
     outString should include ("Syntax:")
     errString should be (empty)
     system.statusOpt should be (Some(0))
+  }
+
+  it should "show -help" in {
+    testHelp("-help")
+  }
+
+  it should "show --help" in {
+    testHelp("--help")
+  }
+
+  it should "show -h" in {
+    testHelp("-h")
   }
 
   it should "catch unknown converters" in {

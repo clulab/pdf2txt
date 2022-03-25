@@ -1,6 +1,6 @@
 assembly / aggregate := false
+assembly / assemblyJarName := "pdf2txt.jar"
 assembly / assemblyMergeStrategy := {
-
   // See https://github.com/sbt/sbt-assembly.
   case PathList(paths @ _*) if paths.last == "module-info.class"                          => MergeStrategy.discard
   case PathList("org", "apache", "commons", "logging", "Log.class")                       => MergeStrategy.first

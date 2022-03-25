@@ -1,41 +1,55 @@
-  Syntax: <command> [-help | --help | <arguments>]
- Whereby: <command> could be
-              scala -jar pdf2txt.jar
-          if you have the "skinny" jar file, or
-              java -jar pdf2txt.jar
-          if you have the "fat" jar file, or if you are running from the GitHub project
-              sbt "runMain org.clulab.pdf2txt.apps.DirApp"
-          <arguments> include the following, all optional, with the last duplicate given precendence
-          -conf confFile, meaning to read other arguments from the file confFile.conf
+  Syntax: From the command line with sbt and having the git repo, use
+              sbt "run <arguments>"
+          or from the command line after having run "sbt assembly" and
+          changed directories (target/scala-2.12) or after having downloaded
+          the jar file,
+              java -jar pdf2txt.jar <arguments>
+
+ Whereby: <arguments> include the following, all optional, with the last
+          duplicate given precendence:
+
+          -h
+          -help
+          --help
+              are used to show this help text.
+          -conf configFile
+              means to read other arguments from file configFile.conf.
           -converter (pdfminer | pdftotext | scienceparse | text | tika)
+              specifies the PDF converter.
           -languageModel (always | gigaword | glove | never)
-          -line              (true | false), to activate the line preprocessor
-          -paragraph         (true | false), for the paragraph preprocessor
-          -unicode           (true | false), and so on
+              sets the language model which helps determine what words are
+              and the next settings activate or deactivate preprocessors.
+          -line              (true | false)
+          -paragraph         (true | false)
+          -unicode           (true | false)
           -number            (true | false)
           -ligature          (true | false)
           -lineBreak         (true | false)
           -wordBreakByHyphen (true | false)
           -wordBreakBySpace  (true | false)
+              The following determine how files or directories are processed:
           -in  <inputFileOrDirectory>
           -out <outputFileOrDirectory>
           -threads <threadCount>
-          -overwrite (true | false), to deal with existing files
-Defaults: with all preprocessors defaulting to true and otherwise
+          -overwrite (true | false)
+              allows one to overwrite existing files.
+
+Defaults: All preprocessors default to true and otherwise
           -converter tika
-          -languageModel gigaWord
+          -languageModel gigaword
           -in  .
           -out .
           -threads 0, meaning to match the available processors
           -overwrite false
-Examples: Explain the syntax
-              java -jar pdf2txt.jar -help
-          Convert all PDFs in the current directory to text files
-              java -jar pdf2txt.jar
-          Convert all PDFs in .pdfs to text files in ./txts
-              java -jar pdf2txt.jar -in ./pdfs -out ./txts
-          Convert all doc.pdf to doc.txt using pdftotxt without the wordBreakBySpace preprocessor
-              java -jar pdf2txt.jar -converter pdftotext -wordBreakBySpace false -in doc.pdf -out doc.txt
-          Preprocess file.txt resulting in file.out.txt
-              java -jar pdf2txt.jar -converter text -in file.txt -out file.out.txt
+
+Examples: <no_arguments>
+              converts all PDFs in the current directory to text files.
+          -in ./pdfs -out ./txts
+              converts all PDFs in ./pdfs to text files in ./txts.
+          -converter pdftotext -wordBreakBySpace false -in doc.pdf -out doc.txt
+              converts doc.pdf to doc.txt using pdftotxt without the
+              wordBreakBySpace preprocessor.
+          -converter text -in file.txt -out file.out.txt
+              preprocesses file.txt resulting in file.out.txt.
+
 See also: http://github.com/clulab/pdf2txt
