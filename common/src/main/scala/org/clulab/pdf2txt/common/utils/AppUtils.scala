@@ -45,6 +45,20 @@ object AppUtils {
     printStream.println()
   }
 
+  def mkArgsString(cmd: AnyRef, args: Array[String], mapAndConfig: MapAndConfig): String = {
+    val command = cmd.getClass.getName
+    val argsAndValues = args.flatMap { arg =>
+      val valueOpt = mapAndConfig.get(arg)
+
+      valueOpt.map { value =>
+        s"-$arg $value"
+      }
+    }
+    val argsString = (command +: argsAndValues).mkString(" ")
+
+    argsString
+  }
+
   def mkMapAndConfig(argsMap: Map[String, String], paramsMap: Map[String, String], resourceConfig: Config, conf: String, configPath: String): MapAndConfig = {
     val fileConfigOpt = {
       val configNameOpt = argsMap.get(conf)

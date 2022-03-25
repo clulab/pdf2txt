@@ -116,6 +116,9 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
       AppUtils.showArgs(Pdf2txtArgs.argKeys, mapAndConfig, system.out)
 
       val preprocessors = preprocessorsConstructor()
+      val argsString = AppUtils.mkArgsString(this, Pdf2txtArgs.argKeys, mapAndConfig)
+
+      Pdf2txtApp.logger.info(s"Running $argsString...")
       (pdfConverterConstructor, preprocessors, inFileOrDirectory, outFileOrDirectory, isFileMode, threads, overwrite)
     }
     catch {
