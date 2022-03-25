@@ -1,3 +1,5 @@
+import org.clulab.sbt.BuildUtils.FavoriteMergeStrategy
+
 assembly / aggregate := false
 assembly / assemblyJarName := "pdf2txt.jar"
 assembly / assemblyMergeStrategy := {
@@ -15,7 +17,7 @@ assembly / assemblyMergeStrategy := {
   case PathList("org", "slf4j", "impl", "StaticMDCBinder.class")                          => MergeStrategy.first
   case PathList("org", "slf4j", "impl", "StaticMarkerBinder.class")                       => MergeStrategy.first
 
-  case PathList("logback.xml") => MergeStrategy.first
+  case PathList("logback.xml") => new FavoriteMergeStrategy("./src/main/resources/logback.xml")
 
   case x =>
     val oldStrategy = (assembly / assemblyMergeStrategy).value

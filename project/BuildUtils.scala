@@ -2,11 +2,38 @@ package org.clulab.sbt
 
 import sbt.IO
 import sbt.MavenRepository
+import sbtassembly.MergeStrategy
 
 import java.io.File
 import java.util.Properties
+import scala.io.{Codec, Source}
 
 object BuildUtils {
+
+  class FavoriteMergeStrategy(fileName: String) extends MergeStrategy() {
+    val contents = getContents(new File(fileName))
+
+    override def name: String = "favorite"
+
+    def getContents(file: File): String = {
+      val source = Source.fromFile(file)(Codec.UTF8)
+      val contents = source.mkString
+
+      source.close()
+      contents
+    }
+
+    override def apply(tempDir: File, path: String, files: Seq[File]): Either[String, Seq[(File, String)]] = {
+      val firstOpt = files.find { file =>
+        contents == getContents(file)
+      }
+
+      firstOpt.map { first =>
+        println(s"Matched with $first")
+        Right(Seq(first -> path))
+      }.getOrElse(Left("None of the files matched contents with your favorite."))
+    }
+  }
 
   def singleLine(text: String): String = text.stripMargin.replace('\n', ' ').trim
 
