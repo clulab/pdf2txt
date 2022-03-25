@@ -7,6 +7,7 @@ import org.clulab.pdf2txt.common.utils.{ConfigError, FileUtils, Logging, Pdf2txt
 import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, GigawordLanguageModel, GloveLanguageModel, NeverLanguageModel}
 import org.clulab.pdf2txt.preprocessor.{LigaturePreprocessor, LineBreakPreprocessor, LinePreprocessor, NumberPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
 import org.clulab.pdf2txt.tika.TikaConverter
+import org.clulab.utils.ThreadUtils
 
 import java.io.File
 
@@ -62,25 +63,31 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
     }
   }
 
-  def file(inputFileName: String, outputFileName: String): Unit = {
+  def file(inputFileName: String, outputFileName: String, overwrite: Boolean = false): Unit = {
     val inputFile = new File(inputFileName)
     val outputFile = new File(outputFileName)
 
-    if (outputFile.exists)
-      println() // TODO Log this along with all conversions?
-    convert(inputFile, outputFile)
+    if (outputFile.exists && !overwrite)
+      Pdf2txt.logger.info(s"""For input file "${inputFile.getPath}" the output file "${outputFile.getPath}" already exists.""")
+    else
+      convert(inputFile, outputFile)
   }
 
-  def dir(inputDirName: String, outputDirName: String): Unit = {
+  def dir(inputDirName: String, outputDirName: String, threads: Int = 0, overwrite: Boolean = false): Unit = {
     val  inputExtension = pdfConverter.inputExtension
     val outputExtension = pdfConverter.outputExtension
     val files = FileUtils.findFiles(inputDirName, inputExtension)
+    val parFiles = threads match {
+      case threads if threads <= 0 => files.par
+      case 1 => files
+      case threads if threads > 1 => ThreadUtils.parallelize(files, threads)
+    }
 
-    files.par.foreach { inputFile =>
+    parFiles.foreach { inputFile =>
       val outputFile = new File(outputDirName + "/" + inputFile.getName.dropRight(inputExtension.length) + outputExtension)
 
-      if (outputFile.exists)
-        println() // TODO Log this along with all conversions?
+      if (outputFile.exists && !overwrite)
+        Pdf2txt.logger.info(s"""For input file "${inputFile.getPath}" the output file "${outputFile.getPath}" already exists.""")
       else
         convert(inputFile, outputFile)
     }

@@ -203,6 +203,17 @@ class Pdf2txtAppTest extends Test {
     system.statusOpt should be (Some(-1))
   }
 
+  it should "try to convert a file to an existing file with overwrite enabled" in {
+    val system = TestSystem()
+    newPdf2txtApp(Array("-overwrite", "true", "-in", "./src/test/resources/inFile.pdf", "-out", "./src/test/resources/outFile.txt"), system)
+    val outString = system.getOutString
+    val errString = system.getErrString
+
+    outString should include ("Configuration")
+    errString should be (empty)
+    system.statusOpt should be (None)
+  }
+
   it should "take txt files into account" in {
     val system = TestSystem()
     newPdf2txtApp(Array("-converter", "text", "-in", "./src/test/resources/inFile.txt", "-out", "./src/test/resources/outFile.txt"), system)

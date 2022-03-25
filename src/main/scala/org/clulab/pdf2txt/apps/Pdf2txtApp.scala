@@ -19,9 +19,9 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
   type PreprocessorConstructor = () => Preprocessor
   type PreprocessorsConstructor = () => Array[Preprocessor]
 
-  val (pdfConverterConstructor, preprocessors, inFileOrDirectory, outFileOrDirectory, isFileMode) = processArgs()
+  val (pdfConverterConstructor, preprocessors, inFileOrDirectory, outFileOrDirectory, isFileMode, threads, overwrite) = processArgs()
 
-  def processArgs(): (PdfConverterConstructor, Array[Preprocessor], String, String, Boolean) = {
+  def processArgs(): (PdfConverterConstructor, Array[Preprocessor], String, String, Boolean, Int, Boolean) = {
     try {
       val map = org.clulab.utils.StringUtils.argsToMap(args, verbose = false)
       val mapAndConfig = AppUtils.mkMapAndConfig(map, params, Pdf2txt.config, Pdf2txtArgs.CONF, "Pdf2txt")
@@ -77,6 +77,8 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
       }
       val inFileOrDirectory = mapAndConfig(Pdf2txtArgs.IN)
       val outFileOrDirectory = mapAndConfig(Pdf2txtArgs.OUT)
+      val threads = mapAndConfig.getInt(Pdf2txtArgs.THREADS)
+      val overwrite = mapAndConfig.getBoolean(Pdf2txtArgs.OVERWRITE)
       val isFileMode = {
         val inFile = new File(inFileOrDirectory)
 
@@ -88,7 +90,11 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
       val _ = {
         val outFile = new File(outFileOrDirectory)
         val isModeOk = if (isFileMode) {
-          if (outFile.isFile) throw new Pdf2txtException(s"""The input file "$inFileOrDirectory" cannot be converted to the existing output file "$outFileOrDirectory".""")
+          if (outFile.isFile) {
+            if (!overwrite)
+              throw new Pdf2txtException(s"""The input file "$inFileOrDirectory" cannot be converted to the existing output file "$outFileOrDirectory".""")
+            true
+          }
           else if (outFile.isDirectory) throw new Pdf2txtException(s"""The input file "$inFileOrDirectory" cannot be converted to the existing output directory "$outFileOrDirectory".""")
           else if (outFile.exists) throw new Pdf2txtException(s"""The input file "$inFileOrDirectory" cannot be converted to the existing output "$outFileOrDirectory".""")
           else true
@@ -110,7 +116,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
       AppUtils.showArgs(Pdf2txtArgs.argKeys, mapAndConfig, system.out)
 
       val preprocessors = preprocessorsConstructor()
-      (pdfConverterConstructor, preprocessors, inFileOrDirectory, outFileOrDirectory, isFileMode)
+      (pdfConverterConstructor, preprocessors, inFileOrDirectory, outFileOrDirectory, isFileMode, threads, overwrite)
     }
     catch {
       case throwable: Throwable =>
@@ -126,7 +132,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
     pdfConverterConstructor().autoClose { pdfConverter =>
       val pdf2txt = new Pdf2txt(pdfConverter, preprocessors)
 
-      pdf2txt.file(inFileOrDirectory, outFileOrDirectory)
+      pdf2txt.file(inFileOrDirectory, outFileOrDirectory, overwrite)
     }
   }
 
@@ -134,7 +140,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
     pdfConverterConstructor().autoClose { pdfConverter =>
       val pdf2txt = new Pdf2txt(pdfConverter, preprocessors)
 
-      pdf2txt.dir(inFileOrDirectory, outFileOrDirectory)
+      pdf2txt.dir(inFileOrDirectory, outFileOrDirectory, threads, overwrite)
     }
   }
 
@@ -159,6 +165,8 @@ object Pdf2txtArgs {
   val WORD_BREAK_BY_SPACE = "wordBreakBySpace"
   val IN = "in"
   val OUT = "out"
+  val THREADS = "threads"
+  val OVERWRITE = "overwrite"
 
   val argKeys: Array[String] = Array(
     CONF,
@@ -174,7 +182,9 @@ object Pdf2txtArgs {
     WORD_BREAK_BY_HYPHEN,
     WORD_BREAK_BY_SPACE,
     IN,
-    OUT
+    OUT,
+    THREADS,
+    OVERWRITE
   )
 
   val PDF_MINER = "pdfminer"

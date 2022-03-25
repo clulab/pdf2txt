@@ -19,11 +19,15 @@
           -wordBreakBySpace  (true | false)
           -in  <inputFileOrDirectory>
           -out <outputFileOrDirectory>
+          -threads <threadCount>
+          -overwrite (true | false), to deal with existing files
 Defaults: with all preprocessors defaulting to true and otherwise
           -converter tika
           -languageModel gigaWord
           -in  .
           -out .
+          -threads 0, meaning to match the available processors
+          -overwrite false
 Examples: Explain the syntax
               java -jar pdf2txt.jar -help
           Convert all PDFs in the current directory to text files

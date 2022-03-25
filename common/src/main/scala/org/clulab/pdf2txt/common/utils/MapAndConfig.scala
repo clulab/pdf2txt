@@ -4,10 +4,12 @@ import com.typesafe.config.Config
 
 case class MapAndConfig(map: Map[String, String], config: Config) {
 
-  def apply(key: String): String = {
+  def apply(key: String): String = getString(key)
+
+  def getString(key: String): String = {
     map.getOrElse(key, {
       if (config.hasPath(key)) config.getString(key)
-      else throw new ConfigError(s"""There is no configured value for "$key".""")
+      else throw new ConfigError(s"""There is no configured string value for "$key".""")
     })
   }
 
@@ -18,6 +20,13 @@ case class MapAndConfig(map: Map[String, String], config: Config) {
       case "true" => true
       case "false" => false
       case _ => throw new ConfigError(s"""For argument "$key" the value is "$value", but it should be "true" or "false".""")
+    }
+  }
+
+  def getInt(key: String): Int = {
+    map.get(key).map(_.toInt).getOrElse {
+      if (config.hasPath(key)) config.getInt(key)
+      else throw new ConfigError(s"""There is no configured integer value for "$key".""")
     }
   }
 
