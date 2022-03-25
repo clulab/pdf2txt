@@ -88,6 +88,7 @@
     <logger name="org.apache.tika"    level="warn"  additivity="false" />
     <!-- This accounts for anything coming from the scienceparse project. -->
     <logger name="org.allenai"        level="warn"  additivity="false" />
+    <logger name="com.amazonaws"      level="warn"  additivity="false" />
 
     <!-- This handles anything from outside of clulab that isn't configured otherwise. -->
     <root level="all">
