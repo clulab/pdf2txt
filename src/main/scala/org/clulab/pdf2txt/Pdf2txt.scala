@@ -10,6 +10,7 @@ import org.clulab.pdf2txt.tika.TikaConverter
 import org.clulab.utils.ThreadUtils
 
 import java.io.File
+import scala.annotation.tailrec
 
 class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) extends Pdf2txtConfigured {
 
@@ -30,9 +31,18 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
 
   def process(rawText: String): String = {
     try {
-      preprocessors.foldLeft(rawText) { (rawText, preprocessor) =>
-        preprocessor.preprocess(rawText).toString
+
+      @tailrec
+      def loop(rawText: String, count: Int): String = {
+        val cookedText = preprocessors.foldLeft(rawText) { (rawText, preprocessor) =>
+          preprocessor.preprocess(rawText).toString
+        }
+
+        if (cookedText == rawText) cookedText
+        else loop(cookedText, count + 1)
       }
+
+      loop(rawText, 0)
     }
     catch {
       case throwable: Throwable => logError(throwable, s"Could not process text.")
