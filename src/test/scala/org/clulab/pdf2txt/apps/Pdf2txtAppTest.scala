@@ -181,7 +181,7 @@ class Pdf2txtAppTest extends Test {
 
   it should "not try to convert a directory to a file" in {
     val system = TestSystem()
-    newPdf2txtApp(Array("-in", "./src/test/resources/inDir", "-out", "./src/test/resources/outFile.pdf"), system)
+    newPdf2txtApp(Array("-in", "./src/test/resources/inDir", "-out", "./src/test/resources/outFile.txt"), system)
     val outString = system.getOutString
     val errString = system.getErrString
 
@@ -193,7 +193,19 @@ class Pdf2txtAppTest extends Test {
 
   it should "not try to convert a file to an existing file" in {
     val system = TestSystem()
-    newPdf2txtApp(Array("-in", "./src/test/resources/inFile.pdf", "-out", "./src/test/resources/outFile.pdf"), system)
+    newPdf2txtApp(Array("-in", "./src/test/resources/inFile.pdf", "-out", "./src/test/resources/outFile.txt"), system)
+    val outString = system.getOutString
+    val errString = system.getErrString
+
+    outString should be (empty)
+    errString should include ("input file")
+    errString should include ("existing output file")
+    system.statusOpt should be (Some(-1))
+  }
+
+  it should "take txt files into account" in {
+    val system = TestSystem()
+    newPdf2txtApp(Array("-converter", "text", "-in", "./src/test/resources/inFile.txt", "-out", "./src/test/resources/outFile.txt"), system)
     val outString = system.getOutString
     val errString = system.getErrString
 
