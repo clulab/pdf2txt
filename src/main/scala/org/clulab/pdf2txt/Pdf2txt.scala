@@ -3,15 +3,14 @@ package org.clulab.pdf2txt
 import com.typesafe.config.Config
 import org.clulab.pdf2txt.common.pdf.PdfConverter
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
-import org.clulab.pdf2txt.common.utils.FileUtils
-import org.clulab.pdf2txt.common.utils.Logging
-import org.clulab.pdf2txt.common.utils.Pdf2txtConfigured
-import org.clulab.pdf2txt.common.utils.Pdf2txtException
+import org.clulab.pdf2txt.common.utils.{ConfigError, FileUtils, Logging, Pdf2txtConfigured, Pdf2txtException}
 import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, GigawordLanguageModel, GloveLanguageModel, NeverLanguageModel}
 import org.clulab.pdf2txt.preprocessor.{LigaturePreprocessor, LineBreakPreprocessor, LinePreprocessor, NumberPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
 import org.clulab.pdf2txt.tika.TikaConverter
+import org.clulab.utils.ThreadUtils
 
 import java.io.File
+import scala.annotation.tailrec
 
 class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) extends Pdf2txtConfigured {
 
@@ -32,9 +31,18 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
 
   def process(rawText: String): String = {
     try {
-      preprocessors.foldLeft(rawText) { (rawText, preprocessor) =>
-        preprocessor.preprocess(rawText).toString
+
+      @tailrec
+      def loop(rawText: String, count: Int): String = {
+        val cookedText = preprocessors.foldLeft(rawText) { (rawText, preprocessor) =>
+          preprocessor.preprocess(rawText).toString
+        }
+
+        if (cookedText == rawText) cookedText
+        else loop(cookedText, count + 1)
       }
+
+      loop(rawText, 0)
     }
     catch {
       case throwable: Throwable => logError(throwable, s"Could not process text.")
@@ -54,7 +62,7 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
 
   def convert(inputFile: File, outputFile: File): Unit = {
     try {
-      println(s"Converting ${inputFile.getCanonicalPath}...")
+      Pdf2txt.logger.info(s"Converting ${inputFile.getCanonicalPath}...")
 
       val rawText = read(inputFile)
       val cookedText = process(rawText)
@@ -65,18 +73,36 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
     }
   }
 
-  def dir(inputDirName: String, outputDirName: String, inputExtension: String = ".pdf", outputExtension: String = ".txt"): Unit = {
-    val files = FileUtils.findFiles(inputDirName, inputExtension)
+  def file(inputFileName: String, outputFileName: String, overwrite: Boolean = false): Unit = {
+    val inputFile = new File(inputFileName)
+    val outputFile = new File(outputFileName)
 
-    files.par.foreach { inputFile =>
+    if (outputFile.exists && !overwrite)
+      Pdf2txt.logger.warn(s"""For input file "${inputFile.getPath}" the output file "${outputFile.getPath}" already exists.""")
+    else
+      convert(inputFile, outputFile)
+  }
+
+  def dir(inputDirName: String, outputDirName: String, threads: Int = 0, overwrite: Boolean = false): Unit = {
+    val  inputExtension = pdfConverter.inputExtension
+    val outputExtension = pdfConverter.outputExtension
+    val files = FileUtils.findFiles(inputDirName, inputExtension)
+    val parFiles = threads match {
+      case threads if threads <= 0 => files.par
+      case 1 => files
+      case threads if threads > 1 => ThreadUtils.parallelize(files, threads)
+    }
+
+    parFiles.foreach { inputFile =>
       val outputFile = new File(outputDirName + "/" + inputFile.getName.dropRight(inputExtension.length) + outputExtension)
 
-      convert(inputFile, outputFile)
+      if (outputFile.exists && !overwrite)
+        Pdf2txt.logger.warn(s"""For input file "${inputFile.getPath}" the output file "${outputFile.getPath}" already exists.""")
+      else
+        convert(inputFile, outputFile)
     }
   }
 }
-
-class ConfigError(config: Config, key: String, value: String, message: String) extends Pdf2txtException(message, null)
 
 object Pdf2txt extends Logging with Pdf2txtConfigured {
 
@@ -91,7 +117,7 @@ object Pdf2txt extends Logging with Pdf2txtConfigured {
       case "gigaWord" => GigawordLanguageModel()
       case "glove" => GloveLanguageModel()
       case "never" => new NeverLanguageModel()
-      case _ => throw new ConfigError(config, key, value, s"""The $key "$value" is not recognized.""")
+      case _ => throw ConfigError(key, value)
     }
 
     def map(key: String, value: => Preprocessor): Option[Preprocessor] =

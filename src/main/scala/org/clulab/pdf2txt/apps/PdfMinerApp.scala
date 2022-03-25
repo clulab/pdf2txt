@@ -1,8 +1,7 @@
 package org.clulab.pdf2txt.apps
 
-import org.clulab.pdf2txt.common.utils.Pdf2txtApp
-import org.clulab.pdf2txt.pdfminer.PdfMinerConverter
+import org.clulab.pdf2txt.common.utils.Pdf2txtAppish
 
-object PdfMinerApp extends Pdf2txtApp {
-  new DirApp(args, new PdfMinerConverter()).run()
+object PdfMinerApp extends Pdf2txtAppish {
+  new Pdf2txtApp(args, Map(Pdf2txtArgs.CONVERTER -> Pdf2txtArgs.PDF_MINER)).run()
 }

@@ -1,8 +1,7 @@
 package org.clulab.pdf2txt.apps
 
-import org.clulab.pdf2txt.common.utils.Pdf2txtApp
-import org.clulab.pdf2txt.tika.TikaConverter
+import org.clulab.pdf2txt.common.utils.Pdf2txtAppish
 
-object TikaApp extends Pdf2txtApp {
-  new DirApp(args, new TikaConverter()).run()
+object TikaApp extends Pdf2txtAppish {
+  new Pdf2txtApp(args, Map(Pdf2txtArgs.CONVERTER -> Pdf2txtArgs.TIKA)).run()
 }

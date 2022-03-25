@@ -1,9 +1,8 @@
-package org.clulab.pdf2txt.apps
+package org.clulab.pdf2txt.apps.log
 
-import org.clulab.pdf2txt.common.utils.TextRange
-import org.clulab.pdf2txt.preprocessor.{NumbersLogger, NumberPreprocessor}
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
-import org.clulab.pdf2txt.common.utils.FileUtils
+import org.clulab.pdf2txt.common.utils.{FileUtils, TextRange}
+import org.clulab.pdf2txt.preprocessor.{NumberPreprocessor, NumbersLogger}
 
 import java.io.File
 

@@ -1,14 +1,13 @@
-package org.clulab.pdf2txt.apps
+package org.clulab.pdf2txt.apps.log
 
-import org.clulab.pdf2txt.common.utils.TextRange
-import org.clulab.pdf2txt.languageModel.{GloveLanguageModel, LanguageModel}
-import org.clulab.pdf2txt.preprocessor.{LigaturePreprocessor, LineBreakPreprocessor}
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
-import org.clulab.utils.FileUtils
+import org.clulab.pdf2txt.common.utils.{FileUtils, TextRange}
+import org.clulab.pdf2txt.languageModel.{GloveLanguageModel, LanguageModel}
+import org.clulab.pdf2txt.preprocessor.LineBreakPreprocessor
 
 import java.io.{File, PrintWriter}
 
-object Ligature2logDir extends App {
+object LineBreak2logDir extends App {
 
   class Logger(printWriter: PrintWriter) {
     protected var fileOpt: Option[File] = None
@@ -28,7 +27,7 @@ object Ligature2logDir extends App {
   class LoggingLanguageModel(languageModel: LanguageModel, logger: Logger) extends LanguageModel {
 
     override def shouldJoin(left: String, right: String, prevWords: Seq[String]): Boolean = {
-      val context = prevWords.mkString(" ") + (if (prevWords.nonEmpty) " " else "") + left + right
+      val context = prevWords.mkString(" ") + (if (prevWords.nonEmpty) " " else "") + left + "-" + right
       val result = languageModel.shouldJoin(left, right, prevWords)
 
       logger.log(left, right, result, context)
@@ -40,11 +39,11 @@ object Ligature2logDir extends App {
   val outputFilename = args.lift(1).getOrElse("output.tsv")
   val files = FileUtils.findFiles(dir, ".txt")
 
-  FileUtils.printWriterFromFile(outputFilename).autoClose { printWriter =>
+  FileUtils.printWriterFromFile(new File(outputFilename)).autoClose { printWriter =>
     val logger = new Logger(printWriter)
     val innerLanguageModel = GloveLanguageModel()
     val outerLanguageModel = new LoggingLanguageModel(innerLanguageModel, logger)
-    val preprocessor = new LigaturePreprocessor(outerLanguageModel)
+    val preprocessor = new LineBreakPreprocessor(outerLanguageModel)
 
     files.foreach { inputFile =>
       val text = FileUtils.getTextFromFile(inputFile)
@@ -52,9 +51,9 @@ object Ligature2logDir extends App {
       logger.setFile(inputFile)
 
       val newText = preprocessor.preprocess(TextRange(text)).toString
-      val newFile = "../corpora/Ligature2logDir/" + inputFile.getName
+      val newFile = "../corpora/LineBreak2logDir/" + inputFile.getName
 
-      FileUtils.printWriterFromFile(newFile).autoClose { printWriter =>
+      FileUtils.printWriterFromFile(new File(newFile)).autoClose { printWriter =>
         printWriter.print(newText)
       }
     }
