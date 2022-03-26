@@ -2,7 +2,7 @@ package org.clulab.pdf2txt.preprocessor
 
 import org.clulab.pdf2txt.common.utils.{StringUtils, TextRange, TextRanges, TripleIndexedSeq}
 import org.clulab.pdf2txt.document.logical.{DocumentBySentence, SentenceDocument, WordDocument}
-import org.clulab.pdf2txt.languageModel.{LanguageModel, NeverLanguageModel, ProbabilisticLanguageModel}
+import org.clulab.pdf2txt.languageModel.{GigawordLanguageModel, LanguageModel, NeverLanguageModel, ProbabilisticLanguageModel}
 
 class WordBreakByHyphenPreprocessor(languageModel: LanguageModel = WordBreakByHyphenPreprocessor.languageModel) extends Preprocessor {
 
@@ -54,5 +54,5 @@ class WordBreakByHyphenPreprocessor(languageModel: LanguageModel = WordBreakByHy
 }
 
 object WordBreakByHyphenPreprocessor {
-  val languageModel = new NeverLanguageModel()
+  lazy val languageModel = GigawordLanguageModel()
 }

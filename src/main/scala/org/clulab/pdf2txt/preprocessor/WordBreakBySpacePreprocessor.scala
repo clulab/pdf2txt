@@ -48,5 +48,5 @@ class WordBreakBySpacePreprocessor(languageModel: LanguageModel = WordBreakBySpa
 }
 
 object WordBreakBySpacePreprocessor {
-  val languageModel = new NeverLanguageModel()
+  lazy val languageModel = new NeverLanguageModel()
 }
