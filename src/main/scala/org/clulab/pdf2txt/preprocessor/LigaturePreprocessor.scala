@@ -81,5 +81,5 @@ class LigaturePreprocessor(languageModel: LanguageModel = LigaturePreprocessor.l
 }
 
 object LigaturePreprocessor {
-  val languageModel = new AlwaysLanguageModel()
+  lazy val languageModel = new AlwaysLanguageModel()
 }

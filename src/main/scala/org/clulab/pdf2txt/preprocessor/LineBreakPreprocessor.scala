@@ -67,5 +67,5 @@ case class DoubleLanguageModel(leftLanguageModel: LanguageModel, rightLanguageMo
 }
 
 object LineBreakPreprocessor {
-  val languageModel = new AlwaysLanguageModel()
+  lazy val languageModel = new AlwaysLanguageModel()
 }

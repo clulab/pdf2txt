@@ -130,8 +130,8 @@ object Pdf2txt extends Logging with Pdf2txtConfigured {
       map("number", new NumberPreprocessor()),
       map("ligature", new LigaturePreprocessor(languageModel)),
       map("lineBreak", new LineBreakPreprocessor(languageModel)),
-      map("wordBreakByHyphen", new WordBreakByHyphenPreprocessor()),
-      map("wordBreakBySpace", new WordBreakBySpacePreprocessor())
+      map("wordBreakByHyphen", new WordBreakByHyphenPreprocessor(languageModel)),
+      map("wordBreakBySpace", new WordBreakBySpacePreprocessor()) // languageModel
     ).flatten
   }
 }
