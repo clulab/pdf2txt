@@ -55,9 +55,9 @@ ThisBuild / scmInfo := Some(
   )
 )
 
-ThisBuild / Compile / packageBin / publishArtifact := true  // Do include the resources.
-ThisBuild / Compile / packageDoc / publishArtifact := false // There is no documentation.
-ThisBuild / Compile / packageSrc / publishArtifact := false // There is no source code.
+ThisBuild / Compile / packageBin / publishArtifact := true // Do include the resources.
+ThisBuild / Compile / packageDoc / publishArtifact := true // Do include the documentation.
+ThisBuild / Compile / packageSrc / publishArtifact := true // Do include the source code.
 ThisBuild / Test    / packageBin / publishArtifact := false
 
 // Please add your credentials to ~/.sbt/<version>/credentials.sbt in lines that looks like this:
