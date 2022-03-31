@@ -1,5 +1,5 @@
 [![Build Status](https://github.com/clulab/pdf2txt/workflows/pdf2txt%20CI/badge.svg)](https://github.com/clulab/pdf2txt/actions)
-[![Maven Central](https://img.shields.io/maven-central/v/org.clulab/pdf2txt_2.12?logo=apachemaven)](https://mvnrepository.com/artifact/org.clulab/pdf2txt)
+[![Maven Central](https://img.shields.io/maven-central/v/org.clulab/pdf2txt_2.12?logo=apachemaven)](https://search.maven.org/search?q=g:org.clulab%20a:pdf2txt*)
 
 # pdf2txt
 
@@ -7,7 +7,7 @@ The pdf2txt project combines interfaces to a number of PDF to text converters wi
 
 ## Library
 
-This project has been published to [maven central](https://mvnrepository.com/search?q=+org.clulab+pdf2txt) and can be used by `sbt` and other build tools as a library dependency.  Include a line like this in `build.sbt` to incorporate the main project along with all the subprojects:
+This project has been published to [maven central](https://search.maven.org/search?q=g:org.clulab%20a:pdf2txt*) and can be used by `sbt` and other build tools as a library dependency.  Include a line like this in `build.sbt` to incorporate the main project along with all the subprojects:
 ```scala
 libraryDependencies += "org.clulab" %% "pdf2txt" % "1.0.0"
 ```
