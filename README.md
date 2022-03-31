@@ -1,8 +1,20 @@
 [![Build Status](https://github.com/clulab/pdf2txt/workflows/pdf2txt%20CI/badge.svg)](https://github.com/clulab/pdf2txt/actions)
+[![Maven Central](https://img.shields.io/maven-central/v/org.clulab/pdf2txt_2.12?logo=apachemaven)](https://mvnrepository.com/artifact/org.clulab/pdf2txt)
 
 # pdf2txt
 
 The pdf2txt project combines interfaces to a number of PDF to text converters with text preprocessors that refine the converted text for use in further NLP applications.
+
+## Library
+
+This project has been published to [maven central](https://mvnrepository.com/search?q=+org.clulab+pdf2txt) and can be used by `sbt` and other build tools as a library dependency.  Include a line like this in `build.sbt` to incorporate the main project along with all the subprojects:
+```scala
+libraryDependencies += "org.clulab" %% "pdf2txt" % "1.0.0"
+```
+
+## Executable
+
+The main `Pdf2txtApp` can be run directly from the [pre-built](https://drive.google.com/file/d/13JPRVsA_B-q3xZK0QVFGqPS-Cw6Go0ES/view?usp=sharing) `jar` file.  The only prerequisite is Java.  Startup is significantly quicker than when it runs via `sbt`.
 
 ## PDF converters
 
@@ -143,16 +155,3 @@ preprocesses file.txt resulting in file.out.txt
 ```
 
 To get the full [help text](https://github.com/clulab/pdf2txt/blob/main/src/main/resources/org/clulab/pdf2txt/Pdf2txtApp.syntax.txt), use `-h`, `-help`, or `--help`.
-
-
-## Library
-
-This project has not yet been published to [maven central](https://search.maven.org/), but might be reused directly from GitHub by including lines like these in the `build.sbt` file of a Scala project:
-```scala
-resolvers += "jitpack" at "https://jitpack.io"
-libraryDependencies += "org.clulab" % "pdf2txt" % "master-SNAPSHOT"
-```
-
-## Executable
-
-The main `Pdf2txtApp` can be run directly from the [pre-built](https://drive.google.com/file/d/13JPRVsA_B-q3xZK0QVFGqPS-Cw6Go0ES/view?usp=sharing) `jar` file.  The only prerequisite is Java.  Startup is significantly quicker than when it runs via `sbt`.
