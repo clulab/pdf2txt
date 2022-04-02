@@ -23,7 +23,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
 
   def processArgs(): (PdfConverterConstructor, Array[Preprocessor], String, String, Boolean, Int, Boolean) = {
     try {
-      val map = org.clulab.utils.StringUtils.argsToMap(args, verbose = false)
+      val map = AppUtils.argsToMap(args)
       val mapAndConfig = AppUtils.mkMapAndConfig(map, params, Pdf2txt.config, Pdf2txtArgs.CONF, "Pdf2txt")
 
       AppUtils.checkArgs(Pdf2txtArgs.argKeys, mapAndConfig, system)

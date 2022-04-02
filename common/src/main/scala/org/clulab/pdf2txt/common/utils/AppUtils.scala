@@ -76,4 +76,25 @@ object AppUtils {
 
     mapAndConfig
   }
+
+  def argsToMap(args: Array[String], default: String = "true"): Map[String, String] = {
+    val keyIndexes = args.indices.filter(args(_).startsWith("-"))
+    val multiMap = keyIndexes.indices.map { index =>
+      val valueStart = keyIndexes(index) + 1
+      val valueEnd =
+          if (index + 1 < keyIndexes.length) keyIndexes(index + 1) // Stop before the next key.
+          else args.length // Stop before the end of the args.
+      val valueRange = Range(valueStart, valueEnd)
+
+      args(keyIndexes(index)) -> valueRange.map(args(_))
+    }.toMap
+    val singleMap = multiMap.map { case (key, values) =>
+      val cleanKey = key.dropWhile(_ == '-')
+      val value = values.headOption.getOrElse(default)
+
+      cleanKey -> value
+    }
+
+    singleMap
+  }
 }
