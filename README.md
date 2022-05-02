@@ -151,7 +151,7 @@ converts `doc.pdf` to `doc.txt` using `pdftotxt` without the
 `wordBreakBySpace` preprocessor.
 ```
 -converter text -in file.txt -out file.out.txt
-preprocesses file.txt resulting in file.out.txt
 ```
+preprocesses file.txt resulting in file.out.txt
 
 To get the full [help text](https://github.com/clulab/pdf2txt/blob/main/src/main/resources/org/clulab/pdf2txt/Pdf2txtApp.syntax.txt), use `-h`, `-help`, or `--help`.
