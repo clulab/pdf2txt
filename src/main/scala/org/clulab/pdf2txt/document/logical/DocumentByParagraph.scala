@@ -21,7 +21,7 @@ class DocumentByParagraph(parentOpt: Option[Document], textRange: TextRange) ext
     val postParagraphSeparator =
         if (contents.isEmpty) emptyEnd
         else after(contents.last.end)
-    val postSeparator = emptyEnd // Tt is used by the paragraph.
+    val postSeparator = emptyEnd // It is used by the paragraph.
     val paragraphDocuments = contents.indices.map { index =>
         val contentTextRange = contents(index)
         val separatorTextRange = interSeparators.lift(index).getOrElse(postParagraphSeparator)
