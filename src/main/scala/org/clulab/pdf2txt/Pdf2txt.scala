@@ -29,12 +29,12 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
     }
   }
 
-  def process(rawText: String): String = {
+  def process(rawText: String, maxLoops: Int): String = {
     try {
 
       @tailrec
-      def loop(rawText: String, count: Int, results: Set[String]): String = {
-        if (count >= Pdf2txt.maxLoops)
+      def loop(rawText: String, loopCount: Int, results: Set[String]): String = {
+        if (maxLoops != 0 && loopCount >= maxLoops)
           rawText
         else {
           val cookedText = preprocessors.foldLeft(rawText) { (rawText, preprocessor) =>
@@ -42,7 +42,7 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
           }
 
           if (results(cookedText)) cookedText
-          else loop(cookedText, count + 1, results + cookedText)
+          else loop(cookedText, loopCount + 1, results + cookedText)
         }
       }
 
@@ -64,12 +64,12 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
     }
   }
 
-  def convert(inputFile: File, outputFile: File): Unit = {
+  def convert(inputFile: File, outputFile: File, loops: Int): Unit = {
     try {
       Pdf2txt.logger.info(s"Converting ${inputFile.getCanonicalPath}...")
 
       val rawText = read(inputFile)
-      val cookedText = process(rawText)
+      val cookedText = process(rawText, loops)
       write(outputFile, cookedText)
     }
     catch {
@@ -77,17 +77,17 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
     }
   }
 
-  def file(inputFileName: String, outputFileName: String, overwrite: Boolean = false): Unit = {
+  def file(inputFileName: String, outputFileName: String, loops: Int = 1, overwrite: Boolean = false): Unit = {
     val inputFile = new File(inputFileName)
     val outputFile = new File(outputFileName)
 
     if (outputFile.exists && !overwrite)
       Pdf2txt.logger.warn(s"""For input file "${inputFile.getPath}" the output file "${outputFile.getPath}" already exists.""")
     else
-      convert(inputFile, outputFile)
+      convert(inputFile, outputFile, loops)
   }
 
-  def dir(inputDirName: String, outputDirName: String, threads: Int = 0, overwrite: Boolean = false): Unit = {
+  def dir(inputDirName: String, outputDirName: String, threads: Int = 0, loops: Int = 1, overwrite: Boolean = false): Unit = {
     val  inputExtension = pdfConverter.inputExtension
     val outputExtension = pdfConverter.outputExtension
     val files = FileUtils.findFiles(inputDirName, inputExtension)
@@ -103,13 +103,12 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
       if (outputFile.exists && !overwrite)
         Pdf2txt.logger.warn(s"""For input file "${inputFile.getPath}" the output file "${outputFile.getPath}" already exists.""")
       else
-        convert(inputFile, outputFile)
+        convert(inputFile, outputFile, loops)
     }
   }
 }
 
 object Pdf2txt extends Logging with Pdf2txtConfigured {
-  val maxLoops = 5
 
   def apply(pdfConverter: PdfConverter = new TikaConverter()): Pdf2txt =
       new Pdf2txt(pdfConverter, getPreprocessors(config))

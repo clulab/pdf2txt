@@ -19,9 +19,9 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
   type PreprocessorConstructor = () => Preprocessor
   type PreprocessorsConstructor = () => Array[Preprocessor]
 
-  val (pdfConverterConstructor, preprocessors, inFileOrDirectory, outFileOrDirectory, isFileMode, threads, overwrite) = processArgs()
+  val (pdfConverterConstructor, preprocessors, inFileOrDirectory, outFileOrDirectory, isFileMode, threads, loops, overwrite) = processArgs()
 
-  def processArgs(): (PdfConverterConstructor, Array[Preprocessor], String, String, Boolean, Int, Boolean) = {
+  def processArgs(): (PdfConverterConstructor, Array[Preprocessor], String, String, Boolean, Int, Int, Boolean) = {
     try {
       val map = AppUtils.argsToMap(args)
       val mapAndConfig = AppUtils.mkMapAndConfig(map, params, Pdf2txt.config, Pdf2txtArgs.CONF, "Pdf2txt")
@@ -79,6 +79,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
       val inFileOrDirectory = mapAndConfig(Pdf2txtArgs.IN)
       val outFileOrDirectory = mapAndConfig(Pdf2txtArgs.OUT)
       val threads = mapAndConfig.getInt(Pdf2txtArgs.THREADS)
+      val loops = mapAndConfig.getInt(Pdf2txtArgs.LOOPS)
       val overwrite = mapAndConfig.getBoolean(Pdf2txtArgs.OVERWRITE)
       val isFileMode = {
         val inFile = new File(inFileOrDirectory)
@@ -120,7 +121,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
       val argsString = AppUtils.mkArgsString(this, Pdf2txtArgs.argKeys, mapAndConfig)
 
       Pdf2txtApp.logger.info(s"Running $argsString...")
-      (pdfConverterConstructor, preprocessors, inFileOrDirectory, outFileOrDirectory, isFileMode, threads, overwrite)
+      (pdfConverterConstructor, preprocessors, inFileOrDirectory, outFileOrDirectory, isFileMode, threads, loops, overwrite)
     }
     catch {
       case throwable: Throwable =>
@@ -136,7 +137,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
     pdfConverterConstructor().autoClose { pdfConverter =>
       val pdf2txt = new Pdf2txt(pdfConverter, preprocessors)
 
-      pdf2txt.file(inFileOrDirectory, outFileOrDirectory, overwrite)
+      pdf2txt.file(inFileOrDirectory, outFileOrDirectory, loops, overwrite)
     }
   }
 
@@ -144,7 +145,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
     pdfConverterConstructor().autoClose { pdfConverter =>
       val pdf2txt = new Pdf2txt(pdfConverter, preprocessors)
 
-      pdf2txt.dir(inFileOrDirectory, outFileOrDirectory, threads, overwrite)
+      pdf2txt.dir(inFileOrDirectory, outFileOrDirectory, threads, loops, overwrite)
     }
   }
 
@@ -172,6 +173,7 @@ object Pdf2txtArgs {
   val IN = "in"
   val OUT = "out"
   val THREADS = "threads"
+  val LOOPS = "loops"
   val OVERWRITE = "overwrite"
 
   val helps: Array[String] = Array(HELP1, HELP2)
@@ -193,6 +195,7 @@ object Pdf2txtArgs {
     IN,
     OUT,
     THREADS,
+    LOOPS,
     OVERWRITE
   )
 

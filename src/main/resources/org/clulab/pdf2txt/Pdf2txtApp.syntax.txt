@@ -32,6 +32,7 @@
           -in  <inputFileOrDirectory>
           -out <outputFileOrDirectory>
           -threads <threadCount>
+          -loops <loopCount>
           -overwrite (true | false)
               allows one to overwrite existing files.
 
@@ -41,6 +42,7 @@ Defaults: All preprocessors default to true and otherwise
           -in  .
           -out .
           -threads 0, meaning to match the available processors
+          -loops 1, for just once while 0 would mean potentially forever
           -overwrite false
 
 Examples: <no_arguments>
