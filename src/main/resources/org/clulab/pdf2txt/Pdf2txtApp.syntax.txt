@@ -22,6 +22,7 @@
           -line              (true | false)
           -paragraph         (true | false)
           -unicode           (true | false)
+          -case              (true | false)
           -number            (true | false)
           -ligature          (true | false)
           -lineBreak         (true | false)

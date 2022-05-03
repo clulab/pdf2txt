@@ -7,7 +7,7 @@ import org.clulab.pdf2txt.common.utils.{AppUtils, ConfigError, Pdf2txtAppish, Pd
 import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, GigawordLanguageModel, GloveLanguageModel, LanguageModel, NeverLanguageModel}
 import org.clulab.pdf2txt.pdfminer.PdfMinerConverter
 import org.clulab.pdf2txt.pdftotext.PdfToTextConverter
-import org.clulab.pdf2txt.preprocessor.{LigaturePreprocessor, LineBreakPreprocessor, LinePreprocessor, NumberPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
+import org.clulab.pdf2txt.preprocessor.{CasePreprocessor, LigaturePreprocessor, LineBreakPreprocessor, LinePreprocessor, NumberPreprocessor, ParagraphPreprocessor, Preprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
 import org.clulab.pdf2txt.scienceparse.ScienceParseConverter
 import org.clulab.pdf2txt.tika.TikaConverter
 
@@ -66,6 +66,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
           map(Pdf2txtArgs.LINE, () => new LinePreprocessor()),
           map(Pdf2txtArgs.PARAGRAPH, () => new ParagraphPreprocessor()),
           map(Pdf2txtArgs.UNICODE, () => new UnicodePreprocessor()),
+          map(Pdf2txtArgs.CASE, () => new CasePreprocessor()),
           map(Pdf2txtArgs.NUMBER, () => new NumberPreprocessor()),
           map(Pdf2txtArgs.LIGATURE, () => new LigaturePreprocessor(languageModel)),
           map(Pdf2txtArgs.LINE_BREAK, () => new LineBreakPreprocessor(languageModel)),
@@ -162,6 +163,7 @@ object Pdf2txtArgs {
   val LINE = "line"
   val PARAGRAPH = "paragraph"
   val UNICODE = "unicode"
+  val CASE = "case"
   val NUMBER = "number"
   val LIGATURE = "ligature"
   val LINE_BREAK = "lineBreak"
@@ -182,6 +184,7 @@ object Pdf2txtArgs {
     LINE,
     PARAGRAPH,
     UNICODE,
+    CASE,
     NUMBER,
     LIGATURE,
     LINE_BREAK,

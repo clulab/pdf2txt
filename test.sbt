@@ -22,6 +22,7 @@ def groupByLanguage(tests: Seq[TestDefinition]) = {
 }
 
 ThisBuild / Test / fork := true // also forces sequential operation
+ThisBuild / Test / javaOptions ++= Seq("-Xmx6g")
 ThisBuild / Test / parallelExecution := false // keeps groups in their order
 //ThisBuild / Test / testForkedParallel := true // Allow parallel within group?
 //ThisBuild / Test / testGrouping := groupByLanguage((Test / definedTests).value)

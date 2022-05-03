@@ -56,6 +56,10 @@ Preprocessors can be configured on (true) and off (false) as shown later, but th
 
     Conversion of unicode characters is controlled by a translation table which can remove accents, spell out Greek letters, convert to spaces, etc. and a list of accented characters which might be spared from such conversion.  How these are used is controlled by parameters.  In the command line interface, they are hard coded, but the library provides access.
 
+* **case**
+
+  Headers and titles often indicated with words that have been capitalized.  Unfortunately, this can confuse part of speech taggers and named entity recognizers.  Case is restored here so that words appear as they would in normal sentences for more accurate processing.
+
 * **number**
  
     Numbers are sometimes converted so that spaces separate some of the digits or a comma lands after a space as in 123 ,45.  This preprocessor tries to remove unnecessary spaces within numbers.
@@ -151,7 +155,7 @@ converts `doc.pdf` to `doc.txt` using `pdftotxt` without the
 `wordBreakBySpace` preprocessor.
 ```
 -converter text -in file.txt -out file.out.txt
-preprocesses file.txt resulting in file.out.txt
 ```
+preprocesses file.txt resulting in file.out.txt
 
 To get the full [help text](https://github.com/clulab/pdf2txt/blob/main/src/main/resources/org/clulab/pdf2txt/Pdf2txtApp.syntax.txt), use `-h`, `-help`, or `--help`.

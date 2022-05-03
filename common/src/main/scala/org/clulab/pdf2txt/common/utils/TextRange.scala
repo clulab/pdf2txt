@@ -143,6 +143,8 @@ object TextRanges {
 
   def apply(textRange: TextRange): TextRanges = new TextRanges() += textRange
 
+  def apply(textRanges: Seq[TextRange]): TextRanges = new TextRanges() ++= textRanges
+
   def test: Unit = {
     val textRange = TextRange("hello")
 
