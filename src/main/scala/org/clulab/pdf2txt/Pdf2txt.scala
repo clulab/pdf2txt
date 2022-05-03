@@ -33,16 +33,20 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
     try {
 
       @tailrec
-      def loop(rawText: String, count: Int): String = {
-        val cookedText = preprocessors.foldLeft(rawText) { (rawText, preprocessor) =>
-          preprocessor.preprocess(rawText).toString
-        }
+      def loop(rawText: String, count: Int, results: Set[String]): String = {
+        if (count >= Pdf2txt.maxLoops)
+          rawText
+        else {
+          val cookedText = preprocessors.foldLeft(rawText) { (rawText, preprocessor) =>
+            preprocessor.preprocess(rawText).toString
+          }
 
-        if (cookedText == rawText) cookedText
-        else loop(cookedText, count + 1)
+          if (results(cookedText)) cookedText
+          else loop(cookedText, count + 1, results + cookedText)
+        }
       }
 
-      loop(rawText, 0)
+      loop(rawText, 0, Set(rawText))
     }
     catch {
       case throwable: Throwable => logError(throwable, s"Could not process text.")
@@ -105,6 +109,7 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
 }
 
 object Pdf2txt extends Logging with Pdf2txtConfigured {
+  val maxLoops = 5
 
   def apply(pdfConverter: PdfConverter = new TikaConverter()): Pdf2txt =
       new Pdf2txt(pdfConverter, getPreprocessors(config))
