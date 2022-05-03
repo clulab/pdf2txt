@@ -2,7 +2,7 @@ package org.clulab.pdf2txt.preprocessor
 
 import org.clulab.dynet.Utils
 import org.clulab.pdf2txt.common.utils.{TextRange, TextRanges}
-import org.clulab.pdf2txt.document.logical.{DocumentBySentence, DocumentByWord, WordDocument}
+import org.clulab.pdf2txt.document.logical.{DocumentByWord, WordDocument}
 
 class CasePreprocessor() extends Preprocessor {
 
@@ -30,6 +30,6 @@ class CasePreprocessor() extends Preprocessor {
 object CasePreprocessor {
   lazy val processor = {
     Utils.initializeDyNet()
-    DocumentBySentence.processor
+    DocumentByWord.processor
   }
 }
