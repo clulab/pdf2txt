@@ -92,7 +92,9 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
     val outputExtension = pdfConverter.outputExtension
     val files = FileUtils.findFiles(inputDirName, inputExtension)
     val parFiles = threads match {
-      case threads if threads <= 0 => files.par
+      case threads if threads <= 0 =>
+        val processors = Runtime.getRuntime().availableProcessors()
+        ThreadUtils.parallelize(files, processors)
       case 1 => files
       case threads if threads > 1 => ThreadUtils.parallelize(files, threads)
     }
