@@ -8,5 +8,6 @@ resolvers ++= Seq(
 
 libraryDependencies ++= {
   Seq(
+    "me.shadaj" %% "scalapy-core" % "0.5.2"
   )
 }

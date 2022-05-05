@@ -1,0 +1,1 @@
+ThisBuild / run / fork := true

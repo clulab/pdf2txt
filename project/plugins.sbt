@@ -24,3 +24,5 @@ addSbtPlugin("com.typesafe.sbteclipse"  % "sbteclipse-plugin"    % "5.2.4")     
 // the same across all modules of Akka that you are using, e.g. if you use [2.5.17] all other modules that are
 // released together MUST be of the same version."
 // * Held back out of an abundance of caution.
+
+libraryDependencies += "ai.kien" %% "python-native-libs" % "0.2.2"
