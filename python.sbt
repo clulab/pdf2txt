@@ -1,14 +1,17 @@
 import ai.kien.python.Python
-
-lazy val python = Python()
+import org.clulab.sbt.BuildUtils
 
 lazy val javaOpts = {
-  println("Keith was up here!")
-  python.scalapyProperties.get.map { case (key, value) =>
-    println("Keith was here!")
-    println(s"$key = $value")
-    s"-D$key=$value"
-  }.toSeq
+  if (BuildUtils.isWindows())
+    // Fill this in manually.
+    Seq("-Djna.library.path = /D:/ProgramFiles/Python39/DLLs")
+  else {
+    Python().scalapyProperties.get.map { case (key, value) =>
+      println("Keith was here!")
+      println(s"$key = $value")
+      s"-D$key=$value"
+    }.toSeq
+  }
 }
 
 ThisBuild / run / javaOptions ++= javaOpts
