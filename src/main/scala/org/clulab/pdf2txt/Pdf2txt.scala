@@ -116,14 +116,24 @@ object Pdf2txt extends Logging with Pdf2txtConfigured {
       new Pdf2txt(pdfConverter, getPreprocessors(config))
 
   def getPreprocessors(config: Config): Array[Preprocessor] = {
-    val key = "languageModel"
-    val value = config.getString(key)
-    val languageModel = value match {
-      case "always" => new AlwaysLanguageModel()
-      case "gigaWord" => GigawordLanguageModel()
-      case "glove" => GloveLanguageModel()
-      case "never" => new NeverLanguageModel()
-      case _ => throw ConfigError(key, value)
+    val languageModel = {
+      val key = "languageModel"
+      val value = config.getString(key)
+
+      value match {
+        case "always" => new AlwaysLanguageModel()
+        case "gigaWord" => GigawordLanguageModel()
+        case "glove" => GloveLanguageModel()
+        case "never" => new NeverLanguageModel()
+        case _ => throw ConfigError(key, value)
+      }
+    }
+
+    val caseCutoff = {
+      val key = "caseCutoff"
+      val value = config.getDouble(key).toFloat
+
+      value
     }
 
     def map(key: String, value: => Preprocessor): Option[Preprocessor] =
@@ -133,7 +143,7 @@ object Pdf2txt extends Logging with Pdf2txtConfigured {
       map("line", new LinePreprocessor()),
       map("paragraph", new ParagraphPreprocessor()),
       map("unicode", new UnicodePreprocessor()),
-      map("case", new CasePreprocessor()),
+      map("case", new CasePreprocessor(caseCutoff)),
       map("number", new NumberPreprocessor()),
       map("ligature", new LigaturePreprocessor(languageModel)),
       map("lineBreak", new LineBreakPreprocessor(languageModel)),

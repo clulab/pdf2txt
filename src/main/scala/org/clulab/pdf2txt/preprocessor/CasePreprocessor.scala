@@ -3,16 +3,43 @@ package org.clulab.pdf2txt.preprocessor
 import org.clulab.dynet.Utils
 import org.clulab.pdf2txt.common.utils.{TextRange, TextRanges}
 import org.clulab.pdf2txt.document.logical.{DocumentByWord, WordDocument}
+import org.clulab.pdf2txt.utils.WordTypes
+import org.clulab.processors.Sentence
 
-class CasePreprocessor() extends Preprocessor {
+class CasePreprocessor(cutoff: Float = CasePreprocessor.defaultCutoff) extends Preprocessor {
+
+  def getPercentNotLower(sentence: Sentence): Float = {
+
+    def countWordType(wordType: WordTypes.WordType): Int =
+      sentence.words.count(WordTypes(_) == wordType)
+
+    val wordCount = sentence.words.length
+    val allLowerCount = countWordType(WordTypes.AllLower)
+    val percentNotLower = (wordCount - allLowerCount).toFloat / wordCount * 100
+
+    percentNotLower
+  }
 
   def preprocess(textRange: TextRange): TextRanges = {
     val document = {
       val processor = CasePreprocessor.processor
-      val document = processor.mkDocument(textRange.toString, keepText = false)
+      val preservedSentences = {
+        val document = processor.mkDocument(textRange.toString, keepText = false)
+        document.sentences
+      }
+      val restoredSentences = {
+        val document = processor.mkDocument(textRange.toString, keepText = false)
+        processor.restoreCase(document)
+        document.sentences
+      }
+      val combinedSentences = preservedSentences.zip(restoredSentences).map { case (preservedSentence, restoredSentence) =>
+        val percentNotLower = getPercentNotLower(preservedSentence)
 
-      processor.restoreCase(document)
-      new DocumentByWord(None, textRange, document.sentences)
+        if (percentNotLower >= cutoff) restoredSentence
+        else preservedSentence
+      }
+
+      new DocumentByWord(None, textRange, combinedSentences)
     }
     val children = document.getChildren.flatMap { textRange =>
       textRange match {
@@ -28,6 +55,8 @@ class CasePreprocessor() extends Preprocessor {
 }
 
 object CasePreprocessor {
+  val defaultCutoff = 67.5f
+
   lazy val processor = {
     Utils.initializeDyNet()
     DocumentByWord.processor
