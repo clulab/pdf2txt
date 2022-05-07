@@ -9,7 +9,7 @@ The pdf2txt project combines interfaces to a number of PDF to text converters wi
 
 This project has been published to [maven central](https://search.maven.org/search?q=g:org.clulab%20a:pdf2txt*) and can be used by `sbt` and other build tools as a library dependency.  Include a line like this in `build.sbt` to incorporate the main project along with all the subprojects:
 ```scala
-libraryDependencies += "org.clulab" %% "pdf2txt" % "1.1.1"
+libraryDependencies += "org.clulab" %% "pdf2txt" % "1.1.2"
 ```
 
 ## Executable
