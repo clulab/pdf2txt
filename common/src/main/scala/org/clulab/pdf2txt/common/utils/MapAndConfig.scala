@@ -30,6 +30,13 @@ case class MapAndConfig(map: Map[String, String], config: Config) {
     }
   }
 
+  def getFloat(key: String, defaultOpt: Option[Float] = None): Float = {
+    map.get(key).map(_.toFloat).getOrElse {
+      if (config.hasPath(key)) config.getDouble(key).toFloat
+      else defaultOpt.getOrElse(throw new ConfigError(s"""There is no configured float value for "$key"."""))
+    }
+  }
+
   def contains(key: String): Boolean = map.contains(key) || config.hasPath(key)
 
   def get(key: String): Option[String] = {

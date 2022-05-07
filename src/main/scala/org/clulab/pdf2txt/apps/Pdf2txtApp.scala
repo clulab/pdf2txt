@@ -57,6 +57,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
           case _ => throw ConfigError(mapAndConfig, key, value)
         }
       }
+      val caseCutoff = mapAndConfig.getFloat(Pdf2txtArgs.CASE_CUTOFF, Some(CasePreprocessor.defaultCutoff))
       val preprocessorsConstructor = {
         def map(key: String, preprocessorConstructor: PreprocessorConstructor): Option[PreprocessorConstructor] =
           if (mapAndConfig.getBoolean(key)) Some(preprocessorConstructor) else None
@@ -66,7 +67,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
           map(Pdf2txtArgs.LINE, () => new LinePreprocessor()),
           map(Pdf2txtArgs.PARAGRAPH, () => new ParagraphPreprocessor()),
           map(Pdf2txtArgs.UNICODE, () => new UnicodePreprocessor()),
-          map(Pdf2txtArgs.CASE, () => new CasePreprocessor()),
+          map(Pdf2txtArgs.CASE, () => new CasePreprocessor(caseCutoff)),
           map(Pdf2txtArgs.NUMBER, () => new NumberPreprocessor()),
           map(Pdf2txtArgs.LIGATURE, () => new LigaturePreprocessor(languageModel)),
           map(Pdf2txtArgs.LINE_BREAK, () => new LineBreakPreprocessor(languageModel)),
@@ -165,6 +166,7 @@ object Pdf2txtArgs {
   val PARAGRAPH = "paragraph"
   val UNICODE = "unicode"
   val CASE = "case"
+  val CASE_CUTOFF = "caseCutoff"
   val NUMBER = "number"
   val LIGATURE = "ligature"
   val LINE_BREAK = "lineBreak"

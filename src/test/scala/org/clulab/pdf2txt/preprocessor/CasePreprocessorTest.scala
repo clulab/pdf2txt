@@ -3,7 +3,7 @@ package org.clulab.pdf2txt.preprocessor
 import org.clulab.pdf2txt.common.utils.Test
 
 class CasePreprocessorTest extends Test {
-  val preprocessor = new CasePreprocessor()
+  val preprocessor = new CasePreprocessor(0f) // Force conversion with very low cutoff.
 
   case class CaseRestoreTest(reason: String, inputText: String, expectedOutputText: String) {
 
