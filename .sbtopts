@@ -1,3 +1,6 @@
--J-Xmx6g
--J-Dfile.encoding=UTF-8
--J-XX:MaxMetaspaceSize=10g
+# There are no sbt-specific options, so use .jvmopts instead.
+# If sbt exhausts memory, change the limit here.
+# -J-Xmx3g
+# -J-Dfile.encoding=UTF-8
+# -J-XX:+CMSClassUnloadingEnabled
+# -J-XX:+UseConcMarkSweepGC
