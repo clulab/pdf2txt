@@ -38,7 +38,8 @@ lazy val core = (project in file("."))
     assembly / mainClass := mainClassOpt,
     Compile / run / mainClass := mainClassOpt,
     trapExit := false, // Avoid sbt.TrapExitSecurityException on System.exit().
-    run / fork := true // Avoid shutting down sbt on untrapped System.exit().
+    run / fork := true, // Avoid shutting down sbt on untrapped System.exit().
+    run / javaOptions += "-Xmx12g" // If running exhausts memory, change it here.
   )
 
 lazy val common = project
