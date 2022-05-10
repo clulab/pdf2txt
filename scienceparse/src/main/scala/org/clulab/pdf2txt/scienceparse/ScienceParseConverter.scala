@@ -8,7 +8,11 @@ import java.io.{BufferedInputStream, File, FileInputStream, InputStream}
 import scala.collection.JavaConverters._
 
 class ScienceParseConverter() extends PdfConverter {
-  val parser = Parser.getInstance()
+  val parser: Parser = {
+    val parserOpt = Option(Parser.getInstance())
+
+    parserOpt.getOrElse(throw new RuntimeException("ScienceParse returned a null parser instance."))
+  }
 
   def toString(extractedMetadata: ExtractedMetadata): String = {
     val stringBuffer = new StringBuffer()
