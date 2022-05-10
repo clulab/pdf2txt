@@ -180,7 +180,7 @@ or
 ```
 Exception in thread "ModelLoaderThread" java.lang.OutOfMemoryError: Java heap space
 ```
-here are some tips to try:
+then here are some tips to try:
 
 * If `sbt` can't complete commands like `compile` or `assembly` for lack of memory, then the `-Xmx` setting in [.jvmopts](https://github.com/clulab/pdf2txt/blob/main/.jvmopts) might be increased.  The Windows version of `sbt` seems to ignore this file, so it may be necessary to instead set the value of the environment variable `_JAVA_OPTIONS`.  Depending on the shell, that might be with `set _JAVA_OPTIONS=-Xmx12g` or `$env:_JAVA_OPTIONS="-Xmx12g"`.
 
@@ -188,13 +188,13 @@ here are some tips to try:
 
 * If the `run` command doesn't work, then use the setting for `run / javaOptions` in [build.sbt](https://github.com/clulab/pdf2txt/blob/main/build.sbt).
 
-* If you execute the jar file from Java and run out of memory, then `_JAVA_OPTIONS` is the best option.  The command for Windows is above.  For other shells, the command is usually `export _JAVA_OPTIONS=-Xmx12g`.
+* If you execute the jar file from Java and run out of memory, then the environment variable `_JAVA_OPTIONS` is the best place to make the change.  The command for Windows is above.  For other operating systems, it is usually `export _JAVA_OPTIONS=-Xmx12g`.
 
-* If `sbt run` or `java -jar` is problematic, then lowering the value for the `-threads` argument can reduce the memory use because fewer documents will be processed at the same time.
+* If `sbt run` or `java -jar` is problematic, then lowering the value for the `-threads` argument can reduce memory requirements because fewer documents will be processed at the same time.
 
 In each case adjust the number before the `g` (gigabytes) as needed.  
 
-Please note that startup messages from [fatdynet](https://github.com/clulab/fatdynet) that are printed to `stderr` like the ones below are normal and not indicative of a problem.
+Please note that the startup messages from [fatdynet](https://github.com/clulab/fatdynet) that are printed to `stderr` like the ones below are normal and not indicative of a problem.
 ```
 [error] [dynet] Checking /home/user/pwd for libdynet_swig.so...
 [error] [dynet] Checking /home/user for libdynet_swig.so...
