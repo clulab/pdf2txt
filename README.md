@@ -5,6 +5,15 @@
 
 The pdf2txt project combines interfaces to a number of PDF to text converters with text preprocessors that refine the converted text for use in further NLP applications.
 
+## Table of Contents
+1. [Library](#library)
+2. [Executable](#executable)
+3. [PDF Converters](#pdf-converters)
+4. [Preprocessors](#preprocessors)
+5. [Language Models](#language-models)
+6. [Command Line Syntax](#command-line-syntax)
+7. [Memory](#memory)
+
 ## Library
 
 This project has been published to [maven central](https://search.maven.org/search?q=g:org.clulab%20a:pdf2txt*) and can be used by `sbt` and other build tools as a library dependency.  Include a line like this in `build.sbt` to incorporate the main project along with all the subprojects:
@@ -16,7 +25,7 @@ libraryDependencies += "org.clulab" %% "pdf2txt" % "1.1.2"
 
 The main `Pdf2txtApp` can be run directly from the [pre-built](https://drive.google.com/file/d/13JPRVsA_B-q3xZK0QVFGqPS-Cw6Go0ES/view?usp=sharing) `jar` file.  The only prerequisite is Java.  Startup is significantly quicker than when it runs via `sbt`.
 
-## PDF converters
+## PDF Converters
 
 The PDF converters are (in alphabetical order, even though **tika** is the default):
 
@@ -82,7 +91,7 @@ Preprocessors can be configured on (true) and off (false) as shown later, but th
 
 The [preprocessor unit tests](https://github.com/clulab/pdf2txt/tree/main/src/test/scala/org/clulab/pdf2txt/preprocessor) include illustrative examples of transformations. 
 
-## Language models
+## Language Models
 
 The primary reponsibility of the language models is to determine whether word "parts" should be joined so that a word is whole again.  The parts may have resulted from spaces or hyphens having been inserted between characters of a word.  The programming interface looks like this:
 
@@ -159,3 +168,39 @@ converts `doc.pdf` to `doc.txt` using `pdftotxt` without the
 preprocesses file.txt resulting in file.out.txt
 
 To get the full [help text](https://github.com/clulab/pdf2txt/blob/main/src/main/resources/org/clulab/pdf2txt/Pdf2txtApp.syntax.txt), use `-h`, `-help`, or `--help`.
+
+## Memory
+
+This software uses lots of memory for multiple large neural network models and dictionaries.  It may not run on machines with less than 16GB of memory, particulary with ScienceParse, and even then, settings may need to be adjusted so that the memory available can also be used.  If you encounter errors indicating memory exhaustion, such as
+```
+[error] ## Exception when compiling 44 sources to /clulab/pdf2txt-project/pdf2txt/target/scala-2.11/classes
+[error] java.lang.OutOfMemoryError: Java heap space
+```
+or
+```
+Exception in thread "ModelLoaderThread" java.lang.OutOfMemoryError: Java heap space
+```
+here are some tips to try:
+
+* If `sbt` can't complete commands like `compile` or `assembly` for lack of memory, then the `-Xmx` setting in [.jvmopts](https://github.com/clulab/pdf2txt/blob/main/.jvmopts) might be increased.  The Windows version of `sbt` seems to ignore this file, so it may be necessary to instead set the value of the environment variable `_JAVA_OPTIONS`.  Depending on the shell, that might be with `set _JAVA_OPTIONS=-Xmx12g` or `$env:_JAVA_OPTIONS="-Xmx12g"`.
+
+* If `sbt` can't complete the `test` command, then the value for `ThisBuild / Test / javaOptions` in [test.sbt](https://github.com/clulab/pdf2txt/blob/main/test.sbt) needs to be adjusted.
+
+* If the `run` command doesn't work, then use the setting for `run / javaOptions` in [build.sbt](https://github.com/clulab/pdf2txt/blob/main/build.sbt).
+
+* If you execute the jar file from Java and run out of memory, then `_JAVA_OPTIONS` is the best option.  The command for Windows is above.  For other shells, the command is usually `export _JAVA_OPTIONS=-Xmx12g`.
+
+* If `sbt run` or `java -jar` is problematic, then lowering the value for the `-threads` argument can reduce the memory use because fewer documents will be processed at the same time.
+
+In each case adjust the number before the `g` (gigabytes) as needed.  
+
+Please note that startup messages from [fatdynet](https://github.com/clulab/fatdynet) that are printed to `stderr` like the ones below are normal and not indicative of a problem.
+```
+[error] [dynet] Checking /home/user/pwd for libdynet_swig.so...
+[error] [dynet] Checking /home/user for libdynet_swig.so...
+[error] [dynet] Extracting resource libdynet_swig.so to /tmp/libdynet_swig-8897097308525612384.so...
+[error] [dynet] Loading DyNet from /tmp/libdynet_swig-8897097308525612384.so...
+[error] [dynet] random seed: 2522620396
+[error] [dynet] allocating memory: 512MB
+[error] [dynet] memory allocation done.
+```
