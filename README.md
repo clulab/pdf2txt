@@ -5,7 +5,7 @@
 
 The pdf2txt project combines interfaces to a number of PDF to text converters with text preprocessors that refine the converted text for use in further NLP applications.
 
-## Table of Contents
+## Contents
 1. [Library](#library)
 2. [Executable](#executable)
 3. [PDF Converters](#pdf-converters)
