@@ -17,16 +17,42 @@ class ScienceParseConverter() extends PdfConverter {
   def toString(extractedMetadata: ExtractedMetadata): String = {
     val stringBuffer = new StringBuffer()
 
+    def containsText(string: String): Boolean = {
+      string.exists(_.isLetter)
+    }
+
+    def fancierTrim(text: String): Seq[String] = {
+      // takes text of a "section" and finds likely paragraph breaks based on mid-text \n's
+      // Expect a paragraph break in science-parse if there is a period followed by new line followed by a capital letter, open paren, or a‘
+      // Indicate those with a unique token and then split on that
+      val paragraphs = text.replaceAll("(?<=\\.)\\n(?=[A-Z]|\\(|‘)", "<par_break>").split("<par_break>")
+      // some extra cleanup
+      paragraphs.map(p =>
+        p.replaceAll("\\n\\d*\\n", " ") // This handles page numbers that end up inside a paragraph when the paragraph break is between pages
+          .replace("- ", "") // the rest handle words split on line breaks in pdfs
+          .replace("-\n","")
+          .replace("\n", " "))
+    }
     def append(textOrNull: String): Unit = {
       val textOpt = Option(textOrNull)
 
       textOpt.map { text =>
-        val trimmedText = text.trim
 
-        stringBuffer.append(trimmedText)
-        if (!trimmedText.endsWith("."))
-          stringBuffer.append(" .")
-        stringBuffer.append("\n\n")
+        val trimmedTexts = fancierTrim(text)
+        for (t <- trimmedTexts) {
+          if (containsText(t)) {
+            stringBuffer.append(t)
+            if (!t.endsWith(".")) {
+              stringBuffer.append(" .")
+            }
+            stringBuffer.append("\n\n")
+          }
+
+        }
+
+//        if (!trimmedText.endsWith("."))
+//          stringBuffer.append(" .")
+//        stringBuffer.append("\n\n")
       }
     }
 
