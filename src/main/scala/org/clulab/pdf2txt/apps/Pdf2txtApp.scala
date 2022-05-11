@@ -1,5 +1,6 @@
 package org.clulab.pdf2txt.apps
 
+import org.clulab.pdf2txt.BuildInfo
 import org.clulab.pdf2txt.Pdf2txt
 import org.clulab.pdf2txt.common.pdf.{PdfConverter, TextConverter}
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
@@ -28,7 +29,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
 
       AppUtils.checkArgs(Pdf2txtArgs.argKeys, mapAndConfig, system)
       if (Pdf2txtArgs.helps.exists(mapAndConfig.contains)) {
-        AppUtils.showSyntax("/org/clulab/pdf2txt/Pdf2txtApp.syntax.txt", system.out)
+        AppUtils.showSyntax("/org/clulab/pdf2txt/Pdf2txtApp.syntax.txt", system.out, BuildInfo.version)
         system.exit(0)
       }
 
