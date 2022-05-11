@@ -1,8 +1,8 @@
 package org.clulab.pdf2txt.preprocessor
 
-import org.clulab.pdf2txt.common.utils.{StringUtils, TextRange, TextRanges, TripleIndexedSeq}
+import org.clulab.pdf2txt.common.utils.{Preprocessor, StringUtils, TextRange, TextRanges, TripleIndexedSeq}
 import org.clulab.pdf2txt.document.logical.{DocumentBySentence, SentenceDocument, WordDocument}
-import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, LocalSetLanguageModel, LanguageModel}
+import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, LanguageModel, LocalSetLanguageModel}
 
 class LineBreakPreprocessor(globalLanguageModel: LanguageModel = LineBreakPreprocessor.languageModel) extends Preprocessor {
 

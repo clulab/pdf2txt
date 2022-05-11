@@ -2,7 +2,7 @@ package org.clulab.pdf2txt.preprocessor
 
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.StringUtils._
-import org.clulab.pdf2txt.common.utils.{Sourcer, StringUtils, TextRange, TextRanges}
+import org.clulab.pdf2txt.common.utils.{Preprocessor, Sourcer, StringUtils, TextRange, TextRanges}
 import org.clulab.pdf2txt.document.physical.DocumentByChar
 
 class UnicodePreprocessor(unicodeOptions: UnicodeOptions = UnicodePreprocessor.defaultUnicodeOptions) extends Preprocessor {

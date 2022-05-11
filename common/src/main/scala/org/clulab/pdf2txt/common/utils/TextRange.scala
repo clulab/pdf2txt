@@ -11,6 +11,11 @@ class TextRange(val text: String, val range: Range) extends IndexedSeq[Char] {
 
   override def toString: String = text.substring(range)
 
+  def toString(stringBuilder: StringBuilder): StringBuilder = {
+    foreach(stringBuilder.append)
+    stringBuilder
+  }
+
   override def isEmpty: Boolean = range.isEmpty
 
   def start: Int = range.start
@@ -52,6 +57,10 @@ class TextRange(val text: String, val range: Range) extends IndexedSeq[Char] {
 
       preTextRanges ++ interTextRanges ++ postTextRanges
     }
+  }
+
+  def replaceAll(textRanges: IndexedSeq[TextRange]): IndexedSeq[TextRange] = {
+    ???
   }
 
   def matches(char: Char): Boolean = length == 1 && head == char
@@ -132,9 +141,12 @@ class TextRanges() extends mutable.ArrayBuffer[TextRange]() {
 
   def +=(textRangeOpt: Option[TextRange]): TextRanges = this ++= textRangeOpt.toSeq
 
-  override def toString: String = foldLeft(new StringBuilder()) { case (stringBuilder, textRange) =>
-    stringBuilder ++= textRange.toString
-  }.toString
+  override def toString: String = toString(new StringBuilder()).toString
+
+  def toString(stringBuilder: StringBuilder): StringBuilder = {
+    foreach(_.toString(stringBuilder))
+    stringBuilder
+  }
 }
 
 object TextRanges {

@@ -1,6 +1,6 @@
 package org.clulab.pdf2txt.preprocessor
 
-import org.clulab.pdf2txt.common.utils.{StringUtils, TextRange, TextRanges}
+import org.clulab.pdf2txt.common.utils.{Preprocessor, StringUtils, TextRange, TextRanges}
 import org.clulab.pdf2txt.document.physical.{DocumentByLine, LineDocument}
 
 import scala.annotation.tailrec

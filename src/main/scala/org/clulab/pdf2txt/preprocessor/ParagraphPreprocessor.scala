@@ -1,6 +1,6 @@
 package org.clulab.pdf2txt.preprocessor
 
-import org.clulab.pdf2txt.common.utils.{TextRange, TextRanges}
+import org.clulab.pdf2txt.common.utils.{Preprocessor, TextRange, TextRanges}
 import org.clulab.pdf2txt.document.logical.DocumentByParagraph
 
 class ParagraphPreprocessor extends Preprocessor {
