@@ -28,7 +28,7 @@ class ScienceParseConverter() extends PdfConverter {
       val paragraphs = text.replaceAll("(?<=\\.)\\n(?=[A-Z]|\\(|‘)", "<par_break>").split("<par_break>")
       // some extra cleanup
       paragraphs.map(p =>
-        p.replaceAll("\\n\\d*\\n", " ") // This handles page numbers that end up inside a paragraph when the paragraph break is between pages
+        p.replaceAll("\\n\\d+\\n", " ") // This handles page numbers that end up inside a paragraph when the paragraph break is between pages
           .replace("- ", "") // the rest handle words split on line breaks in pdfs
           .replace("-\n","")
           .replace("\n", " "))
