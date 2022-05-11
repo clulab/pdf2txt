@@ -3,7 +3,7 @@ package org.clulab.pdf2txt.scienceparse
 import org.allenai.scienceparse.{ExtractedMetadata, Parser}
 import org.clulab.pdf2txt.common.pdf.PdfConverter
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
-import org.clulab.pdf2txt.common.utils.{Preprocessor, TextRange, TextRanges}
+import org.clulab.pdf2txt.common.utils.TextRange
 
 import java.io.{BufferedInputStream, File, FileInputStream, InputStream}
 import scala.collection.JavaConverters._

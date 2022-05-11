@@ -22,10 +22,10 @@ class TextRange(val text: String, val range: Range) extends IndexedSeq[Char] {
 
   def end: Int = range.end
 
-  def findAll(regex: Regex): Seq[TextRange] = {
+  def findAll(regex: Regex): IndexedSeq[TextRange] = {
     regex.findAllMatchIn(toString).map { found =>
       subRange(found.start, found.end) + range.start
-    }.toSeq
+    }.toIndexedSeq
   }
 
   def emptyStart: TextRange = emptyRange(start)
@@ -59,8 +59,22 @@ class TextRange(val text: String, val range: Range) extends IndexedSeq[Char] {
     }
   }
 
-  def replaceAll(textRanges: IndexedSeq[TextRange]): IndexedSeq[TextRange] = {
-    ???
+  def replaceAll(textRanges: IndexedSeq[TextRange], replacement: TextRange): IndexedSeq[TextRange] = {
+    // See removeAll for caveats.
+    if (textRanges.isEmpty) IndexedSeq(this)
+    else {
+      val preTextRanges =
+        if (start < textRanges.head.start) IndexedSeq(subRange(start, textRanges.head.start), replacement)
+        else IndexedSeq.empty
+      val interTextRanges = DoubleIndexedSeq(textRanges).flatMap { case (leftTextRange, rightTextRange) =>
+        IndexedSeq(subRange(leftTextRange.end, rightTextRange.start), replacement)
+      }
+      val postTextRanges =
+        if (textRanges.last.end < end) IndexedSeq(subRange(textRanges.last.end, end))
+        else IndexedSeq.empty
+
+      preTextRanges ++ interTextRanges ++ postTextRanges
+    }
   }
 
   def matches(char: Char): Boolean = length == 1 && head == char

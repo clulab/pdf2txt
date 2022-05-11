@@ -4,23 +4,21 @@ import org.clulab.pdf2txt.common.utils.{Preprocessor, TextRange, TextRanges}
 
 class ParagraphPreprocessor extends Preprocessor {
 
-  // This is a light-weight preprocessor that uses no model.
+  // This is a local, light-weight preprocessor that uses no model.
   def preprocess(textRange: TextRange): TextRanges = {
     val paragraphBreaks = textRange.findAll(ParagraphPreprocessor.paragraphBreakRegex).toVector
     val paragraphs = textRange.removeAll(paragraphBreaks)
-
-//    def containsText(string: String): Boolean = string.exists(_.isLetter)
-
-
-    //    paragraphs.map { paragraph =>
-//      val pageNumbers = paragraph.findAll(ParagraphPreprocessor.pageNumberRegex)
-//
-//      paragraph.replaceAll(pageNumbers, TextRange(" "))
-//    }
-    val paragraphsAndBreaks = paragraphs.flatMap { paragraph =>
-      Seq(paragraph, ParagraphPreprocessor.paragraphSeparatorTextRange)
+    // The page number regex does not remove any letters, so non-lettered paragraphs can be removed now.
+    val letteredParagraphs = paragraphs.filter(_.exists(_.isLetter))
+    val perParagraphParts = letteredParagraphs.map { paragraph =>
+      val pageNumbers = paragraph.findAll(ParagraphPreprocessor.pageNumberRegex)
+      paragraph.replaceAll(pageNumbers, ParagraphPreprocessor.replacementPageNumberTextRange)
     }
-    TextRanges(paragraphsAndBreaks)
+    val partsAndSeparators = perParagraphParts.flatMap { parts =>
+      parts :+ ParagraphPreprocessor.paragraphSeparatorTextRange
+    }
+
+    TextRanges(partsAndSeparators)
   }
 }
 
@@ -35,4 +33,5 @@ object ParagraphPreprocessor {
   val pageNumberRegex = "\\n\\d+\\n".r
   // End each paragraph with one of these, essentially replacing one \n with two.
   val paragraphSeparatorTextRange = TextRange("\n\n")
+  val replacementPageNumberTextRange = TextRange(" ")
 }
