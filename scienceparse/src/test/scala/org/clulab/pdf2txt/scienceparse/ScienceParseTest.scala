@@ -24,7 +24,7 @@ class ScienceParseTest extends Test {
     text should include ("please see our NLP")
   }
 
-  it should "read a PDF file" in {
+  ignore should "read a PDF file" in {
     assert(new File(pdfFilename).exists)
 
     val text = scienceParse.convert(new File(pdfFilename))

@@ -49,7 +49,7 @@ class TikaTest extends Test {
     }
   }
 
-  it should "read a PDF file" in {
+  ignore should "read a PDF file" in {
     assert(new File(pdfFilename).exists)
 
     val text = tika.convert(new File(pdfFilename))
