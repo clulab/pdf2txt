@@ -3,20 +3,21 @@ package org.clulab.pdf2txt.tika
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.Test
 
-import java.io.InputStream
+import java.io.{File, InputStream}
 
 class TikaTest extends Test {
-  val pdfFilename = "/org/clulab/pdf2txt/tika/clulab.pdf"
-  val htmlFilename = "/org/clulab/pdf2txt/tika/clulab.html"
+  val pdfFilename = "./tika/src/test/resources/org/clulab/pdf2txt/tika/clu lab.pdf"
+  val pdfResourceName = "/org/clulab/pdf2txt/tika/clu lab.pdf"
+  val htmlResourceName = "/org/clulab/pdf2txt/tika/clu lab.html"
 
   def getInputStream(filename: String): InputStream = getClass.getResourceAsStream(filename)
 
-  val tika = new TikaConverter()
+  lazy val tika = new TikaConverter()
 
   behavior of "Tika"
 
   it should "detect a PDF file" in {
-    val isPdf = getInputStream(pdfFilename).autoClose { inputStream =>
+    val isPdf = getInputStream(pdfResourceName).autoClose { inputStream =>
       tika.isPdf(inputStream)
     }
 
@@ -24,15 +25,15 @@ class TikaTest extends Test {
   }
 
   it should "not detect an HTML file" in {
-    val isPdf = getInputStream(htmlFilename).autoClose { inputStream =>
+    val isPdf = getInputStream(htmlResourceName).autoClose { inputStream =>
       tika.isPdf(inputStream)
     }
 
     isPdf should not be true
   }
 
-  it should "read a PDF file" in {
-    val text = getInputStream(pdfFilename).autoClose { inputStream =>
+  it should "read a PDF stream" in {
+    val text = getInputStream(pdfResourceName).autoClose { inputStream =>
       tika.read(inputStream)
     }
 
@@ -40,11 +41,20 @@ class TikaTest extends Test {
     text should include ("please see our NLP")
   }
 
-  it should "not read an HTML file" in {
+  it should "not read an HTML stream" in {
     assertThrows[RuntimeException] {
-      getInputStream(htmlFilename).autoClose { inputStream =>
+      getInputStream(htmlResourceName).autoClose { inputStream =>
         tika.read(inputStream)
       }
     }
+  }
+
+  it should "read a PDF file" in {
+    assert(new File(pdfFilename).exists)
+
+    val text = tika.convert(new File(pdfFilename))
+
+    text should include ("The Computational Language Understanding")
+    text should include ("please see our NLP")
   }
 }

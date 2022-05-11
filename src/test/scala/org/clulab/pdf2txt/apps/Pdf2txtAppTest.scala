@@ -1,8 +1,9 @@
 package org.clulab.pdf2txt.apps
 
+import org.clulab.pdf2txt.Pdf2txt
 import org.clulab.pdf2txt.common.utils.{CustomSystem, Systemish, Test}
 
-import java.io.{ByteArrayOutputStream, OutputStream, PrintStream}
+import java.io.{ByteArrayOutputStream, File, OutputStream, PrintStream}
 import java.nio.charset.StandardCharsets
 
 class Pdf2txtAppTest extends Test {
@@ -247,5 +248,18 @@ class Pdf2txtAppTest extends Test {
     outString should include ("threads = 7")
     errString should be (empty)
     system.statusOpt should be (None)
+  }
+
+  ignore should "write to a file with a strange name" in {
+    val file = new File("./txt file.txt")
+    val pdf2Txt = new Pdf2txt(null, null)
+
+    file.delete()
+    file.exists should be (false)
+
+    pdf2Txt.write(file, "This is a test.")
+    file should exist
+
+    file.delete()
   }
 }
