@@ -19,4 +19,12 @@ class TextRangeTest extends Test {
 
     actualResult should be (expectedResult)
   }
+
+  it should "work in the middle of a string" in {
+    val textRange = TextRange("[a1aa23aaa4a]").withoutFirst.withoutLast
+    val actualResult = TextRanges(textRange.replaceAll(textRange.findAll("a".r), TextRange("AB"))).toString
+    val expectedResult = "AB1ABAB23ABABAB4AB"
+
+    actualResult should be (expectedResult)
+  }
 }
