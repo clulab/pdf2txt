@@ -56,3 +56,5 @@ Examples: <no_arguments>
               preprocesses file.txt resulting in file.out.txt.
 
 See also: http://github.com/clulab/pdf2txt
+
+ Version: %1$s

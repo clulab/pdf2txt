@@ -1,6 +1,6 @@
 package org.clulab.pdf2txt.preprocessor
 
-import org.clulab.pdf2txt.common.utils.{DoubleIndexedSeq, StringUtils, TextRange, TextRanges}
+import org.clulab.pdf2txt.common.utils.{DoubleIndexedSeq, Preprocessor, StringUtils, TextRange, TextRanges}
 import org.clulab.pdf2txt.document.logical.{DocumentBySentence, SentenceDocument, WordDocument}
 import org.clulab.pdf2txt.languageModel.{LanguageModel, NeverLanguageModel, ProbabilisticLanguageModel}
 

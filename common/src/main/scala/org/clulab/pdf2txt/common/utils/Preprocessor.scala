@@ -1,6 +1,4 @@
-package org.clulab.pdf2txt.preprocessor
-
-import org.clulab.pdf2txt.common.utils.{TextRange, TextRanges}
+package org.clulab.pdf2txt.common.utils
 
 trait Preprocessor extends {
   def preprocess(textRange: TextRange): TextRanges
