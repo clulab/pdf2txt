@@ -1,5 +1,5 @@
 # If sbt exhausts memory, change the limit here.
--Xmx3g
+-Xmx5g
 -Dfile.encoding=UTF-8
 -XX:+CMSClassUnloadingEnabled
 -XX:+UseConcMarkSweepGC
