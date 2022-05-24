@@ -15,6 +15,7 @@ import org.json4s.jackson.JsonMethods
 
 import java.io.File
 import java.util
+import scala.annotation.tailrec
 import scala.io.Source
 
 class AdobeConverter(credentialsFilename: String) extends PdfConverter {
@@ -46,7 +47,7 @@ class AdobeConverter(credentialsFilename: String) extends PdfConverter {
 
     elements.foreach { element =>
       // For now skip everything in a table.
-      if (!element.inTable) {
+      if (!element.path.isIn(AdobeStage.Table)) {
         val text = element.text
         val extractedText = element.name match {
           case AdobeStage.Document => ignore
@@ -64,7 +65,10 @@ class AdobeConverter(credentialsFilename: String) extends PdfConverter {
           case AdobeStage.P => text
           case AdobeStage.ParagraphSpan => text
 
-          case AdobeStage.Reference => text
+          case AdobeStage.Reference =>
+            // A reference within a reference can usually be ignored.
+            if (element.path.isIn(AdobeStage.Reference)) ignore
+            else text
           case AdobeStage.Sect => ignore
           case AdobeStage.StyleSpan => ignore
           case AdobeStage.Sub => ignore
@@ -76,7 +80,7 @@ class AdobeConverter(credentialsFilename: String) extends PdfConverter {
 
           case AdobeStage.Title => text
         }
-        val dereferencedText = extractedText
+        val dereferencedText = dereference(extractedText)
         val separatedText = element.name match {
           case AdobeStage.ParagraphSpan => dereferencedText
           case _ =>
@@ -88,6 +92,23 @@ class AdobeConverter(credentialsFilename: String) extends PdfConverter {
       }
     }
     stringBuffer.toString()
+  }
+
+  def dereference(text: String): String = {
+    val startText = "(<http"
+    val endText = ">)"
+
+    @tailrec
+    def loop(text: String): String = {
+      val startPos = text.indexOf(startText)
+      val endPos = text.indexOf(endText)
+
+      if (0 <= startPos && startPos < endPos)
+        loop(text.substring(0, startPos) + text.substring(endPos + endText.length))
+      else text
+    }
+
+    loop(text)
   }
 
   def convertJson(json: String): String = {

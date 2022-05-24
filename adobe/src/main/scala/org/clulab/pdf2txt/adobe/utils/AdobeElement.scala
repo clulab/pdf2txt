@@ -2,11 +2,9 @@ package org.clulab.pdf2txt.adobe.utils
 
 import org.json4s.{JObject, JString}
 
-case class AdobeElement(adobePath: AdobePath, text: String) {
+case class AdobeElement(path: AdobePath, text: String) {
 
-  def name: String = adobePath.name
-
-  def inTable: Boolean = adobePath.hasTable
+  def name: String = path.name
 }
 
 object AdobeElement {

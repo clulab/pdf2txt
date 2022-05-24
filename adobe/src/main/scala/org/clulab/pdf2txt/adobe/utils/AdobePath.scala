@@ -6,7 +6,7 @@ class AdobePath(stages: Seq[AdobeStage]) {
 
   def index: Int = stages.last.index
 
-  def hasTable: Boolean = stages.exists(_.name == AdobeStage.Table)
+  def isIn(name: String): Boolean = stages.dropRight(1).exists(_.name == name)
 }
 
 object AdobePath {
