@@ -14,7 +14,7 @@
               are used to show this help text.
           -conf configFile
               means to read other arguments from file configFile.conf.
-          -converter (pdfminer | pdftotext | scienceparse | text | tika)
+          -converter (adobe | pdfminer | pdftotext | scienceparse | text | tika)
               specifies the PDF converter.
           -languageModel (always | gigaword | glove | never)
               sets the language model which helps determine what words are

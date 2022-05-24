@@ -10,7 +10,8 @@ class NumberPreprocessor(hyperparameters: NumberPreprocessor.Hyperparameters = N
 
   def process(text: String, pattern: Pattern, replacement: String): String = {
     val matcher = pattern.matcher(text)
-    val buffer = new StringBuffer()
+    // This is not StringBuilder because some pre-existing matcher methods work on a StringBuffer.
+    val stringBuffer = new StringBuffer()
 
     while (matcher.find()) {
       val before = matcher.group(0).toString
@@ -20,10 +21,10 @@ class NumberPreprocessor(hyperparameters: NumberPreprocessor.Hyperparameters = N
       loggerOpt.foreach { logger =>
         logger.log(before, after)
       }
-      matcher.appendReplacement(buffer, replacement)
+      matcher.appendReplacement(stringBuffer, replacement)
     }
-    matcher.appendTail(buffer)
-    buffer.toString()
+    matcher.appendTail(stringBuffer)
+    stringBuffer.toString()
   }
 
   def preprocessWithComma(text: String): String =
