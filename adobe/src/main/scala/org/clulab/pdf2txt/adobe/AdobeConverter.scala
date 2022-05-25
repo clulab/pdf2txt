@@ -90,6 +90,7 @@ class AdobeConverter(credentialsFilename: String) extends PdfConverter {
         case AdobeStage.ExtraCharSpan => ignore
         case AdobeStage.StyleSpan => ignore
         case AdobeStage.HyphenSpan => ignore
+        case AdobeStage.NbspSpan => ignore
         case AdobeStage.Sub => ignore
 
         case AdobeStage.Table => ignore

@@ -32,6 +32,7 @@ object AdobeStage extends Logging {
   val Span = "Span"
   val ExtraCharSpan = "ExtraCharSpan"
   val HyphenSpan = "HyphenSpan"
+  val NbspSpan = "NbspSpan"
 
   val Table = "Table"
   val TD = "TD"
@@ -48,7 +49,7 @@ object AdobeStage extends Logging {
     H, H1, H2, H3, H4, H5, H6, // it is unclear how far
     L, LI, Lbl, LBody,
     P, ParagraphSpan,
-    Reference, Sect, Span, ExtraCharSpan, StyleSpan, HyphenSpan, Sub,
+    Reference, Sect, Span, ExtraCharSpan, StyleSpan, HyphenSpan, NbspSpan, Sub,
     Table, TD, TH, TR,
     TOC, TOCI,
     Title,
