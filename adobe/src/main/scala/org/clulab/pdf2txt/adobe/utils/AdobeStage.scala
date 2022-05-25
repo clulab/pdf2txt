@@ -15,29 +15,34 @@ object AdobeStage {
   val H5 = "H5"
   val H6 = "H6"
   val L = "L"
-  val Li = "Li"
+  val LI = "LI"
   val Lbl = "Lbl"
-  val Lbody = "Lbody"
+  val LBody = "LBody"
   val P = "P"
   val ParagraphSpan = "ParagraphSpan"
   val Reference = "Reference"
   val Sect = "Sect"
+  val Span = "Span"
+  val ExtraCharSpan = "ExtraCharSpan"
   val StyleSpan = "StyleSpan"
   val Sub = "Sub"
   val Table = "Table"
   val TD = "TD"
   val TH = "TH"
   val TR = "TR"
+  val TOC = "TOC"
+  val TOCI = "TOCI"
   val Title = "Title"
 
   val names = Seq(
     Document,
     Aside, Figure, Footnote,
     H, H1, H2, H3, H4, H5, H6, // it is unclear how far
-    L, Li, Lbl, Lbody,
+    L, LI, Lbl, LBody,
     P, ParagraphSpan,
-    Reference, Sect, StyleSpan, Sub,
+    Reference, Sect, Span, ExtraCharSpan, StyleSpan, Sub,
     Table, TD, TH, TR,
+    TOC, TOCI,
     Title
   )
 
@@ -50,16 +55,18 @@ object AdobeStage {
         assert(0 <= indexStart && indexStart < indexEnd)
         assert(indexEnd == string.length - 1)
         val name = string.substring(0, indexStart)
-        val index = string.substring(indexStart + 1, indexEnd)
+        val index = (string.substring(indexStart + 1, indexEnd)).toInt
 
-        (name, index.toInt)
+        // The convention is that 1 is implied and explicit values start with 2.
+        assert(2 <= index)
+        (name, index)
       }
       else
-        (string, 0)
+        (string, 1)
     }
 
-    assert(0 <= index)
-    assert(names.contains(name))
+    assert(1 <= index)
+    assert(names.contains(name), s"Element $name is unrecognized.")
     new AdobeStage(name, index)
   }
 }

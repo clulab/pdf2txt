@@ -5,6 +5,8 @@ import org.json4s.{JObject, JString}
 case class AdobeElement(path: AdobePath, text: String) {
 
   def name: String = path.name
+
+  def index: Int = path.index
 }
 
 object AdobeElement {
