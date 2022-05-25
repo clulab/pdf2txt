@@ -9,7 +9,7 @@ import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, GigawordLanguageMo
 import org.clulab.pdf2txt.pdfminer.PdfMinerConverter
 import org.clulab.pdf2txt.pdftotext.PdfToTextConverter
 import org.clulab.pdf2txt.preprocessor.{CasePreprocessor, LigaturePreprocessor, LineBreakPreprocessor, LinePreprocessor, NumberPreprocessor, ParagraphPreprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
-import org.clulab.pdf2txt.scienceparse.ScienceParseConverter
+import org.clulab.pdf2txt.scienceparse.{AdobeConverter, ScienceParseConverter}
 import org.clulab.pdf2txt.tika.TikaConverter
 
 import java.io.File
@@ -33,11 +33,14 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
         system.exit(0)
       }
 
+      val adobeCredentialsOpt = mapAndConfig.get(Pdf2txtArgs.ADOBE_CREDENTIALS)
+
       val pdfConverterConstructor = {
         val key = Pdf2txtArgs.CONVERTER
         val value = mapAndConfig(key)
 
         value match {
+          case Pdf2txtArgs.ADOBE => () => new AdobeConverter(adobeCredentialsOpt)
           case Pdf2txtArgs.PDF_MINER => () => new PdfMinerConverter()
           case Pdf2txtArgs.PDF_TO_TEXT => () => new PdfToTextConverter()
           case Pdf2txtArgs.SCIENCE_PARSE => () => new ScienceParseConverter()
@@ -178,6 +181,7 @@ object Pdf2txtArgs {
   val THREADS = "threads"
   val LOOPS = "loops"
   val OVERWRITE = "overwrite"
+  val ADOBE_CREDENTIALS = "adobeCredentials"
 
   val helps: Array[String] = Array(HELP1, HELP2)
   val argKeys: Array[String] = Array(
@@ -202,6 +206,7 @@ object Pdf2txtArgs {
     OVERWRITE
   )
 
+  val ADOBE = "adobe"
   val PDF_MINER = "pdfminer"
   val PDF_TO_TEXT = "pdftotext"
   val SCIENCE_PARSE = "scienceparse"
@@ -209,6 +214,7 @@ object Pdf2txtArgs {
   val TIKA = "tika"
 
   val converters: Array[String] = Array(
+    ADOBE,
     PDF_MINER,
     PDF_TO_TEXT,
     SCIENCE_PARSE,

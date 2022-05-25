@@ -29,6 +29,10 @@ The main `Pdf2txtApp` can be run directly from the [pre-built](https://drive.goo
 
 The PDF converters are (in alphabetical order, even though **tika** is the default):
 
+* **adobe**
+
+    This converter provides an interface to Adobe's online PDF Extract service.  The service requires credentials and eventual payment if used beyond the trial limits.  See the adobe subproject's [README.md](./adobe/README.md) for configuration details.  The service returns a zip file containing a desciption of the PDF.  The zip files are saved alongside the PDFs and will be reused if the same PDF is converted again.  Converted text is generated wholly from the zip file and if one is found with the PDF, the call to the service is skipped (and the credentials are not used or needed).
+
 * **pdfminer**
   
     This Python [project](https://pypi.org/project/pdfminer/) is further wrapped in Python code included as a resource with this project.  It gets run as an external process using the `python3` command which must be available on the `$PATH`.  Furthermore, `pdfminer` needs to have been installed in advance, possibly with `pip install pdfminer`.

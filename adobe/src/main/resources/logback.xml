@@ -1,0 +1,19 @@
+<configuration>
+    <property name="clulab:pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" />
+
+    <appender name="clulab:stderr" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.err</target>
+        <encoder>
+            <pattern>${clulab:pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Some classes are extremely verbose so for STOUT keep them quiet -->
+    <logger name="org.apache.http" level="error" additivity="false" />
+    <!-- This accounts for anything coming from Adobe. -->
+    <logger name="com.adobe" level="warn" additivity="false" />
+
+    <root level="all">
+        <appender-ref ref="clulab:stderr" />
+    </root>
+</configuration>
