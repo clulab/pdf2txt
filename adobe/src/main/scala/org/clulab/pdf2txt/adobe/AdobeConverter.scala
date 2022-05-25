@@ -101,6 +101,7 @@ class AdobeConverter(credentialsFilename: String) extends PdfConverter {
         case AdobeStage.TOCI => ignore
 
         case AdobeStage.Title => text
+        case AdobeStage.Watermark => ignore
         case _ => text // Hope for maintainability.
       }
       val dereferencedText = dereference(extractedText)

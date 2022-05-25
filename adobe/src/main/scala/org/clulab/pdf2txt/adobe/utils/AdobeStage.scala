@@ -5,6 +5,7 @@ import org.clulab.pdf2txt.common.utils.Logging
 class AdobeStage(val name: String, val index: Int)
 
 object AdobeStage extends Logging {
+  // See https://developer.adobe.com/document-services/docs/overview/pdf-extract-api/howtos/extract-api/.
   val Document = "Document"
   val Aside = "Aside"
   val Figure = "Figure"
@@ -24,18 +25,22 @@ object AdobeStage extends Logging {
   val ParagraphSpan = "ParagraphSpan"
   val Reference = "Reference"
   val Sect = "Sect"
+  val StyleSpan = "StyleSpan"
+  val Sub = "Sub"
+
+  // These are not listed in the documentation.
   val Span = "Span"
   val ExtraCharSpan = "ExtraCharSpan"
-  val StyleSpan = "StyleSpan"
   val HyphenSpan = "HyphenSpan"
-  val Sub = "Sub"
+
   val Table = "Table"
   val TD = "TD"
   val TH = "TH"
   val TR = "TR"
+  val Title = "Title"
   val TOC = "TOC"
   val TOCI = "TOCI"
-  val Title = "Title"
+  val Watermark = "Watermark"
 
   val names = Seq(
     Document,
@@ -46,7 +51,8 @@ object AdobeStage extends Logging {
     Reference, Sect, Span, ExtraCharSpan, StyleSpan, HyphenSpan, Sub,
     Table, TD, TH, TR,
     TOC, TOCI,
-    Title
+    Title,
+    Watermark
   )
 
   def apply(string: String): AdobeStage = {
