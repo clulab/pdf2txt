@@ -82,13 +82,16 @@
         <appender-ref ref="clulab:Pdf2txt"/>
     </logger>
 
-    <!-- PDFBox and FontBox are extremely verbose so for STOUT keep them quiet -->
+    <!-- Some classes are extremely verbose so for STOUT keep them quiet -->
     <logger name="org.apache.fontbox" level="warn"  additivity="false" />
     <logger name="org.apache.pdfbox"  level="warn"  additivity="false" />
     <logger name="org.apache.tika"    level="warn"  additivity="false" />
+    <logger name="org.apache.http" level="error" additivity="false" />
     <!-- This accounts for anything coming from the scienceparse project. -->
     <logger name="org.allenai"        level="warn"  additivity="false" />
     <logger name="com.amazonaws"      level="warn"  additivity="false" />
+    <!-- This accounts for anything coming from Adobe. -->
+    <logger name="com.adobe" level="warn" additivity="false" />
 
     <!-- This handles anything from outside of clulab that isn't configured otherwise. -->
     <root level="all">

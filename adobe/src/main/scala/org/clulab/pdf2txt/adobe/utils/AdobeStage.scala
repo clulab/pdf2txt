@@ -1,8 +1,10 @@
 package org.clulab.pdf2txt.adobe.utils
 
+import org.clulab.pdf2txt.common.utils.Logging
+
 class AdobeStage(val name: String, val index: Int)
 
-object AdobeStage {
+object AdobeStage extends Logging {
   val Document = "Document"
   val Aside = "Aside"
   val Figure = "Figure"
@@ -25,6 +27,7 @@ object AdobeStage {
   val Span = "Span"
   val ExtraCharSpan = "ExtraCharSpan"
   val StyleSpan = "StyleSpan"
+  val HyphenSpan = "HyphenSpan"
   val Sub = "Sub"
   val Table = "Table"
   val TD = "TD"
@@ -40,7 +43,7 @@ object AdobeStage {
     H, H1, H2, H3, H4, H5, H6, // it is unclear how far
     L, LI, Lbl, LBody,
     P, ParagraphSpan,
-    Reference, Sect, Span, ExtraCharSpan, StyleSpan, Sub,
+    Reference, Sect, Span, ExtraCharSpan, StyleSpan, HyphenSpan, Sub,
     Table, TD, TH, TR,
     TOC, TOCI,
     Title
@@ -66,7 +69,8 @@ object AdobeStage {
     }
 
     assert(1 <= index)
-    assert(names.contains(name), s"Element $name is unrecognized.")
+    if (!names.contains(name))
+      logger.warn(s"""PDF element "$name" is unrecognized.""")
     new AdobeStage(name, index)
   }
 }

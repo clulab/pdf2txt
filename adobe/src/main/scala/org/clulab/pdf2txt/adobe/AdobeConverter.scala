@@ -89,6 +89,7 @@ class AdobeConverter(credentialsFilename: String) extends PdfConverter {
         case AdobeStage.Span => ignore
         case AdobeStage.ExtraCharSpan => ignore
         case AdobeStage.StyleSpan => ignore
+        case AdobeStage.HyphenSpan => ignore
         case AdobeStage.Sub => ignore
 
         case AdobeStage.Table => ignore
@@ -100,6 +101,7 @@ class AdobeConverter(credentialsFilename: String) extends PdfConverter {
         case AdobeStage.TOCI => ignore
 
         case AdobeStage.Title => text
+        case _ => text // Hope for maintainability.
       }
       val dereferencedText = dereference(extractedText)
       val separatedText = element.name match {
