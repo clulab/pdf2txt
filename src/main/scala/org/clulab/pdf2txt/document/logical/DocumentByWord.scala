@@ -11,10 +11,21 @@ class DocumentByWord(parentOpt: Option[Document], textRange: TextRange, processo
     // Processors works on the entire string, so startOffsets and endOffsets need to be adjusted.
     val offset = start
     val processorContents = processorsSentences.flatMap { sentence =>
+      assert(sentence.words.length == sentence.raw.length)
       sentence.words.indices.map { index =>
+        val lowerWord = sentence.words(index).toLowerCase
+        val lowerRaw = sentence.raw(index).toLowerCase
+        val bestString = {
+            // This is particularly important for n't vs. not,
+            // but it also applies to quotes.
+            if (lowerWord == lowerRaw) sentence.words(index)
+            else sentence.raw(index)
+        }
+
         ContentTextRangeAndProcessorsWord(
           textRange.subRange(sentence.startOffsets(index), sentence.endOffsets(index)) + offset,
-          sentence.words(index)
+          // If only case has changed, take word.  Otherwise, take raw?
+          bestString
         )
       }
     }
