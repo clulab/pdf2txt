@@ -5,6 +5,7 @@ import org.clulab.pdf2txt.common.utils.{Preprocessor, StringUtils, TextRange, Te
 import java.io.{File, PrintWriter}
 import java.util.regex.Pattern
 import scala.annotation.tailrec
+import scala.beans.BeanProperty
 
 class NumberPreprocessor(hyperparameters: NumberPreprocessor.Hyperparameters = NumberPreprocessor.Hyperparameters(), loggerOpt: Option[NumbersLogger] = None) extends Preprocessor {
 
@@ -63,7 +64,13 @@ object NumberPreprocessor {
   val spacePattern = Pattern.compile("(^|\\s)(\\d+)\\s+(\\d+)") // no comma here
   val spaceReplacement = "$1$2$3"
 
-  case class Hyperparameters(joinWithSpaces: Boolean = false)
+  case class Hyperparameters(@BeanProperty var joinWithSpaces: Boolean) {
+    def this() = this(joinWithSpaces = false)
+  }
+
+  object Hyperparameters {
+    def apply(): Hyperparameters = new Hyperparameters()
+  }
 }
 
 class NumbersLogger(printWriter: PrintWriter) {
