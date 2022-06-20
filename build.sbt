@@ -22,7 +22,7 @@ resolvers ++= Seq(
 
 libraryDependencies ++= {
   Seq(
-    "org.clulab" %% "processors-main" % "8.5.0"// up to 8.5.0 as of 2022-05-02
+    "org.clulab" %% "processors-main" % "8.5.1"// up to 8.5.1 as of 2022-06-20
   )
 }
 

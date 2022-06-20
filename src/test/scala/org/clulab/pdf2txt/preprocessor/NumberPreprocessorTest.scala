@@ -10,8 +10,8 @@ class NumberPreprocessorTest extends Test {
   behavior of "NumbersPreprocessor on texts with commas"
 
   {
-    val hyperparameters = NumberPreprocessor.Hyperparameters()
-    val preprocessor = new NumberPreprocessor(hyperparameters, Some(logger))
+    val parameters = NumberPreprocessor.Parameters()
+    val preprocessor = new NumberPreprocessor(parameters, Some(logger))
 
     def test(inputText: String, expectedOutputText: String): Unit = {
       it should s"convert ${escape(inputText)}" in {
@@ -37,8 +37,8 @@ class NumberPreprocessorTest extends Test {
   behavior of "NumbersPreprocessor on texts with spaces"
 
   {
-    val hyperparameters = NumberPreprocessor.Hyperparameters(joinWithSpaces = true)
-    val preprocessor = new NumberPreprocessor(hyperparameters, Some(logger))
+    val parameters = NumberPreprocessor.Parameters(joinWithSpaces = true)
+    val preprocessor = new NumberPreprocessor(parameters, Some(logger))
 
     def test(inputText: String, expectedOutputText: String): Unit = {
       it should s"convert ${escape(inputText)}" in {
@@ -50,5 +50,9 @@ class NumberPreprocessorTest extends Test {
 
     test("+43 01 02 03", "+43 010203")
     test("4123 1234 1234 1234", "4123123412341234")
+    test(
+      "50 000 ha (SAED, 1997; SONADER, 1998). During the 1998 wet season, about 75% of this area was used, i.e. 20 000 ha in Senegal and 18 000 ha in Mauritania, almost exclusively for",
+      "50000 ha (SAED, 1997; SONADER, 1998). During the 1998 wet season, about 75% of this area was used, i.e. 20000 ha in Senegal and 18000 ha in Mauritania, almost exclusively for"
+    )
   }
 }
