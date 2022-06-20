@@ -7,7 +7,7 @@ import java.util.regex.Pattern
 import scala.annotation.tailrec
 import scala.beans.BeanProperty
 
-class NumberPreprocessor(hyperparameters: NumberPreprocessor.Hyperparameters = NumberPreprocessor.Hyperparameters(), loggerOpt: Option[NumbersLogger] = None) extends Preprocessor {
+class NumberPreprocessor(parameters: NumberPreprocessor.Parameters = NumberPreprocessor.Parameters(), loggerOpt: Option[NumbersLogger] = None) extends Preprocessor {
 
   def process(text: String, pattern: Pattern, replacement: String): String = {
     val matcher = pattern.matcher(text)
@@ -41,7 +41,7 @@ class NumberPreprocessor(hyperparameters: NumberPreprocessor.Hyperparameters = N
       else loop(after)
     }
 
-    if (!hyperparameters.joinWithSpaces) text
+    if (!parameters.joinWithSpaces) text
     else loop(text)
   }
 
@@ -64,12 +64,12 @@ object NumberPreprocessor {
   val spacePattern = Pattern.compile("(^|\\s)(\\d+)\\s+(\\d+)") // no comma here
   val spaceReplacement = "$1$2$3"
 
-  case class Hyperparameters(@BeanProperty var joinWithSpaces: Boolean) {
+  case class Parameters(@BeanProperty var joinWithSpaces: Boolean) {
     def this() = this(joinWithSpaces = false)
   }
 
-  object Hyperparameters {
-    def apply(): Hyperparameters = new Hyperparameters()
+  object Parameters {
+    def apply(): Parameters = new Parameters()
   }
 }
 

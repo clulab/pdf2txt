@@ -35,7 +35,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
       }
 
       val adobeCredentialsOpt = mapAndConfig.get(Pdf2txtArgs.ADOBE_CREDENTIALS)
-      val numericHyperparameters = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.NUMBER_HYPERPARAMETERS), classOf[NumberPreprocessor.Hyperparameters])
+      val numberParameters = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.NUMBER_PARAMETERS), classOf[NumberPreprocessor.Parameters])
 
       val pdfConverterConstructor = {
         val key = Pdf2txtArgs.CONVERTER
@@ -74,7 +74,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
           map(Pdf2txtArgs.PARAGRAPH, () => new ParagraphPreprocessor()),
           map(Pdf2txtArgs.UNICODE, () => new UnicodePreprocessor()),
           map(Pdf2txtArgs.CASE, () => new CasePreprocessor(caseCutoff)),
-          map(Pdf2txtArgs.NUMBER, () => new NumberPreprocessor(numericHyperparameters)),
+          map(Pdf2txtArgs.NUMBER, () => new NumberPreprocessor(numberParameters)),
           map(Pdf2txtArgs.LIGATURE, () => new LigaturePreprocessor(languageModel)),
           map(Pdf2txtArgs.LINE_BREAK, () => new LineBreakPreprocessor(languageModel)),
           map(Pdf2txtArgs.WORD_BREAK_BY_HYPHEN, () => new WordBreakByHyphenPreprocessor()),
@@ -184,7 +184,7 @@ object Pdf2txtArgs {
   val LOOPS = "loops"
   val OVERWRITE = "overwrite"
   val ADOBE_CREDENTIALS = "adobeCredentials"
-  val NUMBER_HYPERPARAMETERS = "numberHyperparameters"
+  val NUMBER_PARAMETERS = "numberParameters"
 
   val helps: Array[String] = Array(HELP1, HELP2)
   val argKeys: Array[String] = Array(

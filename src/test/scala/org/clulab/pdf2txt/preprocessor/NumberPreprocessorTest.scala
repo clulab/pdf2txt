@@ -10,8 +10,8 @@ class NumberPreprocessorTest extends Test {
   behavior of "NumbersPreprocessor on texts with commas"
 
   {
-    val hyperparameters = NumberPreprocessor.Hyperparameters()
-    val preprocessor = new NumberPreprocessor(hyperparameters, Some(logger))
+    val parameters = NumberPreprocessor.Parameters()
+    val preprocessor = new NumberPreprocessor(parameters, Some(logger))
 
     def test(inputText: String, expectedOutputText: String): Unit = {
       it should s"convert ${escape(inputText)}" in {
@@ -37,8 +37,8 @@ class NumberPreprocessorTest extends Test {
   behavior of "NumbersPreprocessor on texts with spaces"
 
   {
-    val hyperparameters = NumberPreprocessor.Hyperparameters(joinWithSpaces = true)
-    val preprocessor = new NumberPreprocessor(hyperparameters, Some(logger))
+    val parameters = NumberPreprocessor.Parameters(joinWithSpaces = true)
+    val preprocessor = new NumberPreprocessor(parameters, Some(logger))
 
     def test(inputText: String, expectedOutputText: String): Unit = {
       it should s"convert ${escape(inputText)}" in {
