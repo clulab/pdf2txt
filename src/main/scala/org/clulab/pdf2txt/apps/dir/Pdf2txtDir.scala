@@ -1,11 +1,12 @@
 package org.clulab.pdf2txt.apps.dir
 
 import org.clulab.pdf2txt.Pdf2txt
+import org.clulab.pdf2txt.adobe.AdobeConverter
 import org.clulab.pdf2txt.common.pdf.TextConverter
 import org.clulab.pdf2txt.common.utils.Pdf2txtAppish
 import org.clulab.pdf2txt.pdfminer.PdfMinerConverter
 import org.clulab.pdf2txt.pdftotext.PdfToTextConverter
-import org.clulab.pdf2txt.scienceparse.{AdobeConverter, ScienceParseConverter}
+import org.clulab.pdf2txt.scienceparse.ScienceParseConverter
 import org.clulab.pdf2txt.tika.TikaConverter
 
 import java.io.File
