@@ -1,4 +1,4 @@
-package org.clulab.pdf2txt.scienceparse
+package org.clulab.pdf2txt.adobe
 
 import com.adobe.pdfservices.operation.ExecutionContext
 import com.adobe.pdfservices.operation.auth.Credentials

@@ -1,7 +1,6 @@
 package org.clulab.pdf2txt.adobe
 
 import org.clulab.pdf2txt.common.utils.Test
-import org.clulab.pdf2txt.scienceparse.AdobeConverter
 
 import java.io.File
 
