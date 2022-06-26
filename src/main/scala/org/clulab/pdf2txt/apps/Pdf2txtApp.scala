@@ -3,6 +3,7 @@ package org.clulab.pdf2txt.apps
 import com.typesafe.config.ConfigBeanFactory
 import org.clulab.pdf2txt.BuildInfo
 import org.clulab.pdf2txt.Pdf2txt
+import org.clulab.pdf2txt.adobe.AdobeConverter
 import org.clulab.pdf2txt.common.pdf.{PdfConverter, TextConverter}
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.{AppUtils, ConfigError, Pdf2txtAppish, Pdf2txtException, Preprocessor, StandardSystem, Systemish}
@@ -10,7 +11,7 @@ import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, GigawordLanguageMo
 import org.clulab.pdf2txt.pdfminer.PdfMinerConverter
 import org.clulab.pdf2txt.pdftotext.PdfToTextConverter
 import org.clulab.pdf2txt.preprocessor.{CasePreprocessor, LigaturePreprocessor, LineBreakPreprocessor, LinePreprocessor, NumberPreprocessor, ParagraphPreprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
-import org.clulab.pdf2txt.scienceparse.{AdobeConverter, ScienceParseConverter}
+import org.clulab.pdf2txt.scienceparse.ScienceParseConverter
 import org.clulab.pdf2txt.tika.TikaConverter
 
 import java.io.File
