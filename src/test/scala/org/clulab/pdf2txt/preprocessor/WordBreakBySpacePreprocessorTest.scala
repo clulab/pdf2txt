@@ -8,10 +8,11 @@ class WordBreakBySpacePreprocessorTest extends Test {
   class TestLanguageModel(vocab: Map[String, Float]) extends ProbabilisticLanguageModel {
 
     override def p(nextWord: String, prevWords: Seq[String]): Float  = {
-      // val context = prevWords.mkString(" ")
+      val context = prevWords.mkString(" ")
+      val probability = vocab.getOrElse(nextWord, 0f)
 
-      // println(s"p($nextWord | $context)")
-      vocab.getOrElse(nextWord, 0)
+      println(s"p($nextWord | $context) = $probability")
+      probability
     }
   }
 
