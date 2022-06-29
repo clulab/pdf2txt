@@ -23,7 +23,7 @@ object WordBreakByHyphen2logDir extends App {
   class LoggingLanguageModel(logger: Logger) extends NeverLanguageModel {
 
     override def shouldJoin(left: String, right: String, prevWords: Seq[String]): Boolean = {
-      val message = prevWords.mkString(" ") + (if (prevWords.nonEmpty) " " else "") + left + "-" + right
+      val message = prevWords.mkString(" ") + (if (prevWords.nonEmpty) " " else "") + "[" + left + right + "]"
 
       logger.log(message)
       super.shouldJoin(left, right, prevWords)
