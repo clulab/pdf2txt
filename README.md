@@ -71,7 +71,7 @@ Preprocessors can be configured on (true) and off (false) as shown later, but th
 
 * **case**
 
-  Headers and titles often indicated with words that have been capitalized.  Unfortunately, this can confuse part of speech taggers and named entity recognizers.  Case is restored here so that words appear as they would in normal sentences for more accurate processing.
+    Headers and titles often indicated with words that have been capitalized.  Unfortunately, this can confuse part of speech taggers and named entity recognizers.  Case is restored here so that words appear as they would in normal sentences for more accurate processing.
 
 * **number**
  
