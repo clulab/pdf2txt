@@ -87,7 +87,7 @@ Preprocessors can be configured on (true) and off (false) as shown later, but th
 
 * **wordBreakByHyphen**
  
-    Given the many kinds of dashes (-, &ndash;, &mdash;, etc.) within words, PDF convers sometimes can't tell whether the letters after belong to the same word or the next one and unwanted spaces can get inserted.  Words with hyphens are recombined here.  For example, "left- handed" might be restored to "left-handed" or "two- year- old" to "two-year-old". 
+    Given the many kinds of dashes (-, &ndash;, &mdash;, etc.) within words, PDF converters sometimes can't tell whether the letters after belong to the same word or the next one and unwanted spaces can get inserted.  Words with hyphens are recombined here.  For example, "left- handed" might be restored to "left-handed" or "two- year- old" to "two-year-old". 
  
 * **wordBreakBySpace**
 
