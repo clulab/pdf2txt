@@ -8,10 +8,11 @@ class WordBreakByHyphenPreprocessorTest extends Test {
   class TestLanguageModel(vocab: Map[String, Float]) extends ProbabilisticLanguageModel {
 
     override def p(nextWord: String, prevWords: Seq[String]): Float  = {
-      // val context = prevWords.mkString(" ")
+      val context = prevWords.mkString(" ")
+      val probability = vocab.getOrElse(nextWord, 0f)
 
-      // println(s"p($nextWord | $context)")
-      vocab.getOrElse(nextWord, 0)
+      println(s"p($nextWord | $context) = $probability")
+      probability
     }
   }
 
@@ -28,16 +29,19 @@ class WordBreakByHyphenPreprocessorTest extends Test {
     }
   }
 
-  test("I went in- to the store.", "I went into the store.", Map("into" -> 1))
-  test("Pre- hensile tails are un- common.", "Prehensile tails are uncommon.", Map("Prehensile" -> 1, "uncommon" -> 2))
   test(
-    "Once upon a time.  He went in- to and on- to the house.  They lived happily ever after.",
-    "Once upon a time.  He went into and onto the house.  They lived happily ever after.",
-    Map("into" -> 1f, "onto" -> 2f)
+    "Differences between left- and right- handedness.",
+    "Differences between left- and right-handedness.",
+    Map("right-handedness" -> 1)
   )
   test(
-    "It is a double- triple- quadruple threat.",
-    "It is a doubletriplequadruple threat.",
-    Map("doubletriple" -> 1f, "doubletriplequadruple" -> 2f)
+    "It is a five- year- old bicycle.",
+    "It is a five-year-old bicycle.",
+    Map("five-year" -> 1f, "five-year-old" -> 1f)
+  )
+  test(
+    "It is a five-year- old bicycle.",
+    "It is a five-year-old bicycle.",
+    Map("five-year" -> 1f, "five-year-old" -> 1f)
   )
 }

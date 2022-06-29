@@ -7,8 +7,8 @@ class ProbabilisticLanguageModel extends LanguageModel {
   // We should check if P("dis"|"They decided to") is larger than P("disclose"|"They decided to").
   // If not, then the two tokens should be merged into one.
   override def shouldJoin(left: String, right: String, prevWords: Seq[String]): Boolean = {
-    val pCombined = p(left + right, prevWords)
     val pUncombined = p(left, prevWords)
+    val pCombined = p(left + right, prevWords)
 
     pCombined != 0f && pCombined >= pUncombined // Favor the combined unless we're already at 0.
   }

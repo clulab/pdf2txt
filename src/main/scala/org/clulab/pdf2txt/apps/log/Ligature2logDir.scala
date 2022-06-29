@@ -28,7 +28,7 @@ object Ligature2logDir extends App {
   class LoggingLanguageModel(languageModel: LanguageModel, logger: Logger) extends LanguageModel {
 
     override def shouldJoin(left: String, right: String, prevWords: Seq[String]): Boolean = {
-      val context = prevWords.mkString(" ") + (if (prevWords.nonEmpty) " " else "") + left + right
+      val context = prevWords.mkString(" ") + (if (prevWords.nonEmpty) " " else "") + "[" + left + right + "]"
       val result = languageModel.shouldJoin(left, right, prevWords)
 
       logger.log(left, right, result, context)

@@ -13,8 +13,8 @@ class WordBreakByHyphenPreprocessor(languageModel: LanguageModel = WordBreakByHy
   def isSeparatedBySingleSpace(prevWordDocument: WordDocument, nextWordDocument: WordDocument): Boolean =
       StringUtils.LETTER_BREAK_CHARS.exists(prevWordDocument.postSeparator.matches)
 
-  def shouldJoin(left: String, right: String, prevWords: Seq[String]): Boolean =
-      languageModel.shouldJoin(left, right, prevWords)
+  def shouldJoin(left: String, middle: String, right: String, prevWords: Seq[String]): Boolean =
+      languageModel.shouldJoin(left + middle, right, prevWords)
 
   protected def preprocessSentence(sentence: SentenceDocument): TextRanges = {
     val processorsWords = sentence.contents.map(_.processorsWord)
@@ -24,13 +24,14 @@ class WordBreakByHyphenPreprocessor(languageModel: LanguageModel = WordBreakByHy
       val nextWord = sentence.contents(nextIndex)
 
       isHyphen(hyphenWord) && !isSeparated(prevWord) && isSeparatedBySingleSpace(hyphenWord, nextWord) &&
-          shouldJoin(prevWord.processorsWord, nextWord.processorsWord, processorsWords.take(prevIndex))
+          shouldJoin(prevWord.processorsWord, hyphenWord.processorsWord, nextWord.processorsWord, processorsWords.take(prevIndex))
     }
 
     tripleIndexOpt.map { case (prevIndex, currIndex, nextIndex) =>
       val prevWord = sentence.contents(prevIndex)
+      val currWord = sentence.contents(currIndex)
       val nextWord = sentence.contents(nextIndex)
-      val processorsWord = prevWord.processorsWord + nextWord.processorsWord
+      val processorsWord = prevWord.processorsWord + currWord.processorsWord + nextWord.processorsWord
       val textRanges = new TextRanges()
 
       textRanges += sentence.andBefore(prevWord.preSeparator)
@@ -55,4 +56,5 @@ class WordBreakByHyphenPreprocessor(languageModel: LanguageModel = WordBreakByHy
 
 object WordBreakByHyphenPreprocessor {
   lazy val languageModel = GigawordLanguageModel()
+  val HYPHEN_STRING = StringUtils.HYPHEN.toString
 }
