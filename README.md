@@ -79,7 +79,7 @@ Preprocessors can be configured on (true) and off (false) as shown later, but th
 
 * **ligature**
 
-    Many PDF converts have difficulties with ligatures, like &ffilig; typeset as single glyphs, resulting in spaces inserted into words.  Such situations are detected and resolved with this preprocessor.  In order to do so, it must have a fairly good idea of what is a word or not and even whether one word is more probable than another.  Therefore, this  preprocessor (and all the remaining ones) makes use of a language model described in the next section.
+    Many PDF converts have difficulties with ligatures, like &ffilig; typeset as single glyphs, resulting in spaces inserted into words.  Such situations are detected and resolved with this preprocessor.  "coe ffi cient" would be corrected to "coefficient".  In order to do so, it must have a fairly good idea of what is a word or not and even whether one word is more probable than another.  Therefore, this preprocessor (and all the remaining ones) makes use of a language model described in the next section.
 
 * **lineBreak**
 
@@ -87,7 +87,7 @@ Preprocessors can be configured on (true) and off (false) as shown later, but th
 
 * **wordBreakByHyphen**
  
-    Given the many kinds of dashes (-, &ndash;, &mdash;, etc.) within words, PDF convers sometimes can't tell whether the letters after belong to the same word or the next one and unwanted spaces can get inserted.  Words with hyphens are recombined here.  For example, "in- to" might be restored to "into". 
+    Given the many kinds of dashes (-, &ndash;, &mdash;, etc.) within words, PDF convers sometimes can't tell whether the letters after belong to the same word or the next one and unwanted spaces can get inserted.  Words with hyphens are recombined here.  For example, "left- handed" might be restored to "left-handed" or "two- year- old" to "two-year-old". 
  
 * **wordBreakBySpace**
 
