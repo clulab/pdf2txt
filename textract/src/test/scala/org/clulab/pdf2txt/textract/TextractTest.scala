@@ -1,15 +1,16 @@
 package org.clulab.pdf2txt.textract
 
 import org.clulab.pdf2txt.common.utils.Test
-import software.amazon.awssdk.regions.Region
+import org.scalatest.BeforeAndAfterAll
 
 import java.io.File
 
-class TextractTest extends Test {
+class TextractTest extends Test with BeforeAndAfterAll {
   val pdfFilename = "./textract/src/test/resources/org/clulab/pdf2txt/textract/clu lab.pdf"
 
-  // Get region from somewhere.
-  lazy val textract = new TextractConverter(Region.US_WEST_1, TextractConverter.defaultProfile, TextractConverter.defaultCredentials)
+  lazy val textract = new TextractConverter()
+
+  override def afterAll(): Unit = textract.close()
 
   behavior of "Textract"
 
