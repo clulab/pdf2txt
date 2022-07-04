@@ -14,9 +14,11 @@ class AdobeTest extends Test {
   it should "read a PDF file" in {
     assert(new File(pdfFilename).exists)
 
-    val text = adobe.convert(new File(pdfFilename))
+    if (new File(AdobeConverter.defaultCredentials).exists) {
+      val text = adobe.convert(new File(pdfFilename))
 
-    text should include ("The Computational Language Understanding")
-    text should include ("please see our NLP")
+      text should include ("The Computational Language Understanding")
+      text should include ("please see our NLP")
+    }
   }
 }
