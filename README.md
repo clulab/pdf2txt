@@ -49,6 +49,10 @@ The PDF converters are (in alphabetical order, even though **tika** is the defau
 
     If your text has already been converted from PDF and only needs to be preprocessed. then this is the "converter" to use.  It is implemented directly in this project.  In contrast to the others, it reads files matching *.txt rather than *.pdf.
 
+* **textract**
+
+  This converter interfaces to Amazon AWS's online [Textract service](https://aws.amazon.com/textract/).  The service requires credentials and eventual payment if used beyond the trial limits.  See the textract subproject's [README.md](./textract/README.md) for configuration details.  The service converts the PDF document into images and performs optical character recognition (OCR) to recover the text.  It knows about pages, lines, and words, but not about paragraphs or other logical document structure.
+
 * **tika**
 
   [Apache Tika](https://tika.apache.org/) provides a Java library which is included as a dependency for this project.  This is the default converter.
