@@ -51,7 +51,7 @@ The PDF converters are (in alphabetical order, even though **tika** is the defau
 
 * **textract**
 
-  This converter interfaces to Amazon AWS's online [Textract service](https://aws.amazon.com/textract/).  The service requires credentials and eventual payment if used beyond the trial limits.  See the textract subproject's [README.md](./textract/README.md) for configuration details.  The service converts the PDF document into images and performs optical character recognition (OCR) to recover the text.  It knows about pages, lines, and words, but not about paragraphs or other logical document structure.
+  This converter interfaces to Amazon AWS's online [Textract service](https://aws.amazon.com/textract/).  The service requires credentials and eventual payment if used beyond the trial limits.  An S3 bucket may also be required.  See the textract subproject's [README.md](./textract/README.md) for configuration details.  The service converts the PDF document into images and performs optical character recognition (OCR) to recover the text.  It knows about pages, lines, and words, but not about paragraphs or other logical document structure.
 
 * **tika**
 

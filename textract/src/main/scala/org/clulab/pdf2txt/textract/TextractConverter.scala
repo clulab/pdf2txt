@@ -7,13 +7,15 @@ import software.amazon.awssdk.core.SdkBytes
 import software.amazon.awssdk.profiles.ProfileFile
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.textract.TextractClient
-import software.amazon.awssdk.services.textract.model.{Block, BlockType, DetectDocumentTextRequest, Document, DocumentLocation, FeatureType, GetDocumentTextDetectionRequest, S3Object, StartDocumentAnalysisRequest, StartDocumentTextDetectionRequest}
+import software.amazon.awssdk.services.textract.model.{Block, BlockType, DetectDocumentTextRequest, Document, DocumentLocation, FeatureType, GetDocumentTextDetectionRequest, GetDocumentTextDetectionResponse, S3Object, StartDocumentAnalysisRequest, StartDocumentTextDetectionRequest}
 
 import java.io.{File, FileInputStream}
 import java.util.concurrent.atomic.AtomicBoolean
+import scala.annotation.tailrec
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 class TextractConverter(textractSettings: TextractSettings = TextractConverter.defaultSettings) extends PdfConverter {
   val isOpen = new AtomicBoolean(false)
@@ -79,55 +81,79 @@ class TextractConverter(textractSettings: TextractSettings = TextractConverter.d
     convertBlocks(blocks)
   }
 
-  def convertMultiplePages(pdfFile: File): String = {
+  def convertMultiplePages(pdfFile: File, bucket: String): String = {
+
+    def loopJobId(jobId: String): mutable.Seq[Block] = {
+
+      def loopTokenOpt(tokenOpt: Option[String]): GetDocumentTextDetectionResponse = {
+        val getDocumentTextDetectionRequest = {
+          val builder = GetDocumentTextDetectionRequest.builder()
+            .jobId(jobId)
+
+          tokenOpt.foreach(builder.nextToken)
+          builder.build()
+        }
+
+        @tailrec
+        def loopRequest(): GetDocumentTextDetectionResponse = {
+          val getDocumentTextDetectionResponse = textractClient.getDocumentTextDetection(getDocumentTextDetectionRequest)
+
+          if (getDocumentTextDetectionResponse.jobStatusAsString != "IN_PROGRESS")
+            getDocumentTextDetectionResponse
+          else {
+            Thread.sleep(1000)
+            loopRequest()
+          }
+        }
+
+        loopRequest()
+      }
+
+      def loopBlocks(): mutable.Seq[Block] = {
+        val blocks = mutable.ArrayBuffer[Block]()
+
+        @tailrec
+        def loopNextTokenOpt(tokenOpt: Option[String]): Unit = {
+          val getDocumentTextDetectionResponse = loopTokenOpt(tokenOpt)
+          val nextTokenOpt = Option(getDocumentTextDetectionResponse.nextToken())
+
+          blocks ++= getDocumentTextDetectionResponse.blocks.asScala
+          if (nextTokenOpt.isDefined)
+            loopNextTokenOpt(nextTokenOpt)
+        }
+
+        loopNextTokenOpt(None)
+        blocks
+      }
+
+      loopBlocks()
+    }
+
+    val s3Object = S3Object.builder()
+        .bucket(bucket)
+        .name(pdfFile.getName)
+        .build()
     val documentLocation = DocumentLocation.builder()
-      .s3Object(
-        S3Object.builder()
-          .bucket("awspdf-pdf")
-          .name(pdfFile.getName)
-          .build()
-      )
-      .build()
+        .s3Object(s3Object)
+        .build()
     val startDocumentTextDetectionRequest = StartDocumentTextDetectionRequest.builder()
         .documentLocation(documentLocation)
         .build()
-
     val startDocumentTextDetectionRequestResponse = textractClient.startDocumentTextDetection(startDocumentTextDetectionRequest)
     val jobId = startDocumentTextDetectionRequestResponse.jobId()
-
-    // wait until finished?, get first one that not IN_PROGRESS
-    // while waitWhileInProgress
-    var done = false
-
-    while (!done) {
-      Thread.sleep(1000)
-      val getDocumentTextDetectionRequest = GetDocumentTextDetectionRequest.builder()
-        .jobId(jobId)
-        .build()
-      val getDocumentTextDetectionResponse = textractClient.getDocumentTextDetection(getDocumentTextDetectionRequest)
-
-      if (getDocumentTextDetectionResponse.jobStatusAsString == "IN_PROGRESS")
-        done = false
-      else done = true
-    }
-
-    val getDocumentTextDetectionRequest = GetDocumentTextDetectionRequest.builder()
-      .jobId(jobId)
-      .build()
-    val getDocumentTextDetectionResponse = textractClient.getDocumentTextDetection(getDocumentTextDetectionRequest)
-    val blocks = getDocumentTextDetectionResponse.blocks.asScala
+    val blocks = loopJobId(jobId)
 
     convertBlocks(blocks)
   }
 
   override def convert(pdfFile: File): String = {
-    // convertSinglePage(pdfFile)
-    convertMultiplePages(pdfFile)
+    if (textractSettings.bucket.isEmpty) convertSinglePage(pdfFile)
+    else convertMultiplePages(pdfFile, textractSettings.bucket)
   }
 }
 
-case class TextractSettings(@BeanProperty var credentials: String, @BeanProperty var profile: String, @BeanProperty var region: String) {
-  def this() = this("", "", "")
+case class TextractSettings(@BeanProperty var credentials: String, @BeanProperty var profile: String, @BeanProperty var region: String, @BeanProperty var bucket: String) {
+  def this() = this("", "", "", "")
 }
 
 object TextractConverter {
@@ -137,5 +163,6 @@ object TextractConverter {
   }
   val defaultProfile = "default"
   val defaultRegion = "us-west-1"
-  val defaultSettings = TextractSettings(defaultCredentials, defaultProfile, defaultRegion)
+  val defaultBucket = ""
+  val defaultSettings = TextractSettings(defaultCredentials, defaultProfile, defaultRegion, defaultBucket)
 }
