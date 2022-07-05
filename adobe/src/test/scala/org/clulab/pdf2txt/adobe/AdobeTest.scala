@@ -6,12 +6,11 @@ import java.io.File
 
 class AdobeTest extends Test {
   val pdfFilename = "./adobe/src/test/resources/org/clulab/pdf2txt/adobe/clu lab.pdf"
-
   lazy val adobe = new AdobeConverter()
 
   behavior of "Adobe"
 
-  it should "read a PDF file" in {
+  ignore should "read a PDF file" in {
     assert(new File(pdfFilename).exists)
 
     if (new File(AdobeConverter.defaultCredentials).exists) {
