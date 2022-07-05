@@ -16,7 +16,6 @@ class TextractTest extends Test with BeforeAndAfterAll {
 
   it should "read a PDF file" in {
     assert(new File(pdfFilename).exists)
-
     if (new File(TextractConverter.defaultCredentials).exists) {
       val text = textract.convert(new File(pdfFilename))
 
