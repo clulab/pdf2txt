@@ -1,8 +1,8 @@
 package org.clulab.pdf2txt.common.pdf
 
-import java.io.File
+import java.io.{Closeable, File}
 
-trait PdfConverter {
+trait PdfConverter extends Closeable {
   val  inputExtension: String = ".pdf"
   val outputExtension: String = ".txt"
 

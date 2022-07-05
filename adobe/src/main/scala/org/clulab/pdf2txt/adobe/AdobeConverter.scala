@@ -16,23 +16,18 @@ import org.json4s.jackson.JsonMethods
 import java.io.File
 import java.util
 import scala.annotation.tailrec
+import scala.beans.BeanProperty
 import scala.io.Source
 
-class AdobeConverter(credentialsFilename: String) extends PdfConverter {
-
-  def this(credentialsFilenameOpt: Option[String]) =
-      this(credentialsFilenameOpt.getOrElse(AdobeConverter.defaultCredentials))
-
-  def this() = this(AdobeConverter.defaultCredentials)
-
+class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettings) extends PdfConverter {
   // Put the name of the file in the config
   val executionContextOpt =
       // Output a warning in this case.  Can only do local files.
-      if (!new File(credentialsFilename).exists) None
+      if (!new File(adobeSettings.credentials).exists) None
       else {
         val credentials = Credentials
             .serviceAccountCredentialsBuilder()
-            .fromFile(credentialsFilename)
+            .fromFile(adobeSettings.credentials)
             .build()
 
         Some(ExecutionContext.create(credentials))
@@ -197,10 +192,15 @@ class AdobeConverter(credentialsFilename: String) extends PdfConverter {
   }
 }
 
+case class AdobeSettings(@BeanProperty var credentials: String) {
+  def this() = this("")
+}
+
 object AdobeConverter {
   val defaultCredentials = {
     val userHome = System.getProperty("user.home")
     s"$userHome/.pdf2txt/pdfservices-api-credentials.json"
   }
+  val defaultSettings = AdobeSettings(defaultCredentials)
   val headers = Seq("H", "H1", "H2", "H3", "H4", "H5", "H6")
 }

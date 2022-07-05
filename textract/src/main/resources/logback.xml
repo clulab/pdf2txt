@@ -1,0 +1,17 @@
+<configuration>
+    <property name="clulab:pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" />
+
+    <appender name="clulab:stderr" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.err</target>
+        <encoder>
+            <pattern>${clulab:pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- This accounts for anything coming from AWS. -->
+    <logger name="software.amazon.awssdk" level="warn" additivity="false" />
+
+    <root level="all">
+        <appender-ref ref="clulab:stderr" />
+    </root>
+</configuration>

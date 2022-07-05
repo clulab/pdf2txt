@@ -92,6 +92,8 @@
     <logger name="com.amazonaws"      level="warn"  additivity="false" />
     <!-- This accounts for anything coming from Adobe. -->
     <logger name="com.adobe" level="warn" additivity="false" />
+    <!-- This accounts for anything coming from AWS. -->
+    <logger name="software.amazon.awssdk" level="warn" additivity="false" />
 
     <!-- This handles anything from outside of clulab that isn't configured otherwise. -->
     <root level="all">

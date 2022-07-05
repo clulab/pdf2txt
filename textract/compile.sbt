@@ -11,7 +11,7 @@ Compile / packageBin / mappings := {
   }
 
   // Remove placeholder files (.gitempty).
-  val filtered = (mappings in (Compile, packageBin)).value.filter {
+  val filtered = (Compile / packageBin / mappings).value.filter {
     case (_, name) => !name.endsWith(".gitempty")
   }
 
@@ -78,9 +78,3 @@ Compile / packageBin := {
     }
   }).value
 }
-
-// This setting adversely affects logLevel during tests, so needs counterweight.
-// ThisBuild / Compile / logLevel := Level.Error
-// ThisBuild / Runtime / logLevel := Level.Info
-// Static methods in interface require -target:jvm-1.8
-ThisBuild / Compile / scalacOptions ++= Seq("-feature", "-unchecked", "-deprecation", "-target:jvm-1.8")
