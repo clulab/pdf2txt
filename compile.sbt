@@ -82,4 +82,5 @@ Compile / packageBin := {
 // This setting adversely affects logLevel during tests, so needs counterweight.
 // ThisBuild / Compile / logLevel := Level.Error
 // ThisBuild / Runtime / logLevel := Level.Info
-ThisBuild / Compile / scalacOptions ++= Seq("-feature", "-unchecked", "-deprecation")
+// Static methods in interface require -target:jvm-1.8
+ThisBuild / Compile / scalacOptions ++= Seq("-feature", "-unchecked", "-deprecation", "-target:jvm-1.8")

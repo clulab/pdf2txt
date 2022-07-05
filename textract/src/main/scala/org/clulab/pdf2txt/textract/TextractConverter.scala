@@ -32,7 +32,7 @@ class TextractConverter(textractSettings: TextractSettings = TextractConverter.d
           .build()
     }
 
-    val textractClient = TextractClient.builder
+    val textractClient = TextractClient.builder()
         .region(Region.of(textractSettings.region))
         .credentialsProvider(credentialsProvider)
         .build()

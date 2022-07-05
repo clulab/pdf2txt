@@ -1,4 +1,3 @@
-import org.clulab.sbt.BuildUtils
 import org.clulab.sbt.Resolvers
 
 name := "pdf2txt"
