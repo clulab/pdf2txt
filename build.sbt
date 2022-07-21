@@ -46,6 +46,9 @@ lazy val common = project
 lazy val adobe = project
   .dependsOn(common % "compile -> compile; test -> test")
 
+lazy val google = project
+  .dependsOn(common % "compile -> compile; test -> test")
+
 lazy val pdfminer = project
   .dependsOn(common % "compile -> compile; test -> test")
 
