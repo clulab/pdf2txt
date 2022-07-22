@@ -24,30 +24,10 @@ import scala.collection.JavaConverters._
 
 class GoogleConverter(googleSettings: GoogleSettings = GoogleConverter.defaultSettings) extends PdfConverter {
   // See https://github.com/googleapis/java-vision/blob/HEAD/samples/snippets/src/main/java/com/example/vision/Detect.java.
-  // Line 200
-
-  /*
-  val visionOpt =
-      // Output a warning in this case.  Can only do local files.
-      if (!new File(googleSettings.credentials).exists) None
-      else { // What should be in the file?
-        val inputStream = new FileInputStream(new File(googleSettings.credentials))
-        val credentials = GoogleCredentials.fromStream(inputStream).createScoped(VisionScopes.all())
-        val jsonFactory = JacksonFactory.getDefaultInstance()
-        val vision = new Vision.Builder(
-          GoogleNetHttpTransport.newTrustedTransport(),
-          jsonFactory,
-          new HttpCredentialsAdapter(credentials)
-        ).build()
-
-        vision // .images().asyncBatchAnnotate()
-      }
-  */
 
   // make it a this
   class MyCredentialsProvider(googleCredentials: GoogleCredentials) extends CredentialsProvider {
     override def getCredentials: Credentials = googleCredentials
-    // AIzaSyC0TLX29Y4AE6FpWu2TwzwMBFFU_0OnEOg
   }
 
   override def convert(pdfFile: File): String = {
@@ -125,6 +105,8 @@ class GoogleConverter(googleSettings: GoogleSettings = GoogleConverter.defaultSe
           val text = annotateImageResponse.getFullTextAnnotation().getText()
           // each response has context/pageNumber
 
+          // find the page number, make map of page number to json
+          // combine them into an array after sorting
           // blob.delete()
           println(text)
           stringBuilder.append(text)
