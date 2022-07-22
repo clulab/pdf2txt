@@ -15,7 +15,6 @@ import scala.annotation.tailrec
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 
 class TextractConverter(textractSettings: TextractSettings = TextractConverter.defaultSettings) extends PdfConverter {
   val isOpen = new AtomicBoolean(false)
