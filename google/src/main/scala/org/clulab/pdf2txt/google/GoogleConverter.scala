@@ -16,6 +16,7 @@ import org.json4s.{JArray, JInt, JString}
 import org.json4s.jackson.JsonMethods
 
 import java.io.{File, FileInputStream}
+import java.nio.file.Files
 import java.util.ArrayList
 import java.util.concurrent.atomic.AtomicBoolean
 import scala.beans.BeanProperty
@@ -64,9 +65,14 @@ class GoogleConverter(googleSettings: GoogleSettings = GoogleConverter.defaultSe
     // Add a . to separate the prefix from the suffix.
     val jsonFilePrefix = FileEditor(pdfFile).setExt(inputExtension + ".").get.getName
     val bucketName = googleSettings.bucket
+    val pdfBlob =
+        if (Option(bucket.get(pdfFileName)).isDefined)
+          throw new RuntimeException(s"""There is already a blob "$pdfFileName" in the "$bucketName" bucket.  Please remove it first.""")
+        else
+          bucket.create(pdfFileName, Files.readAllBytes(pdfFile.toPath))
+
     val gcsSourcePath = s"gs://$bucketName/$pdfFileName"
     val gcsDestinationPath = s"gs://$bucketName/$jsonFilePrefix"
-
     val gcsSource = GcsSource.newBuilder().setUri(gcsSourcePath).build()
     val inputConfig = InputConfig.newBuilder()
         .setMimeType("application/pdf")
@@ -95,10 +101,11 @@ class GoogleConverter(googleSettings: GoogleSettings = GoogleConverter.defaultSe
     // Wait for the request to finish. (The result is not used, since the
     // API saves the result to the specified location on GCS.)
     imageAnnotatorClient.asyncBatchAnnotateFilesAsync(requests).get().getResponsesList
+    pdfBlob.delete()
 
     val pageList = bucket.list(BlobListOption.prefix(jsonFilePrefix))
-    val pageAndResponseTuples = pageList.iterateAll.asScala.flatMap { blob =>
-      val json = new String(blob.getContent()) // Doesn't this need a charset?
+    val pageAndResponseTuples = pageList.iterateAll.asScala.flatMap { jsonBlob =>
+      val json = new String(jsonBlob.getContent()) // Doesn't this need a charset?
       val jValue = JsonMethods.parse(json)
       val jArray = (jValue \ "responses").asInstanceOf[JArray]
       val pageNumberAndResponsTuples = jArray.arr.map { response =>
@@ -107,7 +114,7 @@ class GoogleConverter(googleSettings: GoogleSettings = GoogleConverter.defaultSe
         pageNumber -> response
       }
 
-      blob.delete()
+      jsonBlob.delete()
       pageNumberAndResponsTuples
     }.toVector
     val responses = pageAndResponseTuples.sortBy(_._1).map(_._2)
@@ -148,7 +155,6 @@ object GoogleConverter {
     val userHome = System.getProperty("user.home")
     s"$userHome/.pdf2txt/google-credentials.json"
   }
-  val defaultApplication = "pdf2txt"
   val defaultBucket = "pdf2txt_pdfs"
   val defaultSettings: GoogleSettings = GoogleSettings(defaultCredentials, defaultBucket)
 }
