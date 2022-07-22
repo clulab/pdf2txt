@@ -31,7 +31,11 @@ The PDF converters are (in alphabetical order, even though **tika** is the defau
 
 * **adobe**
 
-    This converter provides an interface to Adobe's online [PDF Extract service](https://developer.adobe.com/document-services/apis/pdf-extract/).  The service requires credentials and eventual payment if used beyond the trial limits.  See the adobe subproject's [README.md](./adobe/README.md) for configuration details.  The service returns a zip file containing a desciption of the PDF.  The zip files are saved alongside the PDFs and will be reused if the same PDF is converted again.  Converted text is generated wholly from the zip file and if one is found with the PDF, the call to the service is skipped (and the credentials are not used or needed).
+    This converter provides an interface to Adobe's online [PDF Extract service](https://developer.adobe.com/document-services/apis/pdf-extract/).  The service requires credentials and eventual payment if used beyond the trial limits.  See the adobe subproject's [README.md](./adobe/README.md) for configuration details.  The service returns a zip file containing a description of the PDF.  The zip files are saved alongside the PDFs and will be reused if the same PDF is converted again.  Converted text is generated wholly from the zip file and if one is found with the PDF, the call to the service is skipped (and the credentials are not used or needed).
+
+* **google**
+
+    Google's [Cloud Vision API](https://cloud.google.com/vision/) also offers PDF to text conversion.  The service requires credentials and eventual payment if used beyond the trial limits.  A [cloud storage bucket](https://cloud.google.com/storage) is required.  See the google subproject's [README.md](./google/README.md) for configuration details.  The service separates the PDF into pages and performs optical character recognition (OCR) on each one separately.  Both input and output files need to temporarily reside in a storage bucket.  The service returns a json file containing a description of the PDF.  The json files are saved alongside the PDFs and will be reused if the same PDF is converted again.  Converted text is generated wholly from the json file and if one is found with the PDF, the call to the service is skipped (and the credentials are not used or needed).
 
 * **pdfminer**
   
@@ -51,7 +55,7 @@ The PDF converters are (in alphabetical order, even though **tika** is the defau
 
 * **textract**
 
-  This converter interfaces to Amazon AWS's online [Textract service](https://aws.amazon.com/textract/).  The service requires credentials and eventual payment if used beyond the trial limits.  An S3 bucket may also be required.  See the textract subproject's [README.md](./textract/README.md) for configuration details.  The service converts the PDF document into images and performs optical character recognition (OCR) to recover the text.  It knows about pages, lines, and words, but not about paragraphs or other logical document structure.
+    This converter interfaces to Amazon AWS's online [Textract service](https://aws.amazon.com/textract/).  The service requires credentials and eventual payment if used beyond the trial limits.  An S3 bucket may also be required.  See the textract subproject's [README.md](./textract/README.md) for configuration details.  The service converts the PDF document into images and performs optical character recognition (OCR) to recover the text.  It knows about pages, lines, and words, but not about paragraphs or other logical document structure.  Input files of more than one page need to temporarily reside in an S3 bucket.  If no bucket is configured (the value is an empty string), none is used, but that will cause errors if a PDF has more than one page.
 
 * **tika**
 

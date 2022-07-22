@@ -7,7 +7,6 @@ import java.io.File
 
 class TextractTest extends Test with BeforeAndAfterAll {
   val pdfFilename = "./textract/src/test/resources/org/clulab/pdf2txt/textract/clu lab.pdf"
-
   lazy val textract = new TextractConverter()
 
   override def afterAll(): Unit = textract.close()

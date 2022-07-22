@@ -7,6 +7,7 @@ import org.clulab.pdf2txt.adobe.{AdobeConverter, AdobeSettings}
 import org.clulab.pdf2txt.common.pdf.{PdfConverter, TextConverter}
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.{AppUtils, ConfigError, Pdf2txtAppish, Pdf2txtException, Preprocessor, StandardSystem, Systemish}
+import org.clulab.pdf2txt.google.{GoogleConverter, GoogleSettings}
 import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, GigawordLanguageModel, GloveLanguageModel, LanguageModel, NeverLanguageModel}
 import org.clulab.pdf2txt.pdfminer.PdfMinerConverter
 import org.clulab.pdf2txt.pdftotext.PdfToTextConverter
@@ -37,6 +38,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
       }
 
       val adobeSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.ADOBE), classOf[AdobeSettings])
+      val googleSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.GOOGLE), classOf[GoogleSettings])
       val textractSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.TEXTRACT), classOf[TextractSettings])
       val numberParameters = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.NUMBER_PARAMETERS), classOf[NumberPreprocessor.Parameters])
 
@@ -46,6 +48,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
 
         value match {
           case Pdf2txtArgs.ADOBE => () => new AdobeConverter(adobeSettings)
+          case Pdf2txtArgs.GOOGLE => () => new GoogleConverter(googleSettings)
           case Pdf2txtArgs.PDF_MINER => () => new PdfMinerConverter()
           case Pdf2txtArgs.PDF_TO_TEXT => () => new PdfToTextConverter()
           case Pdf2txtArgs.SCIENCE_PARSE => () => new ScienceParseConverter()
@@ -214,6 +217,7 @@ object Pdf2txtArgs {
   )
 
   val ADOBE = "adobe"
+  val GOOGLE = "google"
   val PDF_MINER = "pdfminer"
   val PDF_TO_TEXT = "pdftotext"
   val SCIENCE_PARSE = "scienceparse"
@@ -223,6 +227,7 @@ object Pdf2txtArgs {
 
   val converters: Array[String] = Array(
     ADOBE,
+    GOOGLE,
     PDF_MINER,
     PDF_TO_TEXT,
     SCIENCE_PARSE,

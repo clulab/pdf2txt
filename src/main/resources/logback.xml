@@ -86,7 +86,10 @@
     <logger name="org.apache.fontbox" level="warn"  additivity="false" />
     <logger name="org.apache.pdfbox"  level="warn"  additivity="false" />
     <logger name="org.apache.tika"    level="warn"  additivity="false" />
-    <logger name="org.apache.http" level="error" additivity="false" />
+
+    <logger name="org.apache.http"    level="error" additivity="false" />
+    <logger name="io.grpc.netty"      level="error" additivity="false" />
+
     <!-- This accounts for anything coming from the scienceparse project. -->
     <logger name="org.allenai"        level="warn"  additivity="false" />
     <logger name="com.amazonaws"      level="warn"  additivity="false" />
