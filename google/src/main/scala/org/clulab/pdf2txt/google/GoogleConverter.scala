@@ -56,7 +56,7 @@ class GoogleConverter(googleSettings: GoogleSettings = GoogleConverter.defaultSe
       text
     }
 
-    texts.mkString("\f")
+    texts.mkString("\n\f\n")
   }
 
   def convertPdf(pdfFile: File, jsonFile: File): String = {

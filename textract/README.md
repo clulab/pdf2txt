@@ -8,7 +8,7 @@ aws_access_key_id = ...
 aws_secret_access_key = ...
 ```
 
-The location of the `.properties` file defaults in `pdf2txt.conf` to `${user.home}/.pdf2txt/aws-credentials.properties`.  The value can be overridden with the environment variable `Pdf2txt.textract.credentials`.  If need be, you can also change it in the configuration file or just specify a different configuration file (e.g., as a command line argument to `pdf2txt`) that contains a different value for `Pdf2txt.textract.credentials` so that it points to your credentials.
+The location of the `.properties` file defaults in `pdf2txt.conf` to `${user.home}/.pdf2txt/aws-credentials.properties`.  The value can be overridden with the environment variable `Pdf2txt_textract_credentials`.  If need be, you can also change it in the configuration file or just specify a different configuration file (e.g., as a command line argument to `pdf2txt`) that contains a different value for `Pdf2txt.textract.credentials` so that it points to your credentials.
 
 Also included in the configuration file are the profile, the AWS region, and the S3 bucket name to use for documents with more than one page.  Default values and the overriding environment variables are as shown.
 
@@ -16,13 +16,13 @@ Also included in the configuration file are the profile, the AWS region, and the
 Pdf2txt {
   textract {
     credentials = ${user.home}/.pdf2txt/aws-credentials.properties
-    credentials = ${?Pdf2txt.textract.credentials}
+    credentials = ${?Pdf2txt_textract_credentials}
     profile = "default"
-    profile = ${?Pdf2txt.textract.profile}
+    profile = ${?Pdf2txt_textract_profile}
     region = "us-west-1"
-    region = ${?Pdf2txt.textract.region}
+    region = ${?Pdf2txt_textract_region}
     bucket = ""
-    bucket = ${?Pdf2txt.textract.bucket}
+    bucket = ${?Pdf2txt_textract_bucket}
   }
 }
 ```
