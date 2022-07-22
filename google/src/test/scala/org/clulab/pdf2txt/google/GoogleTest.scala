@@ -1,12 +1,16 @@
 package org.clulab.pdf2txt.google
 
 import org.clulab.pdf2txt.common.utils.Test
+import org.scalatest.BeforeAndAfterAll
 
 import java.io.File
 
-class GoogleTest extends Test {
+class GoogleTest extends Test with BeforeAndAfterAll {
   val pdfFilename = "./google/src/test/resources/org/clulab/pdf2txt/google/clu lab.pdf"
+
   lazy val google = new GoogleConverter()
+
+  override def afterAll(): Unit = google.close()
 
   behavior of "Google"
 

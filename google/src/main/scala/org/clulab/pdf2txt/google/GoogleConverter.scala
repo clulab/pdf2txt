@@ -32,9 +32,10 @@ class GoogleConverter(googleSettings: GoogleSettings = GoogleConverter.defaultSe
   }
   lazy val imageAnnotatorClient: ImageAnnotatorClient = {
     val imageAnnotatorSettings = ImageAnnotatorSettings.newBuilder().setCredentialsProvider(this).build()
+    val imageAnnotatorClient = ImageAnnotatorClient.create(imageAnnotatorSettings)
 
     isOpen.set(true)
-    ImageAnnotatorClient.create(imageAnnotatorSettings)
+    imageAnnotatorClient
   }
   lazy val bucket: Bucket = {
     val storageOptions = StorageOptions.newBuilder().setCredentials(googleCredentials).build()
@@ -55,7 +56,7 @@ class GoogleConverter(googleSettings: GoogleSettings = GoogleConverter.defaultSe
       text
     }
 
-    texts.mkString("\n")
+    texts.mkString("\f")
   }
 
   def convertPdf(pdfFile: File, jsonFile: File): String = {
@@ -106,6 +107,7 @@ class GoogleConverter(googleSettings: GoogleSettings = GoogleConverter.defaultSe
         pageNumber -> response
       }
 
+      blob.delete()
       pageNumberAndResponsTuples
     }.toVector
     val responses = pageAndResponseTuples.sortBy(_._1).map(_._2)
@@ -147,6 +149,6 @@ object GoogleConverter {
     s"$userHome/.pdf2txt/google-credentials.json"
   }
   val defaultApplication = "pdf2txt"
-  val defaultBucket = ""
+  val defaultBucket = "pdf2txt_pdfs"
   val defaultSettings: GoogleSettings = GoogleSettings(defaultCredentials, defaultBucket)
 }

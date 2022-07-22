@@ -9,9 +9,8 @@
     </appender>
 
     <!-- Some classes are extremely verbose so for STOUT keep them quiet -->
-    <logger name="org.apache.http" level="error" additivity="false" />
-    <!-- This accounts for anything coming from Adobe. -->
-    <logger name="com.adobe" level="warn" additivity="false" />
+    <logger name="io.grpc.netty" level="error" additivity="false" />
+    <!-- This accounts for anything coming from Google. -->
 
     <root level="all">
         <appender-ref ref="clulab:stderr" />
