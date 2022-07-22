@@ -2,7 +2,6 @@ package org.clulab.pdf2txt.google
 
 import com.google.api.gax.core.CredentialsProvider
 import com.google.auth.oauth2.GoogleCredentials
-import com.google.api.services.vision.v1.VisionScopes
 import com.google.auth.Credentials
 import com.google.cloud.storage.Bucket
 import com.google.cloud.storage.Storage.BlobListOption
@@ -27,7 +26,7 @@ class GoogleConverter(googleSettings: GoogleSettings = GoogleConverter.defaultSe
   val isOpen = new AtomicBoolean(false)
   lazy val googleCredentials: GoogleCredentials = {
     val inputStream = new FileInputStream(new File(googleSettings.credentials))
-    val googleCredentials = GoogleCredentials.fromStream(inputStream).createScoped(VisionScopes.all())
+    val googleCredentials = GoogleCredentials.fromStream(inputStream)
 
     googleCredentials
   }
