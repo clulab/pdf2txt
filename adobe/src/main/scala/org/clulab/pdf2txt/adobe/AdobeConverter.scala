@@ -21,7 +21,7 @@ import scala.io.Source
 
 class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettings) extends PdfConverter {
   // Put the name of the file in the config
-  val executionContextOpt =
+  val executionContextOpt: Option[ExecutionContext] =
       // Output a warning in this case.  Can only do local files.
       if (!new File(adobeSettings.credentials).exists) None
       else {
@@ -32,7 +32,7 @@ class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettin
 
         Some(ExecutionContext.create(credentials))
       }
-  val extractPdfOptions = ExtractPDFOptions.extractPdfOptionsBuilder()
+  val extractPdfOptions: ExtractPDFOptions = ExtractPDFOptions.extractPdfOptionsBuilder()
       .addElementsToExtract(util.Arrays.asList(ExtractElementType.TEXT))
       .build()
 
@@ -59,7 +59,7 @@ class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettin
           if (text.head.isDigit)
             text.dropWhile(_.isDigit).dropWhile(_.isSpaceChar)
           // Sometimes it is a letter like a or b, especially for author affiliations.
-          else if (text.head.isLower  && text.lift(1) == Some(' '))
+          else if (text.head.isLower  && text.lift(1).contains(' '))
             text.drop(2)
           else text
 
@@ -115,7 +115,7 @@ class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettin
 
       stringBuffer.append(separatedText)
     }
-    stringBuffer.toString()
+    stringBuffer.toString
   }
 
   def dereference(text: String): String = {
@@ -170,24 +170,27 @@ class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettin
     convertJson(json)
   }
 
+  def convertPdf(pdfFile: File, zipFile: File): Unit = {
+    if (executionContextOpt.isEmpty)
+      throw new RuntimeException("The AdobeConverter does not have the credentials to run.  It can only use previously converted documents.")
+    val pdfFileRef = FileRef.createFromLocalFile(pdfFile.getAbsolutePath)
+    val extractPdfOperation = {
+      val extractPdfOperation = ExtractPDFOperation.createNew()
+
+      extractPdfOperation.setOptions(extractPdfOptions)
+      extractPdfOperation.setInputFile(pdfFileRef)
+      extractPdfOperation
+    }
+    val zipFileRef = extractPdfOperation.execute(executionContextOpt.get)
+
+    zipFileRef.saveAs(zipFile.getAbsolutePath)
+  }
+
   override def convert(pdfFile: File): String = {
     val zipFile = new FileEditor(pdfFile).setExt(".zip").get
 
-    if (!zipFile.exists) {
-      if (executionContextOpt.isEmpty)
-        throw new RuntimeException("The AdobeConverter does not have the credentials to run.  It can only use previously converted documents.")
-      val pdfFileRef = FileRef.createFromLocalFile(pdfFile.getAbsolutePath)
-      val extractPdfOperation = {
-        val extractPdfOperation = ExtractPDFOperation.createNew()
-
-        extractPdfOperation.setOptions(extractPdfOptions)
-        extractPdfOperation.setInputFile(pdfFileRef)
-        extractPdfOperation
-      }
-      val zipFileRef = extractPdfOperation.execute(executionContextOpt.get)
-
-      zipFileRef.saveAs(zipFile.getAbsolutePath)
-    }
+    if (!zipFile.exists)
+      convertPdf(pdfFile, zipFile)
     convertZip(zipFile)
   }
 }
@@ -197,10 +200,10 @@ case class AdobeSettings(@BeanProperty var credentials: String) {
 }
 
 object AdobeConverter {
-  val defaultCredentials = {
+  val defaultCredentials: String = {
     val userHome = System.getProperty("user.home")
     s"$userHome/.pdf2txt/pdfservices-api-credentials.json"
   }
-  val defaultSettings = AdobeSettings(defaultCredentials)
-  val headers = Seq("H", "H1", "H2", "H3", "H4", "H5", "H6")
+  val defaultSettings: AdobeSettings = AdobeSettings(defaultCredentials)
+  val headers: Seq[String] = Seq("H", "H1", "H2", "H3", "H4", "H5", "H6")
 }
