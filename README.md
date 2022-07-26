@@ -58,6 +58,10 @@ The PDF converters are divided into two categories.  Some converters work locall
 
     This converter provides an interface to Adobe's online [PDF Extract service](https://developer.adobe.com/document-services/apis/pdf-extract/).  The service requires credentials and eventual payment if used beyond the trial limits.  See the adobe subproject's [README.md](./adobe/README.md) for configuration details.  The service returns a zip file containing a description of the PDF.  The zip files are saved alongside the PDFs and will be reused if the same PDF is converted again.  Converted text is generated wholly from the zip file and if one is found with the PDF, the call to the service is skipped (and the credentials are not used or needed).
 
+  * **amazon**
+
+    Amazon provides via AWS a similar online [Textract service](https://aws.amazon.com/textract/).  The service requires credentials and eventual payment if used beyond the trial limits.  An S3 bucket may also be required.  See the amazon subproject's [README.md](./amazon/README.md) for configuration details.  The service converts the PDF document into images and performs optical character recognition (OCR) to recover the text.  It knows about pages, lines, and words, but not about paragraphs or other logical document structure.  Input files of more than one page need to temporarily reside in an S3 bucket.  If no bucket is configured (the value is an empty string), none is used, but that will cause errors if a PDF has more than one page.
+
   * **google**
 
     Google's [Cloud Vision API](https://cloud.google.com/vision/) also offers PDF to text conversion.  The service requires credentials and eventual payment if used beyond the trial limits.  A [cloud storage bucket](https://cloud.google.com/storage) is required.  See the google subproject's [README.md](./google/README.md) for configuration details.  The service separates the PDF into pages and performs optical character recognition (OCR) on each one separately.  Both input and output files need to temporarily reside in a storage bucket.  The service returns a json file containing a description of the PDF.  The json files are saved alongside the PDFs and will be reused if the same PDF is converted again.  Converted text is generated wholly from the json file and if one is found with the PDF, the call to the service is skipped (and the credentials are not used or needed).
@@ -65,10 +69,6 @@ The PDF converters are divided into two categories.  Some converters work locall
   * **microsoft**
 
     Microsoft has its own [computer vision](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/) service.  As with several of the other converters, its processing of PDFs is an extension of more general image processing capabilities.  The PDF is converted into an image and then scanned for text.  In this case, no cloud storage is needed and no temporary files are created.  Credentials are required and there are eventual charges after a trial period.  Free conversions are limited both in number of pages (to two) and submission rate (20 calls per minute).  There are also image size limits.  See Microsoft documentation for [input requirements](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/overview-ocr#input-requirements).  The subproject's [README.md](./microsoft/README.md) has information on how to configure the credentials.
-
-  * **textract**
-
-    This converter interfaces to Amazon AWS's online [Textract service](https://aws.amazon.com/textract/).  The service requires credentials and eventual payment if used beyond the trial limits.  An S3 bucket may also be required.  See the textract subproject's [README.md](./textract/README.md) for configuration details.  The service converts the PDF document into images and performs optical character recognition (OCR) to recover the text.  It knows about pages, lines, and words, but not about paragraphs or other logical document structure.  Input files of more than one page need to temporarily reside in an S3 bucket.  If no bucket is configured (the value is an empty string), none is used, but that will cause errors if a PDF has more than one page.
 
 ## Preprocessors
 

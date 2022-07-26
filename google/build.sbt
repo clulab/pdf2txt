@@ -1,5 +1,5 @@
 name := "pdf2txt-google"
-description := "The pdf2txt-google subproject implements an interface to the google converters."
+description := "The pdf2txt-google subproject implements an interface to the google converter."
 
 resolvers ++= Seq(
 //  Resolvers.localResolver, // Reserve for Two Six.
