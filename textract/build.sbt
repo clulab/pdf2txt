@@ -10,6 +10,7 @@ libraryDependencies ++= {
   val json4sVersion = "3.5.2"
 
   Seq(
-    "software.amazon.awssdk"           % "textract"           % "2.17.224"
+    "software.amazon.awssdk" % "s3"       % "2.17.237",
+    "software.amazon.awssdk" % "textract" % "2.17.224"
   )
 }
