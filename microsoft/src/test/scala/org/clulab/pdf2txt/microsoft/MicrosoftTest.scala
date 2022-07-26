@@ -5,11 +5,9 @@ import org.scalatest.BeforeAndAfterAll
 
 import java.io.File
 
-class MicrosoftTest extends Test with BeforeAndAfterAll {
-  val pdfFilename = "./textract/src/test/resources/org/clulab/pdf2txt/microsoft/clu lab.pdf"
+class MicrosoftTest extends Test {
+  val pdfFilename = "./microsoft/src/test/resources/org/clulab/pdf2txt/microsoft/clu lab.pdf"
   lazy val microsoft = new MicrosoftConverter()
-
-  override def afterAll(): Unit = microsoft.close()
 
   behavior of "Microsoft"
 
