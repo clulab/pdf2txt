@@ -1,17 +1,19 @@
 package org.clulab.pdf2txt.microsoft
 
 import com.microsoft.azure.cognitiveservices.vision.computervision.implementation.ComputerVisionImpl
-import com.microsoft.azure.cognitiveservices.vision.computervision.models.ReadInStreamOptionalParameter
-import com.microsoft.azure.cognitiveservices.vision.computervision.{ComputerVisionClient, ComputerVisionManager}
+import com.microsoft.azure.cognitiveservices.vision.computervision.models.{AnalyzeResults, OperationStatusCodes}
+import com.microsoft.azure.cognitiveservices.vision.computervision.ComputerVisionManager
 import org.clulab.pdf2txt.common.pdf.PdfConverter
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
-import rx.Observable
 
 import java.io.{BufferedInputStream, File, FileInputStream}
 import java.nio.file.Files
-import java.util.Properties
+import java.util.{Properties, UUID}
+import scala.annotation.tailrec
 import scala.beans.BeanProperty
+import scala.collection.JavaConverters._
 
+// See https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/quickstarts-sdk/client-library?tabs=visual-studio&pivots=programming-language-java.
 class MicrosoftConverter(microsoftSettings: MicrosoftSettings = MicrosoftConverter.defaultSettings) extends PdfConverter {
 
   def getKey: String = {
@@ -23,26 +25,54 @@ class MicrosoftConverter(microsoftSettings: MicrosoftSettings = MicrosoftConvert
     properties.getProperty("key")
   }
 
-  val computerVisionClient: ComputerVisionClient = ComputerVisionManager.authenticate(getKey).withEndpoint(microsoftSettings.endpoint)
-
+  val computerVision: ComputerVisionImpl = ComputerVisionManager
+      .authenticate(getKey)
+      .withEndpoint(microsoftSettings.endpoint)
+      .computerVision
+      .asInstanceOf[ComputerVisionImpl]
 
   override def close(): Unit = ()
 
+  def getAnalyzeResults(operationUUID: UUID): AnalyzeResults = {
+
+    @tailrec
+    def loop(): AnalyzeResults = {
+      Thread.sleep(1000)
+
+      val readOperationResultOpt = Option(computerVision.getReadResult(operationUUID))
+      val statusOpt = readOperationResultOpt.map(_.status)
+      val succeeded = statusOpt.exists { status =>
+        if (status == OperationStatusCodes.FAILED)
+          throw new RuntimeException("The service reports that the conversion failed.")
+        status == OperationStatusCodes.SUCCEEDED
+      }
+
+      if (succeeded) readOperationResultOpt.get.analyzeResult()
+      else loop()
+    }
+
+    loop()
+  }
+
   override def convert(pdfFile: File): String = {
     val bytes = Files.readAllBytes(pdfFile.toPath)
-    // Put this higher up
-    val computerVision = computerVisionClient.computerVision.asInstanceOf[ComputerVisionImpl]
     val readInStreamHeaders = computerVision
         .readInStreamWithServiceResponseAsync(bytes, null)
-        .toBlocking()
+        .toBlocking
         .single()
         .headers()
-    val operationLocation = readInStreamHeaders.operationLocation()
+    val operationId = readInStreamHeaders
+        .operationLocation()
+        .split('/')
+        .last
+    val operationUUID = UUID.fromString(operationId)
+    val analyzeResults = getAnalyzeResults(operationUUID)
+    val sortedReadResults = analyzeResults.readResults.asScala.sortBy { readResult => readResult.page }
+    val text = sortedReadResults.map { readResult =>
+      readResult.lines.asScala.map(_.text()).mkString("\n")
+    }.mkString("\n\f\n")
 
-
-    // need to get location
-
-    operationLocation
+    text
   }
 }
 
