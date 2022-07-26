@@ -1,5 +1,5 @@
 name := "pdf2txt-microsoft"
-description := "The pdf2txt-microsoft subproject implements an interface to the AWS textract converters."
+description := "The pdf2txt-microsoft subproject implements an interface to the microsoft converter."
 
 resolvers ++= Seq(
 //  Resolvers.localResolver, // Reserve for Two Six.
@@ -7,10 +7,9 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= {
-  val json4sVersion = "3.5.2"
+//  val json4sVersion = "3.5.2"
 
   Seq(
-    "software.amazon.awssdk" % "s3"       % "2.17.237",
-    "software.amazon.awssdk" % "textract" % "2.17.224"
+    "com.microsoft.azure.cognitiveservices" % "azure-cognitiveservices-computervision" % "1.0.9-beta"
   )
 }
