@@ -45,7 +45,7 @@ The PDF converters are divided into two categories.  Some converters work locall
 
   * **text**
 
-    If your text has already been converted from PDF and only needs to be preprocessed. then this is the "converter" to use.  It is implemented directly in this project.  In contrast to the others, it reads files matching *.txt rather than *.pdf.
+    If your text has already been converted from PDF and only needs to be preprocessed. then this is the "converter" to use.  It is implemented directly in this project rather than in a subproject.  In contrast to the others, it reads files matching *.txt rather than *.pdf.
 
   * **tika**
 
@@ -61,6 +61,10 @@ The PDF converters are divided into two categories.  Some converters work locall
   * **google**
 
     Google's [Cloud Vision API](https://cloud.google.com/vision/) also offers PDF to text conversion.  The service requires credentials and eventual payment if used beyond the trial limits.  A [cloud storage bucket](https://cloud.google.com/storage) is required.  See the google subproject's [README.md](./google/README.md) for configuration details.  The service separates the PDF into pages and performs optical character recognition (OCR) on each one separately.  Both input and output files need to temporarily reside in a storage bucket.  The service returns a json file containing a description of the PDF.  The json files are saved alongside the PDFs and will be reused if the same PDF is converted again.  Converted text is generated wholly from the json file and if one is found with the PDF, the call to the service is skipped (and the credentials are not used or needed).
+
+  * **microsoft**
+
+    Microsoft has its own [computer vision](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/) service.  As with several of the other converters, its processing of PDFs is an extension of more general image processing capabilities.  The PDF is converted into an image and then scanned for text.  In this case, no cloud storage is needed and no temporary files are created.  Credentials are required and there are eventual charges after a trial period.  Free conversions are limited both in number of pages (to two) and submission rate (20 calls per minute).  There are also image size limits.  See Microsoft documentation for [input requirements](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/overview-ocr#input-requirements).  The subproject's [README.md](./microsoft/README.md) has information on how to configure the credentials.
 
   * **textract**
 
