@@ -8,8 +8,7 @@
         </encoder>
     </appender>
 
-    <!-- This accounts for anything coming from AWS. -->
-    <logger name="software.amazon.awssdk" level="warn" additivity="false" />
+    <!-- This accounts for anything coming from Microsoft. -->
 
     <root level="all">
         <appender-ref ref="clulab:stderr" />
