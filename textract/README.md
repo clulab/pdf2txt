@@ -27,4 +27,13 @@ Pdf2txt {
 }
 ```
 
-The `profile` should match the one in the credentials file and the `region` and `bucket` should be coordinated with your AWS account.  If the bucket is empty, only documents of one page can be processed.  If a non-empty string is used for the bucket, the program will still use the input directory to collect file names, but it will then use the files in the bucket rather than on disk.  It will complain if the file is not in the bucket.  You'll need to upload the files to S3 manually.
+The `profile` should match the one in the credentials file and the `region` and `bucket` should be coordinated with your AWS account.  If the bucket name is empty, only documents of one page can be processed.  If a non-empty string is used for the bucket name (a requirement for PDFs of more than one page), the program will copy files from the input directory to the bucket and then initiate the conversion from there.  After conversion, the file will be removed from the S3 bucket.  If there is a name clash and the file is already in the bucket, the conversion fails for that file.  These operations on the bucket require permissions that might be defined as such in the bucket policy:
+
+```json
+"Action": [
+    "s3:DeleteObject",
+    "s3:GetObjectAttributes",
+    "s3:PutObject"
+],
+"Resource": "arn:aws:s3:::<bucket>/*"
+```

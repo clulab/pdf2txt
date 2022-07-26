@@ -6,8 +6,10 @@ import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider
 import software.amazon.awssdk.core.SdkBytes
 import software.amazon.awssdk.profiles.ProfileFile
 import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.textract.TextractClient
-import software.amazon.awssdk.services.textract.model.{Block, BlockType, DetectDocumentTextRequest, Document, DocumentLocation, FeatureType, GetDocumentTextDetectionRequest, GetDocumentTextDetectionResponse, S3Object, StartDocumentAnalysisRequest, StartDocumentTextDetectionRequest}
+import software.amazon.awssdk.services.textract.model.{Block, BlockType, DetectDocumentTextRequest, Document, DocumentLocation, GetDocumentTextDetectionRequest, GetDocumentTextDetectionResponse, S3Object, StartDocumentTextDetectionRequest}
+import software.amazon.awssdk.services.s3.model.{DeleteObjectRequest, GetObjectAttributesRequest, NoSuchKeyException, ObjectAttributes, PutObjectRequest}
 
 import java.io.{File, FileInputStream}
 import java.util.concurrent.atomic.AtomicBoolean
@@ -17,30 +19,75 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 class TextractConverter(textractSettings: TextractSettings = TextractConverter.defaultSettings) extends PdfConverter {
-  val isOpen = new AtomicBoolean(false)
-  lazy val textractClient = {
-    val credentialsProvider = {
-      val profileFile = ProfileFile.builder()
-          .content(new File(textractSettings.credentials).toPath)
-          .`type`(ProfileFile.Type.CREDENTIALS)
-          .build()
-
-      ProfileCredentialsProvider.builder()
-          .profileFile(profileFile)
-          .profileName(textractSettings.profile)
-          .build()
-    }
-
-    val textractClient = TextractClient.builder()
-        .region(Region.of(textractSettings.region))
-        .credentialsProvider(credentialsProvider)
+  val s3IsOpen = new AtomicBoolean(false)
+  val textractIsOpen = new AtomicBoolean(false)
+  val bucketName: String = textractSettings.bucket
+  lazy val credentialsProvider: ProfileCredentialsProvider = {
+    val profileFile = ProfileFile.builder()
+        .content(new File(textractSettings.credentials).toPath)
+        .`type`(ProfileFile.Type.CREDENTIALS)
         .build()
 
-    isOpen.set(true)
+    ProfileCredentialsProvider.builder()
+        .profileFile(profileFile)
+        .profileName(textractSettings.profile)
+        .build()
+  }
+  lazy val s3Client: S3Client = {
+    val s3Client = S3Client.builder()
+        .credentialsProvider(credentialsProvider)
+        .region(Region.of(textractSettings.region))
+        .build()
+
+    s3IsOpen.set(true)
+    s3Client
+  }
+  lazy val textractClient: TextractClient = {
+    val textractClient = TextractClient.builder()
+      .region(Region.of(textractSettings.region))
+      .credentialsProvider(credentialsProvider)
+      .build()
+
+    textractIsOpen.set(true)
     textractClient
   }
 
-  override def close(): Unit = if (isOpen.getAndSet(false)) textractClient.close()
+  override def close(): Unit = {
+    if (s3IsOpen.getAndSet(false)) s3Client.close()
+    if (textractIsOpen.getAndSet(false)) textractClient.close()
+  }
+
+  def s3FileExists(fileName: String): Boolean = {
+    try {
+      val getObjectAttributesRequest = GetObjectAttributesRequest.builder()
+          .bucket(bucketName)
+          .key(fileName)
+          .objectAttributes(ObjectAttributes.OBJECT_SIZE)
+          .build()
+      val getObjectAttributesResponse = s3Client.getObjectAttributes(getObjectAttributesRequest)
+      true
+    }
+    catch {
+      case _: NoSuchKeyException => false
+      case throwable: Throwable => throw throwable
+    }
+  }
+
+  def s3UploadFile(file: File, fileName: String): Unit = {
+    val putObjectRequest = PutObjectRequest.builder()
+        .bucket(bucketName)
+        .key(fileName)
+        .build()
+    val putObjectResponse = s3Client.putObject(putObjectRequest, file.toPath)
+  }
+
+  def s3DeleteFile(fileName: String): Unit = {
+    val deleteObjectRequest = DeleteObjectRequest.builder()
+      .bucket(bucketName)
+      .key(fileName)
+      .build()
+    val deleteObjectResponse = s3Client.deleteObject(deleteObjectRequest)
+  }
 
   def convertBlocks(blocks: mutable.Seq[Block]): String = {
     // It doesn't need to be thread-safe, so the faster StringBuilder is preferred.
@@ -80,7 +127,8 @@ class TextractConverter(textractSettings: TextractSettings = TextractConverter.d
     convertBlocks(blocks)
   }
 
-  def convertMultiplePages(pdfFile: File, bucket: String): String = {
+  def convertMultiplePages(pdfFile: File): String = {
+    val pdfFileName = pdfFile.getName
 
     def loopJobId(jobId: String): mutable.Seq[Block] = {
 
@@ -128,9 +176,14 @@ class TextractConverter(textractSettings: TextractSettings = TextractConverter.d
       loopBlocks()
     }
 
+    if (s3FileExists(pdfFileName))
+      throw new RuntimeException(s"""There is already a blob "$pdfFileName" in the "$bucketName" bucket.  Please remove it first.""")
+    else
+      s3UploadFile(pdfFile, pdfFileName)
+
     val s3Object = S3Object.builder()
-        .bucket(bucket)
-        .name(pdfFile.getName)
+        .bucket(bucketName)
+        .name(pdfFileName)
         .build()
     val documentLocation = DocumentLocation.builder()
         .s3Object(s3Object)
@@ -141,13 +194,15 @@ class TextractConverter(textractSettings: TextractSettings = TextractConverter.d
     val startDocumentTextDetectionRequestResponse = textractClient.startDocumentTextDetection(startDocumentTextDetectionRequest)
     val jobId = startDocumentTextDetectionRequestResponse.jobId()
     val blocks = loopJobId(jobId)
+    val result = convertBlocks(blocks)
 
-    convertBlocks(blocks)
+    s3DeleteFile(pdfFileName)
+    result
   }
 
   override def convert(pdfFile: File): String = {
     if (textractSettings.bucket.isEmpty) convertSinglePage(pdfFile)
-    else convertMultiplePages(pdfFile, textractSettings.bucket)
+    else convertMultiplePages(pdfFile)
   }
 }
 
@@ -156,12 +211,12 @@ case class TextractSettings(@BeanProperty var credentials: String, @BeanProperty
 }
 
 object TextractConverter {
-  val defaultCredentials = {
+  val defaultCredentials: String = {
     val userHome = System.getProperty("user.home")
     s"$userHome/.pdf2txt/aws-credentials.properties"
   }
   val defaultProfile = "default"
   val defaultRegion = "us-west-1"
   val defaultBucket = ""
-  val defaultSettings = TextractSettings(defaultCredentials, defaultProfile, defaultRegion, defaultBucket)
+  val defaultSettings: TextractSettings = TextractSettings(defaultCredentials, defaultProfile, defaultRegion, defaultBucket)
 }
