@@ -1,39 +1,24 @@
 # pdf2txt-microsoft
 
-In order to use this converter, you will need to have [credentials](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys) for programmatic access from [Amazon AWS](https://aws.amazon.com/).  They will include both an access key and a secret access key which should be recorded in a `.properties` file that looks like this:
+In order to use this converter, you will need an [API key](https://docs.microsoft.com/en-us/azure/search/search-security-api-keys) and an [endpoint](https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-service-endpoints-overview) for [Microsoft Azure Cognitive Services](https://azure.microsoft.com/en-us/services/cognitive-services/).  They key is a simple string that should be stored in a standard properties file which looks like this:
 
 ```properties
-[default]
-aws_access_key_id = ...
-aws_secret_access_key = ...
+key = ...
 ```
 
-The location of the `.properties` file defaults in `pdf2txt.conf` to `${user.home}/.pdf2txt/aws-credentials.properties`.  The value can be overridden with the environment variable `Pdf2txt_textract_credentials`.  If need be, you can also change it in the configuration file or just specify a different configuration file (e.g., as a command line argument to `pdf2txt`) that contains a different value for `Pdf2txt.textract.credentials` so that it points to your credentials.
+The location of the `.properties` file defaults in `pdf2txt.conf` to `${user.home}/.pdf2txt/microsoft-credentials.properties`.  The value can be overridden with the environment variable `Pdf2txt_microsoft_credentials`.  If need be, you can also change it in the configuration file or just specify a different configuration file (e.g., as a command line argument to `pdf2txt`) that contains a different value for `Pdf2txt.microsoft.credentials` so that it points to your credentials.
 
-Also included in the configuration file are the profile, the AWS region, and the S3 bucket name to use for documents with more than one page.  Default values and the overriding environment variables are as shown.
+Also included in the configuration file is the value for the endpoint.  Default values and the overriding environment variables are as shown.
 
 ```
 Pdf2txt {
-  textract {
-    credentials = ${user.home}/.pdf2txt/aws-credentials.properties
-    credentials = ${?Pdf2txt_textract_credentials}
-    profile = "default"
-    profile = ${?Pdf2txt_textract_profile}
-    region = "us-west-1"
-    region = ${?Pdf2txt_textract_region}
-    bucket = ""
-    bucket = ${?Pdf2txt_textract_bucket}
+  microsoft {
+    credentials = ${user.home}/.pdf2txt/microsoft-credentials.properties
+    credentials = ${?Pdf2txt_microsoft_credentials}
+    endpoint = ""
+    endpoint = ${?Pdf2txt_microsoft_endpoint}
   }
 }
 ```
 
-The `profile` should match the one in the credentials file and the `region` and `bucket` should be coordinated with your AWS account.  If the bucket name is empty, only documents of one page can be processed.  If a non-empty string is used for the bucket name (a requirement for PDFs of more than one page), the program will copy files from the input directory to the bucket and then initiate the conversion from there.  After conversion, the file will be removed from the S3 bucket.  If there is a name clash and the file is already in the bucket, the conversion fails for that file.  These operations on the bucket require permissions that might be defined as such in the bucket policy:
-
-```json
-"Action": [
-    "s3:DeleteObject",
-    "s3:GetObjectAttributes",
-    "s3:PutObject"
-],
-"Resource": "arn:aws:s3:::<bucket>/*"
-```
+The `endpoint` should be coordinated with your Azure account.  It is eventually used in a connection string which takes care of the `http[s]://` on the front and `/vision/v3.2/` at the back, so don't include these parts yourself.  The endpoint in the configuration file might look like `myproject.cognitiveservices.azure.com`.
