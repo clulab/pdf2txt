@@ -33,7 +33,7 @@ The PDF converters are divided into two categories.  Some converters work locall
 
   * **ghostact**
  
-    This converter is a combination of [GhostScript](https://github.com/ArtifexSoftware/ghostpdl-downloads/releases) for conversion of PDF to images and [Tesseract](https://github.com/tesseract-ocr/tesseract) for conversion of images to text. 
+    This converter is a combination of [Ghostscript](https://github.com/ArtifexSoftware/ghostpdl-downloads/releases) for conversion of PDF to images and [Tesseract](https://github.com/tesseract-ocr/tesseract) for conversion of images to text.  It depends on both of these programs having been installed in advance and being available on the `$PATH` if default settings are used.  The settings can be adjusted.  See the subproject's [README.md](./ghostact/README.md) for details.  This converter does not do well on any but the simplest pages, but it is able to process images embedded in PDFs.
  
   * **pdfminer**
 

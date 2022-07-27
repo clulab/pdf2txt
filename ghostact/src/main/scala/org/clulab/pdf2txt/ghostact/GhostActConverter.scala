@@ -4,7 +4,6 @@ import org.clulab.pdf2txt.common.pdf.PdfConverter
 import org.clulab.pdf2txt.common.utils.{FileUtils, StringUtils}
 
 import java.io.File
-import java.nio.file.Files
 import scala.beans.BeanProperty
 
 class GhostActConverter(ghostActSettings: GhostActSettings = GhostActConverter.defaultSettings) extends PdfConverter() {
@@ -49,7 +48,7 @@ case class GhostActSettings(@BeanProperty var ghostscript: String, @BeanProperty
 }
 
 object GhostActConverter {
-  val defaultGhostscript = "gswin64.exe"
+  val defaultGhostscript = "gswin64"
   val defaultDevice = "png16m"
   val defaultResolution = 400
   val defaultTesseract = "tesseract"
