@@ -8,6 +8,7 @@ import org.clulab.pdf2txt.amazon.{AmazonConverter, AmazonSettings}
 import org.clulab.pdf2txt.common.pdf.{PdfConverter, TextConverter}
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.{AppUtils, ConfigError, Pdf2txtAppish, Pdf2txtException, Preprocessor, StandardSystem, Systemish}
+import org.clulab.pdf2txt.ghostact.{GhostActConverter, GhostActSettings}
 import org.clulab.pdf2txt.google.{GoogleConverter, GoogleSettings}
 import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, GigawordLanguageModel, GloveLanguageModel, LanguageModel, NeverLanguageModel}
 import org.clulab.pdf2txt.microsoft.{MicrosoftConverter, MicrosoftSettings}
@@ -40,6 +41,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
 
       val adobeSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.ADOBE), classOf[AdobeSettings])
       val amazonSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.AMAZON), classOf[AmazonSettings])
+      val ghostActSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.GHOST_ACT), classOf[GhostActSettings])
       val googleSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.GOOGLE), classOf[GoogleSettings])
       val microsoftSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.MICROSOFT), classOf[MicrosoftSettings])
       val numberParameters = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.NUMBER_PARAMETERS), classOf[NumberPreprocessor.Parameters])
@@ -51,6 +53,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
         value match {
           case Pdf2txtArgs.ADOBE => () => new AdobeConverter(adobeSettings)
           case Pdf2txtArgs.AMAZON => () => new AmazonConverter(amazonSettings)
+          case Pdf2txtArgs.GHOST_ACT => () => new GhostActConverter(ghostActSettings)
           case Pdf2txtArgs.GOOGLE => () => new GoogleConverter(googleSettings)
           case Pdf2txtArgs.MICROSOFT => () => new MicrosoftConverter(microsoftSettings)
           case Pdf2txtArgs.PDF_MINER => () => new PdfMinerConverter()
@@ -193,7 +196,6 @@ object Pdf2txtArgs {
   val THREADS = "threads"
   val LOOPS = "loops"
   val OVERWRITE = "overwrite"
-  val ADOBE_CREDENTIALS = "adobeCredentials"
   val NUMBER_PARAMETERS = "numberParameters"
 
   val helps: Array[String] = Array(HELP1, HELP2)
@@ -221,6 +223,7 @@ object Pdf2txtArgs {
 
   val ADOBE = "adobe"
   val AMAZON = "amazon"
+  val GHOST_ACT = "ghostact"
   val GOOGLE = "google"
   val MICROSOFT = "microsoft"
   val PDF_MINER = "pdfminer"
@@ -232,6 +235,7 @@ object Pdf2txtArgs {
   val converters: Array[String] = Array(
     ADOBE,
     AMAZON,
+    GHOST_ACT,
     GOOGLE,
     MICROSOFT,
     PDF_MINER,
