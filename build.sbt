@@ -30,8 +30,8 @@ val mainClassOpt = Some("org.clulab.pdf2txt.apps.Pdf2txtApp")
 lazy val core = (project in file("."))
   .enablePlugins(BuildInfoPlugin, JavaAppPackaging)
   .disablePlugins(PlayScala)
-  .dependsOn(common % "compile -> compile; test -> test", adobe, google, microsoft, pdfminer, pdftotext, textract, tika, scienceparse)
-  .aggregate(common, adobe, google, microsoft, pdfminer, pdftotext, textract, tika, scienceparse)
+  .dependsOn(common % "compile -> compile; test -> test", adobe, amazon, google, microsoft, pdfminer, pdftotext, tika, scienceparse)
+  .aggregate(common, adobe, amazon, google, microsoft, pdfminer, pdftotext, tika, scienceparse)
   .settings(
     assembly / aggregate := false,
     assembly / mainClass := mainClassOpt,
@@ -46,6 +46,9 @@ lazy val common = project
 lazy val adobe = project
   .dependsOn(common % "compile -> compile; test -> test")
 
+lazy val amazon = project
+  .dependsOn(common % "compile -> compile; test -> test")
+	
 lazy val google = project
   .dependsOn(common % "compile -> compile; test -> test")
 
@@ -61,8 +64,5 @@ lazy val pdftotext = project
 lazy val scienceparse = project
   .dependsOn(common % "compile -> compile; test -> test")
 
-lazy val textract = project
-  .dependsOn(common % "compile -> compile; test -> test")
-	
 lazy val tika = project
   .dependsOn(common % "compile -> compile; test -> test")

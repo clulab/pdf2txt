@@ -1,5 +1,5 @@
 name := "pdf2txt-adobe"
-description := "The pdf2txt-adobe subproject implements an interface to the adobe converters."
+description := "The pdf2txt-adobe subproject implements an interface to the adobe converter."
 
 resolvers ++= Seq(
 //  Resolvers.localResolver, // Reserve for Two Six.

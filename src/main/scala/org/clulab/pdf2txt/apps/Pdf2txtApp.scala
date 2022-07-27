@@ -4,6 +4,7 @@ import com.typesafe.config.ConfigBeanFactory
 import org.clulab.pdf2txt.BuildInfo
 import org.clulab.pdf2txt.Pdf2txt
 import org.clulab.pdf2txt.adobe.{AdobeConverter, AdobeSettings}
+import org.clulab.pdf2txt.amazon.{AmazonConverter, AmazonSettings}
 import org.clulab.pdf2txt.common.pdf.{PdfConverter, TextConverter}
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.{AppUtils, ConfigError, Pdf2txtAppish, Pdf2txtException, Preprocessor, StandardSystem, Systemish}
@@ -14,7 +15,6 @@ import org.clulab.pdf2txt.pdfminer.PdfMinerConverter
 import org.clulab.pdf2txt.pdftotext.PdfToTextConverter
 import org.clulab.pdf2txt.preprocessor.{CasePreprocessor, LigaturePreprocessor, LineBreakPreprocessor, LinePreprocessor, NumberPreprocessor, ParagraphPreprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
 import org.clulab.pdf2txt.scienceparse.ScienceParseConverter
-import org.clulab.pdf2txt.textract.{TextractConverter, TextractSettings}
 import org.clulab.pdf2txt.tika.TikaConverter
 
 import java.io.File
@@ -39,9 +39,9 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
       }
 
       val adobeSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.ADOBE), classOf[AdobeSettings])
+      val amazonSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.AMAZON), classOf[AmazonSettings])
       val googleSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.GOOGLE), classOf[GoogleSettings])
       val microsoftSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.MICROSOFT), classOf[MicrosoftSettings])
-      val textractSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.TEXTRACT), classOf[TextractSettings])
       val numberParameters = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.NUMBER_PARAMETERS), classOf[NumberPreprocessor.Parameters])
 
       val pdfConverterConstructor = {
@@ -50,13 +50,13 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
 
         value match {
           case Pdf2txtArgs.ADOBE => () => new AdobeConverter(adobeSettings)
+          case Pdf2txtArgs.AMAZON => () => new AmazonConverter(amazonSettings)
           case Pdf2txtArgs.GOOGLE => () => new GoogleConverter(googleSettings)
           case Pdf2txtArgs.MICROSOFT => () => new MicrosoftConverter(microsoftSettings)
           case Pdf2txtArgs.PDF_MINER => () => new PdfMinerConverter()
           case Pdf2txtArgs.PDF_TO_TEXT => () => new PdfToTextConverter()
           case Pdf2txtArgs.SCIENCE_PARSE => () => new ScienceParseConverter()
           case Pdf2txtArgs.TEXT => () => new TextConverter()
-          case Pdf2txtArgs.TEXTRACT => () => new TextractConverter(textractSettings)
           case Pdf2txtArgs.TIKA => () => new TikaConverter()
           case _ => throw ConfigError(mapAndConfig, key, value)
         }
@@ -220,17 +220,18 @@ object Pdf2txtArgs {
   )
 
   val ADOBE = "adobe"
+  val AMAZON = "amazon"
   val GOOGLE = "google"
   val MICROSOFT = "microsoft"
   val PDF_MINER = "pdfminer"
   val PDF_TO_TEXT = "pdftotext"
   val SCIENCE_PARSE = "scienceparse"
   val TEXT = "text"
-  val TEXTRACT = "textract"
   val TIKA = "tika"
 
   val converters: Array[String] = Array(
     ADOBE,
+    AMAZON,
     GOOGLE,
     MICROSOFT,
     PDF_MINER,

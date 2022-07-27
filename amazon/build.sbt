@@ -1,5 +1,5 @@
-name := "pdf2txt-textract"
-description := "The pdf2txt-textract subproject implements an interface to the AWS textract converters."
+name := "pdf2txt-amazon"
+description := "The pdf2txt-amazon subproject implements an interface to the AWS amazon converter."
 
 resolvers ++= Seq(
 //  Resolvers.localResolver, // Reserve for Two Six.

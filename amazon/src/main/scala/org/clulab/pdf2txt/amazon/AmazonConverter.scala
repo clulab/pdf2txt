@@ -1,4 +1,4 @@
-package org.clulab.pdf2txt.textract
+package org.clulab.pdf2txt.amazon
 
 import org.clulab.pdf2txt.common.pdf.PdfConverter
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
@@ -18,43 +18,43 @@ import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
-class TextractConverter(textractSettings: TextractSettings = TextractConverter.defaultSettings) extends PdfConverter {
+class AmazonConverter(amazonSettings: AmazonSettings = AmazonConverter.defaultSettings) extends PdfConverter {
   val s3IsOpen = new AtomicBoolean(false)
-  val textractIsOpen = new AtomicBoolean(false)
-  val bucketName: String = textractSettings.bucket
+  val amazonIsOpen = new AtomicBoolean(false)
+  val bucketName: String = amazonSettings.bucket
   lazy val credentialsProvider: ProfileCredentialsProvider = {
     val profileFile = ProfileFile.builder()
-        .content(new File(textractSettings.credentials).toPath)
+        .content(new File(amazonSettings.credentials).toPath)
         .`type`(ProfileFile.Type.CREDENTIALS)
         .build()
 
     ProfileCredentialsProvider.builder()
         .profileFile(profileFile)
-        .profileName(textractSettings.profile)
+        .profileName(amazonSettings.profile)
         .build()
   }
   lazy val s3Client: S3Client = {
     val s3Client = S3Client.builder()
         .credentialsProvider(credentialsProvider)
-        .region(Region.of(textractSettings.region))
+        .region(Region.of(amazonSettings.region))
         .build()
 
     s3IsOpen.set(true)
     s3Client
   }
-  lazy val textractClient: TextractClient = {
-    val textractClient = TextractClient.builder()
-      .region(Region.of(textractSettings.region))
+  lazy val amazonClient: TextractClient = {
+    val amazonClient = TextractClient.builder()
+      .region(Region.of(amazonSettings.region))
       .credentialsProvider(credentialsProvider)
       .build()
 
-    textractIsOpen.set(true)
-    textractClient
+    amazonIsOpen.set(true)
+    amazonClient
   }
 
   override def close(): Unit = {
     if (s3IsOpen.getAndSet(false)) s3Client.close()
-    if (textractIsOpen.getAndSet(false)) textractClient.close()
+    if (amazonIsOpen.getAndSet(false)) amazonClient.close()
   }
 
   def s3FileExists(fileName: String): Boolean = {
@@ -121,7 +121,7 @@ class TextractConverter(textractSettings: TextractSettings = TextractConverter.d
     val detectDocumentTextRequest = DetectDocumentTextRequest.builder()
         .document(document)
         .build()
-    val detectDocumentTextResponse = textractClient.detectDocumentText(detectDocumentTextRequest)
+    val detectDocumentTextResponse = amazonClient.detectDocumentText(detectDocumentTextRequest)
     val blocks = detectDocumentTextResponse.blocks.asScala
 
     convertBlocks(blocks)
@@ -143,7 +143,7 @@ class TextractConverter(textractSettings: TextractSettings = TextractConverter.d
 
         @tailrec
         def loopRequest(): GetDocumentTextDetectionResponse = {
-          val getDocumentTextDetectionResponse = textractClient.getDocumentTextDetection(getDocumentTextDetectionRequest)
+          val getDocumentTextDetectionResponse = amazonClient.getDocumentTextDetection(getDocumentTextDetectionRequest)
 
           if (getDocumentTextDetectionResponse.jobStatusAsString != "IN_PROGRESS")
             getDocumentTextDetectionResponse
@@ -191,7 +191,7 @@ class TextractConverter(textractSettings: TextractSettings = TextractConverter.d
     val startDocumentTextDetectionRequest = StartDocumentTextDetectionRequest.builder()
         .documentLocation(documentLocation)
         .build()
-    val startDocumentTextDetectionRequestResponse = textractClient.startDocumentTextDetection(startDocumentTextDetectionRequest)
+    val startDocumentTextDetectionRequestResponse = amazonClient.startDocumentTextDetection(startDocumentTextDetectionRequest)
     val jobId = startDocumentTextDetectionRequestResponse.jobId()
     val blocks = loopJobId(jobId)
     val result = convertBlocks(blocks)
@@ -201,16 +201,16 @@ class TextractConverter(textractSettings: TextractSettings = TextractConverter.d
   }
 
   override def convert(pdfFile: File): String = {
-    if (textractSettings.bucket.isEmpty) convertSinglePage(pdfFile)
+    if (amazonSettings.bucket.isEmpty) convertSinglePage(pdfFile)
     else convertMultiplePages(pdfFile)
   }
 }
 
-case class TextractSettings(@BeanProperty var credentials: String, @BeanProperty var profile: String, @BeanProperty var region: String, @BeanProperty var bucket: String) {
+case class AmazonSettings(@BeanProperty var credentials: String, @BeanProperty var profile: String, @BeanProperty var region: String, @BeanProperty var bucket: String) {
   def this() = this("", "", "", "")
 }
 
-object TextractConverter {
+object AmazonConverter {
   val defaultCredentials: String = {
     val userHome = System.getProperty("user.home")
     s"$userHome/.pdf2txt/aws-credentials.properties"
@@ -218,5 +218,5 @@ object TextractConverter {
   val defaultProfile = "default"
   val defaultRegion = "us-west-1"
   val defaultBucket = ""
-  val defaultSettings: TextractSettings = TextractSettings(defaultCredentials, defaultProfile, defaultRegion, defaultBucket)
+  val defaultSettings: AmazonSettings = AmazonSettings(defaultCredentials, defaultProfile, defaultRegion, defaultBucket)
 }
