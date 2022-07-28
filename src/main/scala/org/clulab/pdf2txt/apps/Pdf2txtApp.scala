@@ -13,7 +13,7 @@ import org.clulab.pdf2txt.google.{GoogleConverter, GoogleSettings}
 import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, GigawordLanguageModel, GloveLanguageModel, LanguageModel, NeverLanguageModel}
 import org.clulab.pdf2txt.microsoft.{MicrosoftConverter, MicrosoftSettings}
 import org.clulab.pdf2txt.pdfminer.{PdfMinerConverter, PdfMinerSettings}
-import org.clulab.pdf2txt.pdftotext.PdfToTextConverter
+import org.clulab.pdf2txt.pdftotext.{PdfToTextConverter, PdfToTextSettings}
 import org.clulab.pdf2txt.preprocessor.{CasePreprocessor, LigaturePreprocessor, LineBreakPreprocessor, LinePreprocessor, NumberPreprocessor, ParagraphPreprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
 import org.clulab.pdf2txt.scienceparse.ScienceParseConverter
 import org.clulab.pdf2txt.tika.TikaConverter
@@ -45,6 +45,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
       val googleSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.GOOGLE), classOf[GoogleSettings])
       val microsoftSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.MICROSOFT), classOf[MicrosoftSettings])
       val pdfMinerSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.PDF_MINER), classOf[PdfMinerSettings])
+      val pdfToTextSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.PDF_TO_TEXT), classOf[PdfToTextSettings])
       val numberParameters = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.NUMBER_PARAMETERS), classOf[NumberPreprocessor.Parameters])
 
       val pdfConverterConstructor = {
@@ -58,7 +59,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
           case Pdf2txtArgs.GOOGLE => () => new GoogleConverter(googleSettings)
           case Pdf2txtArgs.MICROSOFT => () => new MicrosoftConverter(microsoftSettings)
           case Pdf2txtArgs.PDF_MINER => () => new PdfMinerConverter(pdfMinerSettings)
-          case Pdf2txtArgs.PDF_TO_TEXT => () => new PdfToTextConverter()
+          case Pdf2txtArgs.PDF_TO_TEXT => () => new PdfToTextConverter(pdfToTextSettings)
           case Pdf2txtArgs.SCIENCE_PARSE => () => new ScienceParseConverter()
           case Pdf2txtArgs.TEXT => () => new TextConverter()
           case Pdf2txtArgs.TIKA => () => new TikaConverter()
