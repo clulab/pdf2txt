@@ -4,8 +4,8 @@ import org.clulab.pdf2txt.common.process.ExternalProcess
 
 import java.io.File
 
-class PdfToTextProcess(inputFile: File, outputFile: File) extends ExternalProcess() {
-	command.add("pdftotext")
+class PdfToTextProcess(pdfToText: String, inputFile: File, outputFile: File) extends ExternalProcess() {
+	command.add(pdfToText)
 	command.add("-eol")
 	command.add("unix")
 	command.add("-enc")

@@ -41,7 +41,7 @@ The PDF converters are divided into two categories.  Some converters work locall
 
   * **pdftotext**
 
-    This [executable program](https://en.wikipedia.org/wiki/Pdftotext) needs to be installed on the local computer and accessible via the operating system `$PATH` so that the `pdftotext` command can run.  It is started as an external process to perform the conversion.
+    This [executable program](https://en.wikipedia.org/wiki/Pdftotext) needs to be installed on the local computer and accessible via the operating system `$PATH` so that the `pdftotext` command can run.  It is started as an external process to perform the conversion.  See the [README.md](./pdftotext/README.md) file for configuration details.
 
   * **scienceparse**
 
