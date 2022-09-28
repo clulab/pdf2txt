@@ -125,6 +125,6 @@ libraryDependencies ++= {
     // "org.slf4j" % "slf4j-simple" % "1.7.7",
 
     // This is used to produce the metadata.
-    "com.lihaoyi"       %% "ujson"          % "0.9.6"
+    "com.lihaoyi"       %% "ujson"          % "2.0.0"
   )
 }
