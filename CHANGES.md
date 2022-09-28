@@ -1,5 +1,6 @@
 #Changes
 =======
++ **1.1.5** - Add metadata, particularly for ScienceParse
 + **1.1.4** - Add AdobeConverter & fix bug in case restoration
 + **1.1.3** - Improve internals of ScienceParse & regex operations on TextRange
 + **1.1.2** - Restore case conditionally based on cutoff value 

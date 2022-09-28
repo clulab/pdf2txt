@@ -79,10 +79,10 @@ class ScienceParseConverter(scienceParseSettings: ScienceParseSettings = Science
         }
       ),
       "sections" -> ujson.Arr.from(
-        extractedMetadata.getSections.asScala.map { section =>
+        Option(extractedMetadata.sections).map(_.asScala).getOrElse(List.empty).map { section =>
           ujson.Obj(
-            "heading" -> section.getHeading,
-            "text" -> section.getText
+            "heading" -> ujson.Str(section.getHeading),
+            "text" -> ujson.Str(section.getText)
           )
         }
       ),
