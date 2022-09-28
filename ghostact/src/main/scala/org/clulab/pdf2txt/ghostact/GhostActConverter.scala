@@ -1,14 +1,14 @@
 package org.clulab.pdf2txt.ghostact
 
 import org.clulab.pdf2txt.common.pdf.PdfConverter
-import org.clulab.pdf2txt.common.utils.{FileUtils, StringUtils}
+import org.clulab.pdf2txt.common.utils.{FileUtils, MetadataHolder, StringUtils}
 
 import java.io.File
 import scala.beans.BeanProperty
 
 class GhostActConverter(ghostActSettings: GhostActSettings = GhostActConverter.defaultSettings) extends PdfConverter() {
 
-  override def convert(inputFile: File): String = {
+  override def convert(inputFile: File, metadataHolderOpt: Option[MetadataHolder] = None): String = {
     // The simple name needs to have %d in it to that multiple pages can be converted.
     // So, hopefully the prefix will suffice to make a unique file name and the suffix is extra.
     val imgOutputFile = File.createTempFile(getClass.getSimpleName + "-", ".%d")

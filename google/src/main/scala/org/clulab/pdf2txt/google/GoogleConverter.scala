@@ -9,8 +9,7 @@ import com.google.cloud.storage.StorageOptions
 import com.google.cloud.vision.v1.{AsyncAnnotateFileRequest, Feature, GcsDestination, GcsSource, ImageAnnotatorClient, ImageAnnotatorSettings, InputConfig, OutputConfig}
 import org.clulab.pdf2txt.common.pdf.PdfConverter
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
-import org.clulab.pdf2txt.common.utils.FileEditor
-import org.clulab.pdf2txt.common.utils.FileUtils
+import org.clulab.pdf2txt.common.utils.{FileEditor, FileUtils, MetadataHolder}
 import org.json4s.{JArray, JInt, JString}
 import org.json4s.jackson.JsonMethods
 
@@ -136,7 +135,7 @@ class GoogleConverter(googleSettings: GoogleSettings = GoogleConverter.defaultSe
     text
   }
 
-  override def convert(pdfFile: File): String = {
+  override def convert(pdfFile: File, metadataHolderOpt: Option[MetadataHolder] = None): String = {
     val jsonFile = new FileEditor(pdfFile).setExt(".json").get
 
     if (jsonFile.exists) convertJson(jsonFile)

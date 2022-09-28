@@ -257,7 +257,7 @@ class Pdf2txtAppTest extends Test {
     file.delete()
     file.exists should be (false)
 
-    pdf2Txt.write(file, "This is a test.")
+    pdf2Txt.writeOut(file, "This is a test.")
     file should exist
 
     file.delete()
