@@ -8,6 +8,7 @@ import org.apache.tika.parser.AutoDetectParser
 import org.apache.tika.sax.BodyContentHandler
 import org.clulab.pdf2txt.common.pdf.PdfConverter
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
+import org.clulab.pdf2txt.common.utils.MetadataHolder
 
 import java.io.{BufferedInputStream, File, FileInputStream, InputStream}
 
@@ -43,7 +44,7 @@ class TikaConverter(config: TikaConfig = new TikaConfig()) extends PdfConverter 
       throw new RuntimeException("Not PDF!")
   }
 
-  override def convert(file: File): String = {
+  override def convert(file: File, metadataHolderOpt: Option[MetadataHolder] = None): String = {
     // The InputStream must support mark/reset which isn't enforced by the type system.
     // In other words, a simple FileInputStream will throw an exception at runtime.
     new BufferedInputStream(new FileInputStream(file)).autoClose { inputStream =>

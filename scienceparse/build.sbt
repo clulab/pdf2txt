@@ -117,12 +117,14 @@ libraryDependencies ++= {
 
     // ml 0.16
     "com.goldmansachs"   % "gs-collections" % "6.1.0",
-    "de.ruedigermoeller" % "fst"            % "2.47"
+    "de.ruedigermoeller" % "fst"            % "2.47",
 
     // This is ruled out by an exclude().
     // "args4j" % "args4j" % "2.32",
     // Logging is arranged elsewhere.
     // "org.slf4j" % "slf4j-simple" % "1.7.7",
+
+    // This is used to produce the metadata.
+    "com.lihaoyi"       %% "ujson"          % "2.0.0"
   )
 }
-

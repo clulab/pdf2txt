@@ -5,6 +5,7 @@ import com.microsoft.azure.cognitiveservices.vision.computervision.models.{Analy
 import com.microsoft.azure.cognitiveservices.vision.computervision.ComputerVisionManager
 import org.clulab.pdf2txt.common.pdf.PdfConverter
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
+import org.clulab.pdf2txt.common.utils.MetadataHolder
 
 import java.io.{BufferedInputStream, File, FileInputStream}
 import java.nio.file.Files
@@ -54,7 +55,7 @@ class MicrosoftConverter(microsoftSettings: MicrosoftSettings = MicrosoftConvert
     loop()
   }
 
-  override def convert(pdfFile: File): String = {
+  override def convert(pdfFile: File, metadataHolderOpt: Option[MetadataHolder] = None): String = {
     val bytes = Files.readAllBytes(pdfFile.toPath)
     val readInStreamHeaders = computerVision
         .readInStreamWithServiceResponseAsync(bytes, null)

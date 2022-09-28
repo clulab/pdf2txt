@@ -2,7 +2,7 @@ package org.clulab.pdf2txt.pdfminer
 
 import org.clulab.pdf2txt.common.pdf.PdfConverter
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
-import org.clulab.pdf2txt.common.utils.FileUtils
+import org.clulab.pdf2txt.common.utils.{FileUtils, MetadataHolder}
 
 import java.io.File
 import java.nio.file.Files
@@ -19,7 +19,7 @@ class PdfMinerConverter(pdfMinerSettings: PdfMinerSettings = PdfMinerConverter.d
     pythonFile
   }
 
-  override def convert(inputFile: File): String = {
+  override def convert(inputFile: File, metadataHolderOpt: Option[MetadataHolder] = None): String = {
     val outputFile = File.createTempFile(getClass.getSimpleName + "-", ".txt")
     val process = new PdfMinerProcess(pdfMinerSettings.python, pythonFile, inputFile, outputFile)
 

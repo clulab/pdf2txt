@@ -9,7 +9,7 @@ import net.lingala.zip4j.ZipFile
 import org.clulab.pdf2txt.adobe.utils.{AdobeElement, AdobeStage}
 import org.clulab.pdf2txt.common.pdf.PdfConverter
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
-import org.clulab.pdf2txt.common.utils.FileEditor
+import org.clulab.pdf2txt.common.utils.{FileEditor, MetadataHolder}
 import org.json4s.{JArray, JObject}
 import org.json4s.jackson.JsonMethods
 
@@ -186,7 +186,7 @@ class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettin
     zipFileRef.saveAs(zipFile.getAbsolutePath)
   }
 
-  override def convert(pdfFile: File): String = {
+  override def convert(pdfFile: File, metadataHolderOpt: Option[MetadataHolder] = None): String = {
     val zipFile = new FileEditor(pdfFile).setExt(".zip").get
 
     if (!zipFile.exists)

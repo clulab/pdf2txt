@@ -15,7 +15,7 @@ import org.clulab.pdf2txt.microsoft.{MicrosoftConverter, MicrosoftSettings}
 import org.clulab.pdf2txt.pdfminer.{PdfMinerConverter, PdfMinerSettings}
 import org.clulab.pdf2txt.pdftotext.{PdfToTextConverter, PdfToTextSettings}
 import org.clulab.pdf2txt.preprocessor.{CasePreprocessor, LigaturePreprocessor, LineBreakPreprocessor, LinePreprocessor, NumberPreprocessor, ParagraphPreprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
-import org.clulab.pdf2txt.scienceparse.ScienceParseConverter
+import org.clulab.pdf2txt.scienceparse.{ScienceParseConverter, ScienceParseSettings}
 import org.clulab.pdf2txt.tika.TikaConverter
 
 import java.io.File
@@ -26,9 +26,9 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
   type PreprocessorConstructor = () => Preprocessor
   type PreprocessorsConstructor = () => Array[Preprocessor]
 
-  val (pdfConverterConstructor, preprocessors, inFileOrDirectory, outFileOrDirectory, isFileMode, threads, loops, overwrite) = processArgs()
+  val (pdfConverterConstructor, preprocessors, inFileOrDirectory, outFileOrDirectory, metaFileOrDirectoryOpt, isFileMode, threads, loops, overwrite) = processArgs()
 
-  def processArgs(): (PdfConverterConstructor, Array[Preprocessor], String, String, Boolean, Int, Int, Boolean) = {
+  def processArgs(): (PdfConverterConstructor, Array[Preprocessor], String, String, Option[String], Boolean, Int, Int, Boolean) = {
     try {
       val map = AppUtils.argsToMap(args)
       val mapAndConfig = AppUtils.mkMapAndConfig(map, params, Pdf2txt.config, Pdf2txtArgs.CONF, "Pdf2txt")
@@ -46,6 +46,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
       val microsoftSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.MICROSOFT), classOf[MicrosoftSettings])
       val pdfMinerSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.PDF_MINER), classOf[PdfMinerSettings])
       val pdfToTextSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.PDF_TO_TEXT), classOf[PdfToTextSettings])
+      val scienceParseSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.SCIENCE_PARSE), classOf[ScienceParseSettings])
       val numberParameters = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.NUMBER_PARAMETERS), classOf[NumberPreprocessor.Parameters])
 
       val pdfConverterConstructor = {
@@ -60,7 +61,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
           case Pdf2txtArgs.MICROSOFT => () => new MicrosoftConverter(microsoftSettings)
           case Pdf2txtArgs.PDF_MINER => () => new PdfMinerConverter(pdfMinerSettings)
           case Pdf2txtArgs.PDF_TO_TEXT => () => new PdfToTextConverter(pdfToTextSettings)
-          case Pdf2txtArgs.SCIENCE_PARSE => () => new ScienceParseConverter()
+          case Pdf2txtArgs.SCIENCE_PARSE => () => new ScienceParseConverter(scienceParseSettings)
           case Pdf2txtArgs.TEXT => () => new TextConverter()
           case Pdf2txtArgs.TIKA => () => new TikaConverter()
           case _ => throw ConfigError(mapAndConfig, key, value)
@@ -100,6 +101,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
       }
       val inFileOrDirectory = mapAndConfig(Pdf2txtArgs.IN)
       val outFileOrDirectory = mapAndConfig(Pdf2txtArgs.OUT)
+      val metaFileOrDirectoryOpt = mapAndConfig.get(Pdf2txtArgs.META)
       val threads = mapAndConfig.getInt(Pdf2txtArgs.THREADS)
       val loops = mapAndConfig.getInt(Pdf2txtArgs.LOOPS)
       val overwrite = mapAndConfig.getBoolean(Pdf2txtArgs.OVERWRITE)
@@ -111,7 +113,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
         else if (!inFile.exists) throw new Pdf2txtException(s""""$inFileOrDirectory" can't be found.""")
         else throw new Pdf2txtException(s""""$inFileOrDirectory" can't be identified as a file or directory.""")
       }
-      val _ = {
+      val _out = {
         val outFile = new File(outFileOrDirectory)
         val isModeOk = if (isFileMode) {
           if (outFile.isFile) {
@@ -136,6 +138,31 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
         assert(isModeOk)
         isModeOk
       }
+      val _meta = metaFileOrDirectoryOpt.map { mataFileOrDirectory =>
+        val metaFile = new File(mataFileOrDirectory)
+        val isModeOk = if (isFileMode) {
+          if (metaFile.isFile) {
+            if (!overwrite)
+              throw new Pdf2txtException(s"""The input file "$inFileOrDirectory" cannot be converted to the existing meta file "$mataFileOrDirectory".""")
+            true
+          }
+          else if (metaFile.isDirectory) throw new Pdf2txtException(s"""The input file "$inFileOrDirectory" cannot be converted to the existing meta directory "$mataFileOrDirectory".""")
+          else if (metaFile.exists) throw new Pdf2txtException(s"""The input file "$inFileOrDirectory" cannot be converted to the existing meta "$mataFileOrDirectory".""")
+          else true
+        }
+        else {
+          if (metaFile.isFile) throw new Pdf2txtException(s"""The input directory cannot be converted to the existing output file "$mataFileOrDirectory".""")
+          else if (metaFile.isDirectory) true
+          else if (metaFile.exists) throw new Pdf2txtException(s"""The input directory cannot be converter to the existing output "$mataFileOrDirectory".""")
+          else {
+            if (!metaFile.mkdirs())
+              throw new Pdf2txtException(s"""The meta directory "$mataFileOrDirectory" could not be created.""")
+            true
+          }
+        }
+        assert(isModeOk)
+        isModeOk
+      }
 
       AppUtils.showArgs(Pdf2txtArgs.argKeys, mapAndConfig, system.out)
 
@@ -143,7 +170,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
       val argsString = AppUtils.mkArgsString(this, Pdf2txtArgs.argKeys, mapAndConfig)
 
       Pdf2txtApp.logger.info(s"Running $argsString...")
-      (pdfConverterConstructor, preprocessors, inFileOrDirectory, outFileOrDirectory, isFileMode, threads, loops, overwrite)
+      (pdfConverterConstructor, preprocessors, inFileOrDirectory, outFileOrDirectory, metaFileOrDirectoryOpt, isFileMode, threads, loops, overwrite)
     }
     catch {
       case throwable: Throwable =>
@@ -159,7 +186,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
     pdfConverterConstructor().autoClose { pdfConverter =>
       val pdf2txt = new Pdf2txt(pdfConverter, preprocessors)
 
-      pdf2txt.file(inFileOrDirectory, outFileOrDirectory, loops, overwrite)
+      pdf2txt.file(inFileOrDirectory, outFileOrDirectory, metaFileOrDirectoryOpt, loops, overwrite)
     }
   }
 
@@ -167,7 +194,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
     pdfConverterConstructor().autoClose { pdfConverter =>
       val pdf2txt = new Pdf2txt(pdfConverter, preprocessors)
 
-      pdf2txt.dir(inFileOrDirectory, outFileOrDirectory, threads, loops, overwrite)
+      pdf2txt.dir(inFileOrDirectory, outFileOrDirectory, metaFileOrDirectoryOpt, threads, loops, overwrite)
     }
   }
 
@@ -195,6 +222,7 @@ object Pdf2txtArgs {
   val WORD_BREAK_BY_SPACE = "wordBreakBySpace"
   val IN = "in"
   val OUT = "out"
+  val META = "meta"
   val THREADS = "threads"
   val LOOPS = "loops"
   val OVERWRITE = "overwrite"
@@ -218,6 +246,7 @@ object Pdf2txtArgs {
     WORD_BREAK_BY_SPACE,
     IN,
     OUT,
+    META,
     THREADS,
     LOOPS,
     OVERWRITE

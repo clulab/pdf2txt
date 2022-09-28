@@ -6,7 +6,7 @@
               java -jar pdf2txt.jar <arguments>
 
  Whereby: <arguments> include the following, all optional, with the last
-          duplicate given precendence:
+          duplicate given precedence:
 
           -h
           -help
@@ -31,6 +31,7 @@
               The following determine how files or directories are processed:
           -in  <inputFileOrDirectory>
           -out <outputFileOrDirectory>
+          -meta <metaFileOrDirectory> (optional)
           -threads <threadCount>
           -loops <loopCount>
           -overwrite (true | false)

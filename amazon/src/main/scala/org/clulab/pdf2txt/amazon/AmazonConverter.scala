@@ -2,6 +2,7 @@ package org.clulab.pdf2txt.amazon
 
 import org.clulab.pdf2txt.common.pdf.PdfConverter
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
+import org.clulab.pdf2txt.common.utils.MetadataHolder
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider
 import software.amazon.awssdk.core.SdkBytes
 import software.amazon.awssdk.profiles.ProfileFile
@@ -200,7 +201,7 @@ class AmazonConverter(amazonSettings: AmazonSettings = AmazonConverter.defaultSe
     result
   }
 
-  override def convert(pdfFile: File): String = {
+  override def convert(pdfFile: File, metadataHolderOpt: Option[MetadataHolder] = None): String = {
     if (amazonSettings.bucket.isEmpty) convertSinglePage(pdfFile)
     else convertMultiplePages(pdfFile)
   }
