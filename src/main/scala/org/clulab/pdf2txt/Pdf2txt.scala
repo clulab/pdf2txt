@@ -94,7 +94,7 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
     }
   }
 
-  def file(inputFileName: String, outputFileName: String, metaFileNameOpt: Option[String], loops: Int = 1, overwrite: Boolean = false): Unit = {
+  def file(inputFileName: String, outputFileName: String, metaFileNameOpt: Option[String] = None, loops: Int = 1, overwrite: Boolean = false): Unit = {
     val inputFile = new File(inputFileName)
     val outputFile = new File(outputFileName)
     val metaFileOpt = metaFileNameOpt.map(new File(_))
@@ -109,7 +109,7 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
       convert(inputFile, outputFile, metaFileOpt, loops)
   }
 
-  def dir(inputDirName: String, outputDirName: String, metaDirNameOpt: Option[String], threads: Int = 0, loops: Int = 1, overwrite: Boolean = false): Unit = {
+  def dir(inputDirName: String, outputDirName: String, metaDirNameOpt: Option[String] = None, threads: Int = 0, loops: Int = 1, overwrite: Boolean = false): Unit = {
     val  inputExtension = pdfConverter.inputExtension
     val outputExtension = pdfConverter.outputExtension
     val   metaExtension = pdfConverter.metaExtension
