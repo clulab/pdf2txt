@@ -1,7 +1,7 @@
 package org.clulab.pdf2txt.microsoft
 
 import com.microsoft.azure.cognitiveservices.vision.computervision.implementation.ComputerVisionImpl
-import com.microsoft.azure.cognitiveservices.vision.computervision.models.{AnalyzeResults, OperationStatusCodes}
+import com.microsoft.azure.cognitiveservices.vision.computervision.models.{AnalyzeResults, OperationStatusCodes, ReadInStreamOptionalParameter}
 import com.microsoft.azure.cognitiveservices.vision.computervision.ComputerVisionManager
 import org.clulab.pdf2txt.common.pdf.PdfConverter
 import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
@@ -58,7 +58,7 @@ class MicrosoftConverter(microsoftSettings: MicrosoftSettings = MicrosoftConvert
   override def convert(pdfFile: File, metadataHolderOpt: Option[MetadataHolder] = None): String = {
     val bytes = Files.readAllBytes(pdfFile.toPath)
     val readInStreamHeaders = computerVision
-        .readInStreamWithServiceResponseAsync(bytes, null)
+        .readInStreamWithServiceResponseAsync(bytes, MicrosoftConverter.readInStreamOptionalParameter)
         .toBlocking
         .single()
         .headers()
@@ -88,4 +88,5 @@ object MicrosoftConverter {
   }
   val defaultEndpoint = ""
   val defaultSettings: MicrosoftSettings = MicrosoftSettings(defaultCredentials, defaultEndpoint)
+  val readInStreamOptionalParameter = new ReadInStreamOptionalParameter()
 }

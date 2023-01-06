@@ -178,7 +178,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
           system.err.println(message)
         }
         system.exit(-1)
-        null
+        throw new IllegalStateException("The system has already exited!")
     }
   }
 
