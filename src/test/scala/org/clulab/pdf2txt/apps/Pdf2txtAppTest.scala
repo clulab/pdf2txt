@@ -1,6 +1,7 @@
 package org.clulab.pdf2txt.apps
 
 import org.clulab.pdf2txt.Pdf2txt
+import org.clulab.pdf2txt.common.pdf.TextConverter
 import org.clulab.pdf2txt.common.utils.{CustomSystem, Systemish, Test}
 
 import java.io.{ByteArrayOutputStream, File, OutputStream, PrintStream}
@@ -252,7 +253,7 @@ class Pdf2txtAppTest extends Test {
 
   ignore should "write to a file with a strange name" in {
     val file = new File("./txt file.txt")
-    val pdf2Txt = new Pdf2txt(null, null)
+    val pdf2Txt = new Pdf2txt(new TextConverter(), Array.empty)
 
     file.delete()
     file.exists should be (false)

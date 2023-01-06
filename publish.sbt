@@ -27,7 +27,7 @@ ThisBuild / publishTo := {
 
   if (useArtifactory) {
     val realm = "Artifactory Realm"
-    val provider = "http://artifactory.cs.arizona.edu:8081/artifactory/"
+    val provider = "https://artifactory.clulab.org/artifactory/"
     val repository = "sbt-release-local"
     val details =
       if (isSnapshot.value) ";build.timestamp=" + new java.util.Date().getTime
@@ -72,4 +72,4 @@ ThisBuild / Test    / packageBin / publishArtifact := false
 // password=<password>
 
 // Example realms: Artifactory Realm, Sonatype Nexus Repository Manager
-// Example hosts: artifactory.cs.arizona.edu, oss.sonatype.org
+// Example hosts: artifactory.clulab.org, oss.sonatype.org
