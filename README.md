@@ -23,7 +23,7 @@ libraryDependencies += "org.clulab" %% "pdf2txt" % "1.1.2"
 
 ## Executable
 
-The main `Pdf2txtApp` can be run directly from the [pre-built](https://drive.google.com/file/d/13JPRVsA_B-q3xZK0QVFGqPS-Cw6Go0ES/view?usp=sharing) `jar` file.  The only prerequisite is Java.  Startup is significantly quicker than when it runs via `sbt`.
+The main `Pdf2txtApp` can be run directly from the [pre-built](https://arizona.box.com/s/e13oc3mtyfb1v964bxle9xeneksavj04) `jar` file.  The only prerequisite is Java.  Startup is significantly quicker than when it runs via `sbt`.
 
 ## PDF Converters
 
