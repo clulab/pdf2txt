@@ -33,7 +33,7 @@ class BagLanguageModel(val wordFrequencies: Map[String, Int], lowercase: Boolean
   }
 
   // This is used for ligatures like "coe ffi cient".
-  override def shouldJoin(rawLeft: String, rawMiddle: String, rawRight: String, prevWords: Seq[String]): Boolean = {
+  def shouldJoinWithMiddle(rawLeft: String, rawMiddle: String, rawRight: String, prevWords: Seq[String]): Boolean = {
     val left = if (lowercase) rawLeft.toLowerCase else rawLeft
     val middle = if (lowercase) rawMiddle.toLowerCase else rawMiddle
     val right = if (lowercase) rawRight.toLowerCase else rawRight
@@ -48,6 +48,29 @@ class BagLanguageModel(val wordFrequencies: Map[String, Int], lowercase: Boolean
     }
 
     (contains || containsBetweenHyphens) && !betweenDigits
+  }
+
+  // This is used for hyphenations like "imple - ment".
+  def shouldJoinWithoutMiddle(rawLeft: String, rawMiddle: String, rawRight: String, prevWords: Seq[String], withMiddle: Boolean = true): Boolean = {
+    val left = if (lowercase) rawLeft.toLowerCase else rawLeft
+    val middle = if (lowercase) rawMiddle.toLowerCase else rawMiddle
+    val right = if (lowercase) rawRight.toLowerCase else rawRight
+
+    lazy val contains = wordFrequencies(left + right) >= lowerLimit
+    lazy val betweenDigits = left.last.isDigit || middle.head.isDigit || middle.last.isDigit || right.head.isDigit
+    lazy val containsBetweenHyphens = !middle.exists(_ == StringUtils.HYPHEN) && {
+      val leftAfterHyphen = StringUtils.afterLast(left, StringUtils.HYPHEN, all = true)
+      val rightBeforeHyphen = StringUtils.beforeFirst(right, StringUtils.HYPHEN, all = true)
+
+      wordFrequencies(leftAfterHyphen + rightBeforeHyphen) >= lowerLimit
+    }
+
+    (contains || containsBetweenHyphens) && !betweenDigits
+  }
+
+  override def shouldJoin(rawLeft: String, rawMiddle: String, rawRight: String, prevWords: Seq[String], withMiddle: Boolean = true): Boolean = {
+    if (withMiddle) shouldJoinWithMiddle(rawLeft, rawMiddle, rawRight, prevWords)
+    else shouldJoinWithoutMiddle(rawLeft, rawMiddle, rawRight, prevWords)
   }
 }
 

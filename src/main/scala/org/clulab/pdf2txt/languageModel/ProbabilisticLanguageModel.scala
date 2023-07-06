@@ -12,6 +12,25 @@ class ProbabilisticLanguageModel extends LanguageModel {
 
     pCombined != 0f && pCombined >= pUncombined // Favor the combined unless we're already at 0.
   }
+
+  def shouldJoinWithMiddle(left: String, middle: String, right: String, prevWords: Seq[String]): Boolean = {
+    val pUncombined = p(left, prevWords)
+    val pCombined = p(left + middle + right, prevWords)
+
+    pCombined != 0f && pCombined >= pUncombined // Favor the combined unless we're already at 0.
+  }
+
+  def shouldJoinWithoutMiddle(left: String, middle: String, right: String, prevWords: Seq[String]): Boolean = {
+    val pUncombined = p(left, prevWords)
+    val pCombined = p(left + right, prevWords)
+
+    pCombined != 0f && pCombined >= pUncombined // Favor the combined unless we're already at 0.
+  }
+
+  override def shouldJoin(rawLeft: String, rawMiddle: String, rawRight: String, prevWords: Seq[String], withMiddle: Boolean = true): Boolean = {
+    if (withMiddle) shouldJoinWithMiddle(rawLeft, rawMiddle, rawRight, prevWords)
+    else shouldJoinWithoutMiddle(rawLeft, rawMiddle, rawRight, prevWords)
+  }
 }
 
 object ProbabilisticLanguageModel {

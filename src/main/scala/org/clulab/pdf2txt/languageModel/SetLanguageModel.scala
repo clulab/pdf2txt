@@ -24,7 +24,7 @@ class SetLanguageModel(val words: Set[String]) extends LanguageModel {
   }
 
   // This is used for ligatures like "coe ffi cient".
-  override def shouldJoin(left: String, middle: String, right: String, prevWords: Seq[String]): Boolean = {
+  def shouldJoinWithMiddle(left: String, middle: String, right: String, prevWords: Seq[String]): Boolean = {
     lazy val contains = words.contains(left + middle + right)
     lazy val betweenDigits = left.last.isDigit || middle.head.isDigit || middle.last.isDigit || right.head.isDigit
     lazy val containsBetweenHyphens = !middle.exists(_ == StringUtils.HYPHEN) && {
@@ -36,7 +36,27 @@ class SetLanguageModel(val words: Set[String]) extends LanguageModel {
 
     (contains || containsBetweenHyphens) && !betweenDigits
   }
+
+  // This is used for hyphenations like "imple - ment".
+  def shouldJoinWithoutMiddle(left: String, middle: String, right: String, prevWords: Seq[String]): Boolean = {
+    lazy val contains = words.contains(left + right)
+    lazy val betweenDigits = left.last.isDigit || middle.head.isDigit || middle.last.isDigit || right.head.isDigit
+    lazy val containsBetweenHyphens = !middle.exists(_ == StringUtils.HYPHEN) && {
+      val leftAfterHyphen = StringUtils.afterLast(left, StringUtils.HYPHEN, all = true)
+      val rightBeforeHyphen = StringUtils.beforeFirst(right, StringUtils.HYPHEN, all = true)
+
+      words.contains(leftAfterHyphen + rightBeforeHyphen)
+    }
+
+    (contains || containsBetweenHyphens) && !betweenDigits
+  }
+
+  override def shouldJoin(rawLeft: String, rawMiddle: String, rawRight: String, prevWords: Seq[String], withMiddle: Boolean = true): Boolean = {
+    if (withMiddle) shouldJoinWithMiddle(rawLeft, rawMiddle, rawRight, prevWords)
+    else shouldJoinWithoutMiddle(rawLeft, rawMiddle, rawRight, prevWords)
+  }
 }
+
 
 object GloveLanguageModel {
 
