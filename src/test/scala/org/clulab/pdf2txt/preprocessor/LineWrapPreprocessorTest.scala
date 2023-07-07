@@ -67,7 +67,7 @@ class LineWrapPreprocessorTest extends Test {
       "tokens",
       "transformer",
       "Universidad",
-      "unknown",
+      "unknown"
     )
     val map = words.map { word => word -> 1f }.toMap
     val languageModel = new TestLanguageModel(map)
