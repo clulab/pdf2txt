@@ -100,15 +100,19 @@ Preprocessors can be configured on (true) and off (false) as shown later, but th
 
 * **ligature**
 
-    Many PDF converts have difficulties with ligatures, like &ffilig; typeset as single glyphs, resulting in spaces inserted into words.  Such situations are detected and resolved with this preprocessor.  "coe ffi cient" would be corrected to "coefficient".  In order to do so, it must have a fairly good idea of what is a word or not and even whether one word is more probable than another.  Therefore, this preprocessor (and all the remaining ones) makes use of a language model described in the next section.
+    Many PDF converters have difficulties with ligatures, like &ffilig; typeset as single glyphs, resulting in spaces inserted into words.  Such situations are detected and resolved with this preprocessor.  "coe ffi cient" would be corrected to "coefficient".  In order to do so, it must have a fairly good idea of what is a word or not and even whether one word is more probable than another.  Therefore, this preprocessor (and all the remaining ones) makes use of a language model described in the next section.
 
 * **lineBreak**
 
     Words, particularly in justified text, are often hyphenated and split between lines of text.  Some words already include hyphens that are not optional.  This preprocessor, with the aid from a language model, attempts to find words split across lines and unite the parts.
 
+* **lineWrap**
+
+    Some PDF converters attempt to reformat each paragraph of text into a single line like it would be in a word processor with automatic word wrapping.  Unfortunately, the operation often ignores the possibility of words having been hyphenated across lines.  Rather than removing the hyphen and line break, the converter simply replaces the break with a space and leaves the hyphen, resulting in text like "imple- ment".  This preprocessor monitors for this situation and with the help of a language model corrects to "implement", since that is a word.
+
 * **wordBreakByHyphen**
  
-    Given the many kinds of dashes (-, &ndash;, &mdash;, etc.) within words, PDF converters sometimes can't tell whether the letters after belong to the same word or the next one and unwanted spaces can get inserted.  Words with hyphens are recombined here.  For example, "left- handed" might be restored to "left-handed" or "two- year- old" to "two-year-old". 
+    Given the many kinds of dashes (-, &ndash;, &mdash;, etc.) within words, PDF converters sometimes can't tell whether the letters after the dash belong to the same word or to the next one, and unwanted spaces can get inserted.  Words with hyphens are recombined here.  For example, "left- handed" might be restored to "left-handed" or "two- year- old" to "two-year-old". 
  
 * **wordBreakBySpace**
 
