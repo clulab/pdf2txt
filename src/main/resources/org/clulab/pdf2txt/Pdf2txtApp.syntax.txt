@@ -26,6 +26,7 @@
           -number            (true | false)
           -ligature          (true | false)
           -lineBreak         (true | false)
+          -lineWrap          (true | false)
           -wordBreakByHyphen (true | false)
           -wordBreakBySpace  (true | false)
               The following determine how files or directories are processed:

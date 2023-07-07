@@ -14,7 +14,7 @@ import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, GigawordLanguageMo
 import org.clulab.pdf2txt.microsoft.{MicrosoftConverter, MicrosoftSettings}
 import org.clulab.pdf2txt.pdfminer.{PdfMinerConverter, PdfMinerSettings}
 import org.clulab.pdf2txt.pdftotext.{PdfToTextConverter, PdfToTextSettings}
-import org.clulab.pdf2txt.preprocessor.{CasePreprocessor, LigaturePreprocessor, LineBreakPreprocessor, LinePreprocessor, NumberPreprocessor, ParagraphPreprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
+import org.clulab.pdf2txt.preprocessor.{CasePreprocessor, LigaturePreprocessor, LineBreakPreprocessor, LinePreprocessor, LineWrapPreprocessor, NumberPreprocessor, ParagraphPreprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
 import org.clulab.pdf2txt.scienceparse.{ScienceParseConverter, ScienceParseSettings}
 import org.clulab.pdf2txt.tika.TikaConverter
 
@@ -93,6 +93,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
           map(Pdf2txtArgs.NUMBER, () => new NumberPreprocessor(numberParameters)),
           map(Pdf2txtArgs.LIGATURE, () => new LigaturePreprocessor(languageModel)),
           map(Pdf2txtArgs.LINE_BREAK, () => new LineBreakPreprocessor(languageModel)),
+          map(Pdf2txtArgs.LINE_WRAP, () => new LineWrapPreprocessor(languageModel)),
           map(Pdf2txtArgs.WORD_BREAK_BY_HYPHEN, () => new WordBreakByHyphenPreprocessor()),
           map(Pdf2txtArgs.WORD_BREAK_BY_SPACE, () => new WordBreakBySpacePreprocessor())
         ).flatten
@@ -218,6 +219,7 @@ object Pdf2txtArgs {
   val NUMBER = "number"
   val LIGATURE = "ligature"
   val LINE_BREAK = "lineBreak"
+  val LINE_WRAP = "lineWrap"
   val WORD_BREAK_BY_HYPHEN = "wordBreakByHyphen"
   val WORD_BREAK_BY_SPACE = "wordBreakBySpace"
   val IN = "in"
@@ -242,6 +244,7 @@ object Pdf2txtArgs {
     NUMBER,
     LIGATURE,
     LINE_BREAK,
+    LINE_WRAP,
     WORD_BREAK_BY_HYPHEN,
     WORD_BREAK_BY_SPACE,
     IN,
