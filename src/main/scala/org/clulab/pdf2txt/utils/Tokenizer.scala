@@ -2,10 +2,10 @@ package org.clulab.pdf2txt.utils
 
 import org.clulab.pdf2txt.common.utils.TextRange
 import org.clulab.processors.clu.BalaurProcessor
-import org.clulab.processors.{Processor, Sentence}
+import org.clulab.processors.Sentence
 import org.clulab.utils.Lazy
 
-class Tokenizer(processor: Processor) {
+class Tokenizer(val processor: BalaurProcessor) {
 
   def tokenize(textRange: TextRange, restoreCase: Boolean = false): Array[Sentence] = {
     val document = processor.mkDocument(textRange.toString, keepText = false)
