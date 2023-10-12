@@ -31,4 +31,6 @@ object Tokenizer {
   }
 
   def getProcessor: BalaurProcessor = getTokenizer.processor
+
+  def setProcessor(processor: BalaurProcessor): Unit = setTokenizer(new Tokenizer(processor))
 }
