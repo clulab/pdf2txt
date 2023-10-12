@@ -22,15 +22,14 @@ class CasePreprocessor(cutoff: Float = CasePreprocessor.defaultCutoff) extends P
 
   def preprocess(textRange: TextRange): TextRanges = {
     val document = {
-      val processor = CasePreprocessor.processor
+      val tokenizer = CasePreprocessor.tokenizer
       val preservedSentences = {
-        val document = processor.mkDocument(textRange.toString, keepText = false)
-        document.sentences
+        val sentences = tokenizer.tokenize(textRange)
+        sentences
       }
       val restoredSentences = {
-        val document = processor.mkDocument(textRange.toString, keepText = false)
-        processor.restoreCase(document)
-        document.sentences
+        val sentences = tokenizer.tokenize(textRange, restoreCase = true)
+        sentences
       }
       val combinedSentences = preservedSentences.zip(restoredSentences).map { case (preservedSentence, restoredSentence) =>
         val percentNotLower = getPercentNotLower(preservedSentence)
@@ -57,8 +56,5 @@ class CasePreprocessor(cutoff: Float = CasePreprocessor.defaultCutoff) extends P
 object CasePreprocessor {
   val defaultCutoff = 67.5f
 
-  lazy val processor = {
-    Utils.initializeDyNet()
-    DocumentByWord.processor
-  }
+  lazy val tokenizer = DocumentByWord.tokenizer
 }

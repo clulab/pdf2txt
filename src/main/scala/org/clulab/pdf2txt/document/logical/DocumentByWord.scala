@@ -54,11 +54,11 @@ class DocumentByWord(parentOpt: Option[Document], textRange: TextRange, processo
 case class ContentTextRangeAndProcessorsWord(contentTextRange: TextRange, processorsWord: String)
 
 object DocumentByWord {
-  lazy val processor = Document.processor
+  lazy val tokenizer = Document.tokenizer
 
   def apply(text: String): DocumentByWord = apply(TextRange(text))
   def apply(textRange: TextRange): DocumentByWord = {
-    val processorsSentences = processor.mkDocument(textRange.toString, keepText = false).sentences
+    val processorsSentences = tokenizer.tokenize(textRange)
 
     new DocumentByWord(None, textRange, processorsSentences)
   }

@@ -32,11 +32,11 @@ class DocumentBySentence(parentOpt: Option[Document], textRange: TextRange, proc
 }
 
 object DocumentBySentence {
-  lazy val processor = Document.processor
+  lazy val tokenizer = Document.tokenizer
 
   def apply(text: String): DocumentBySentence = apply(TextRange(text))
   def apply(textRange: TextRange): DocumentBySentence = {
-    val processorsSentences = processor.mkDocument(textRange.toString, keepText = false).sentences
+    val processorsSentences = tokenizer.tokenize(textRange)
 
     new DocumentBySentence(None, textRange, processorsSentences)
   }
