@@ -18,11 +18,19 @@ class Tokenizer(val processor: BalaurProcessor) {
 
 object Tokenizer {
   // A lazy must be a val, not a var.
-  var lazyTokenizer: Lazy[Tokenizer] = Lazy{
+  protected var lazyTokenizer: Lazy[Tokenizer] = Lazy{
     new Tokenizer(new BalaurProcessor())
+  }
+
+  def getTokenizer: Tokenizer = synchronized {
+    lazyTokenizer.value
   }
 
   def setTokenizer(tokenizer: Tokenizer): Unit = synchronized {
     lazyTokenizer = Lazy(tokenizer)
   }
+
+  def getProcessor: BalaurProcessor = getTokenizer.processor
+
+  def setProcessor(processor: BalaurProcessor): Unit = setTokenizer(new Tokenizer(processor))
 }
