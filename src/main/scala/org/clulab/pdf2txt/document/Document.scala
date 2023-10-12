@@ -16,7 +16,7 @@ abstract class Document(val parentOpt: Option[Document], textRange: TextRange) e
 }
 
 object Document {
-  lazy val tokenizer = Tokenizer.defaultTokenizer
+  lazy val tokenizer = Tokenizer.lazyTokenizer.value
 }
 
 // The Separator is another document and could have its own separators.  In order to stop the

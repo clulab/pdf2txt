@@ -4,6 +4,7 @@ import org.clulab.dynet.Utils
 import org.clulab.pdf2txt.common.utils.TextRange
 import org.clulab.processors.clu.CluProcessor
 import org.clulab.processors.Sentence
+import org.clulab.utils.Lazy
 
 class Tokenizer(processor: CluProcessor) {
 
@@ -17,9 +18,14 @@ class Tokenizer(processor: CluProcessor) {
 }
 
 object Tokenizer {
-  lazy val defaultTokenizer: Tokenizer = {
+  // A lazy must be a val, not a var.
+  var lazyTokenizer: Lazy[Tokenizer] = Lazy{
     Utils.initializeDyNet()
 
     new Tokenizer(new CluProcessor())
+  }
+
+  def setTokenizer(tokenizer: Tokenizer): Unit = synchronized {
+    lazyTokenizer = Lazy(tokenizer)
   }
 }
