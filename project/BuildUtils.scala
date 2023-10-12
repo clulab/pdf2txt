@@ -67,6 +67,6 @@ object BuildUtils {
   // Up to 2.8.7 theoretically, but 2.8.1 practically because of unresolved dependencies in webapp.
   // Again, only theoretically, because 2.7.4 is the last one to support Scala 2.11.
   val sbtPluginVersion = "2.7.4"
-  val artifactory = false
+  val artifactory = true
   val compression = true
 }
