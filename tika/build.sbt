@@ -10,7 +10,7 @@ libraryDependencies ++= {
   Seq(
     "org.apache.tika" % "tika-core"                     % "2.1.0",
     "org.apache.tika" % "tika-parsers"                  % "2.1.0" pomOnly (),
-    "org.apache.tika" % "tika-parsers-standard-package" % "2.1.0",
-    // "xml-apis"        % "xml-apis"                      % "1.4.01"
+    // Use of xml-apis results in a circular dependency.
+    "org.apache.tika" % "tika-parsers-standard-package" % "2.1.0" exclude("xml-apis", "xml-apis")
   )
 }
