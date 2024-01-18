@@ -31,7 +31,7 @@ lazy val core = (project in file("."))
   .enablePlugins(BuildInfoPlugin, JavaAppPackaging)
   .disablePlugins(PlayScala)
   .dependsOn(common % "compile -> compile; test -> test", adobe, amazon, ghostact, google, microsoft, pdfminer, pdftotext, tika, scienceparse)
-  .aggregate(common, adobe, amazon, ghostact, google, microsoft, pdfminer, pdftotext, tika, scienceparse)
+  .aggregate(common, adobe, amazon, ghostact, google, microsoft, pdfminer, pdftotext, tika, scienceparse, scienceparselib)
   .settings(
     assembly / aggregate := false,
     assembly / mainClass := mainClassOpt,
