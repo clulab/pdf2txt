@@ -66,6 +66,11 @@ lazy val pdftotext = project
 
 lazy val scienceparse = project
   .dependsOn(common % "compile -> compile; test -> test")
+  .dependsOn(scienceparselib % "compile -> compile; test -> test")
+  
+lazy val scienceparseassembly = project
+
+lazy val scienceparselib = project
 
 lazy val tika = project
   .dependsOn(common % "compile -> compile; test -> test")
