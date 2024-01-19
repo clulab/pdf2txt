@@ -8,8 +8,3 @@ resolvers ++= Seq(
 
 // https://stackoverflow.com/questions/67126344/sbt-plugin-add-an-unmanaged-jar-file
 Compile / packageBin := baseDirectory.value / "lib" / "xml-apis-1.4.01.jar"
-
-libraryDependencies ++= {
-  Seq.empty
-}
-
