@@ -1,19 +1,19 @@
 package org.clulab.pdf2txt.pdfminer
 
 import org.clulab.pdf2txt.common.pdf.PdfConverter
-import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.{FileUtils, MetadataHolder}
 
 import java.io.File
 import java.nio.file.Files
 import scala.beans.BeanProperty
+import scala.util.Using
 
 class PdfMinerConverter(pdfMinerSettings: PdfMinerSettings = PdfMinerConverter.defaultSettings) extends PdfConverter() {
   val pythonFile = {
     val script = FileUtils.getTextFromResource("/org/clulab/pdf2txt/pdfminer/pdf_to_txt_file.py")
     val pythonFile = File.createTempFile(getClass.getSimpleName + "-", ".py")
 
-    FileUtils.printWriterFromFile(pythonFile).autoClose { printWriter =>
+    Using.resource(FileUtils.printWriterFromFile(pythonFile)) { printWriter =>
       printWriter.print(script)
     }
     pythonFile

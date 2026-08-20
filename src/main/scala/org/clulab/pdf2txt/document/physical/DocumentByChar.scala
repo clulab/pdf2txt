@@ -5,7 +5,7 @@ import org.clulab.pdf2txt.document.Document
 
 class DocumentByChar(parentOpt: Option[Document], textRange: TextRange) extends Document(parentOpt, textRange) {
   val charDocument: CharDocument = new CharDocument(Some(this), textRange)
-  override val contents: Seq[CharDocument] = Array(charDocument)
+  override val contents: Seq[CharDocument] = Seq(charDocument)
 }
 
 object DocumentByChar {

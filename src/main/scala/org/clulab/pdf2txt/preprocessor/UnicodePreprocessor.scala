@@ -1,9 +1,10 @@
 package org.clulab.pdf2txt.preprocessor
 
-import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.StringUtils._
 import org.clulab.pdf2txt.common.utils.{Preprocessor, Sourcer, StringUtils, TextRange, TextRanges}
 import org.clulab.pdf2txt.document.physical.DocumentByChar
+
+import scala.util.Using
 
 class UnicodePreprocessor(unicodeOptions: UnicodeOptions = UnicodePreprocessor.defaultUnicodeOptions) extends Preprocessor {
 
@@ -42,7 +43,7 @@ object UnicodePreprocessor {
   val defaultUnicodeOptions = UnicodeOptions(unknownToSpace = true, knownToSpace = false, keepKnownAccent = false)
 
   def mkUnicodeMap(resourceName: String): Map[Char, String] = {
-    Sourcer.sourceFromResource(resourceName).autoClose { source =>
+    Using.resource(Sourcer.sourceFromResource(resourceName)) { source =>
       source
           .getLines()
           .filterNot(_.startsWith("#"))
@@ -59,7 +60,7 @@ object UnicodePreprocessor {
   }
 
   def mkAccentSet(resourceName: String): Set[Char] = {
-    Sourcer.sourceFromResource(resourceName).autoClose { source =>
+    Using.resource(Sourcer.sourceFromResource(resourceName)) { source =>
       source
           .getLines()
           .map(_.normalizeUnicode.trim)

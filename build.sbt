@@ -4,13 +4,15 @@ name := "pdf2txt"
 description := "The pdf2txt project implements the org.clulab.pdf2txt package including the Pdf2txt class."
 maintainer := "clulab.org"
 
-// Last checked 2021-08-23
+// Last checked 2026-07-29
 val scala11 = "2.11.12" // up to 2.11.12
-val scala12 = "2.12.15" // up to 2.12.15
-val scala13 = "2.13.8"  // up to 2.13.8
+val scala12 = "2.12.21" // up to 2.12.21
+val scala13 = "2.13.18" // up to 2.13.18
+val scala33 = "3.3.8"   // up to 3.3.8
+val scala3 = scala33
 
 // scala13 is skipped here.
-ThisBuild / crossScalaVersions := Seq(scala12, scala11)
+ThisBuild / crossScalaVersions := Seq(scala12, scala11, scala13, scala3)
 ThisBuild / scalaVersion := crossScalaVersions.value.head
 
 resolvers ++= Seq(
@@ -21,7 +23,7 @@ resolvers ++= Seq(
 
 libraryDependencies ++= {
   Seq(
-    "org.clulab" %% "processors-main" % "8.5.1"// up to 8.5.1 as of 2022-06-20
+    "org.clulab" %% "processors-main" % "8.5.4"// up to 8.5.4 as of 2024-01-11
   )
 }
 
@@ -29,9 +31,9 @@ val mainClassOpt = Some("org.clulab.pdf2txt.apps.Pdf2txtApp")
 
 lazy val core = (project in file("."))
   .enablePlugins(BuildInfoPlugin, JavaAppPackaging)
-  .disablePlugins(PlayScala)
-  .dependsOn(common % "compile -> compile; test -> test", adobe, amazon, ghostact, google, microsoft, pdfminer, pdftotext, tika, scienceparse)
-  .aggregate(common, adobe, amazon, ghostact, google, microsoft, pdfminer, pdftotext, tika, scienceparse, scienceparselib, xmlapislib)
+//  .disablePlugins(PlayScala)
+  .dependsOn(common % "compile -> compile; test -> test", adobe, amazon, ghostact, google, microsoft, pdfminer, pdftotext, tika /*, scienceparse*/)
+  .aggregate(common, adobe, amazon, ghostact, google, microsoft, pdfminer, pdftotext, tika /*, scienceparse, scienceparselib*/, xmlapislib)
   .settings(
     assembly / aggregate := false,
     assembly / mainClass := mainClassOpt,
@@ -64,13 +66,13 @@ lazy val pdfminer = project
 lazy val pdftotext = project
   .dependsOn(common % "compile -> compile; test -> test")
 
-lazy val scienceparse = project
-  .dependsOn(common % "compile -> compile; test -> test")
-  .dependsOn(scienceparselib % "compile -> compile; test -> test")
-  
-lazy val scienceparseassembly = project
+//lazy val scienceparse = project
+//  .dependsOn(common % "compile -> compile; test -> test")
+//  .dependsOn(scienceparselib % "compile -> compile; test -> test")
 
-lazy val scienceparselib = project
+//lazy val scienceparseassembly = project
+
+//lazy val scienceparselib = project
 
 lazy val tika = project
   .dependsOn(common % "compile -> compile; test -> test")

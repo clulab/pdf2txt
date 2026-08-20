@@ -8,17 +8,18 @@ import com.google.cloud.storage.Storage.BlobListOption
 import com.google.cloud.storage.StorageOptions
 import com.google.cloud.vision.v1.{AsyncAnnotateFileRequest, Feature, GcsDestination, GcsSource, ImageAnnotatorClient, ImageAnnotatorSettings, InputConfig, OutputConfig}
 import org.clulab.pdf2txt.common.pdf.PdfConverter
-import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.{FileEditor, FileUtils, MetadataHolder}
 import org.json4s.{JArray, JInt, JString}
 import org.json4s.jackson.JsonMethods
+import org.json4s.jvalue2monadic // for \
 
 import java.io.{File, FileInputStream}
 import java.nio.file.Files
 import java.util.ArrayList
 import java.util.concurrent.atomic.AtomicBoolean
 import scala.beans.BeanProperty
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
+import scala.util.Using
 
 class GoogleConverter(googleSettings: GoogleSettings = GoogleConverter.defaultSettings) extends PdfConverter with CredentialsProvider {
   // See https://github.com/googleapis/java-vision/blob/HEAD/samples/snippets/src/main/java/com/example/vision/Detect.java.
@@ -119,7 +120,7 @@ class GoogleConverter(googleSettings: GoogleSettings = GoogleConverter.defaultSe
     val jResponses = JArray(responses.toList)
     val text = getText(jResponses)
 
-    FileUtils.printWriterFromFile(jsonFile).autoClose { printWriter =>
+    Using.resource(FileUtils.printWriterFromFile(jsonFile)) { printWriter =>
       val json = JsonMethods.pretty(jResponses)
 
       printWriter.println(json)

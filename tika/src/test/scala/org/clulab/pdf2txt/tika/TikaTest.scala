@@ -1,9 +1,9 @@
 package org.clulab.pdf2txt.tika
 
-import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.Test
 
 import java.io.{File, InputStream}
+import scala.util.Using
 
 class TikaTest extends Test {
   val pdfFilename = "./tika/src/test/resources/org/clulab/pdf2txt/tika/clu lab.pdf"
@@ -17,7 +17,7 @@ class TikaTest extends Test {
   behavior of "Tika"
 
   it should "detect a PDF file" in {
-    val isPdf = getInputStream(pdfResourceName).autoClose { inputStream =>
+    val isPdf = Using.resource(getInputStream(pdfResourceName)) { inputStream =>
       tika.isPdf(inputStream)
     }
 
@@ -25,7 +25,7 @@ class TikaTest extends Test {
   }
 
   it should "not detect an HTML file" in {
-    val isPdf = getInputStream(htmlResourceName).autoClose { inputStream =>
+    val isPdf = Using.resource(getInputStream(htmlResourceName)) { inputStream =>
       tika.isPdf(inputStream)
     }
 
@@ -33,7 +33,7 @@ class TikaTest extends Test {
   }
 
   it should "read a PDF stream" in {
-    val text = getInputStream(pdfResourceName).autoClose { inputStream =>
+    val text = Using.resource(getInputStream(pdfResourceName)) { inputStream =>
       tika.read(inputStream)
     }
 
@@ -43,7 +43,7 @@ class TikaTest extends Test {
 
   it should "not read an HTML stream" in {
     assertThrows[RuntimeException] {
-      getInputStream(htmlResourceName).autoClose { inputStream =>
+      Using.resource(getInputStream(htmlResourceName)) { inputStream =>
         tika.read(inputStream)
       }
     }

@@ -7,10 +7,10 @@ import org.apache.tika.metadata.Metadata
 import org.apache.tika.parser.AutoDetectParser
 import org.apache.tika.sax.BodyContentHandler
 import org.clulab.pdf2txt.common.pdf.PdfConverter
-import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.MetadataHolder
 
 import java.io.{BufferedInputStream, File, FileInputStream, InputStream}
+import scala.util.Using
 
 class TikaConverter(config: TikaConfig = new TikaConfig()) extends PdfConverter {
   val detector: Detector = config.getDetector
@@ -47,7 +47,7 @@ class TikaConverter(config: TikaConfig = new TikaConfig()) extends PdfConverter 
   override def convert(file: File, metadataHolderOpt: Option[MetadataHolder] = None): String = {
     // The InputStream must support mark/reset which isn't enforced by the type system.
     // In other words, a simple FileInputStream will throw an exception at runtime.
-    new BufferedInputStream(new FileInputStream(file)).autoClose { inputStream =>
+    Using.resource(new BufferedInputStream(new FileInputStream(file))) { inputStream =>
       read(inputStream)
     }
   }

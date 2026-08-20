@@ -88,11 +88,11 @@ class LineWrapPreprocessorTest extends Test {
 
   // chapter11_sentences.txt
   test(
-  	"The previous chapter was our first exposure to recurrent neural net- works, which included intuitions for why they are useful for natural language processing, various architectures, and training algorithms.",
+    "The previous chapter was our first exposure to recurrent neural net- works, which included intuitions for why they are useful for natural language processing, various architectures, and training algorithms.",
     "The previous chapter was our first exposure to recurrent neural networks, which included intuitions for why they are useful for natural language processing, various architectures, and training algorithms."
   )
   test(
-  	"To take a break from NLP applications for English, in this chapter we use the AnCora corpus (Taul\u00E9 et al., 2008), which primarily con- sists of newspaper texts in Spanish and Catalan with different linguistic annotations.",
+    "To take a break from NLP applications for English, in this chapter we use the AnCora corpus (Taul\u00E9 et al., 2008), which primarily con- sists of newspaper texts in Spanish and Catalan with different linguistic annotations.",
     "To take a break from NLP applications for English, in this chapter we use the AnCora corpus (Taul\u00E9 et al., 2008), which primarily consists of newspaper texts in Spanish and Catalan with different linguistic annotations."
   )
   test(
@@ -154,11 +154,11 @@ class LineWrapPreprocessorTest extends Test {
 
   // chapter13_sentences.txt
   test(
-	"Intuitively, this strategy allows transformer net- works to achieve higher performance on smaller datasets by relying on statistics acquired at scale in an unsupervised way (e.g., through the masked language model training objective).",
+    "Intuitively, this strategy allows transformer net- works to achieve higher performance on smaller datasets by relying on statistics acquired at scale in an unsupervised way (e.g., through the masked language model training objective).",
     "Intuitively, this strategy allows transformer networks to achieve higher performance on smaller datasets by relying on statistics acquired at scale in an unsupervised way (e.g., through the masked language model training objective)."
   )
   test(
-	"Using pre-trained trans- former encoders, we will implement the two tasks that served as use cases in the previous chapters: text classification and part-of-speech tagging.",
+    "Using pre-trained trans- former encoders, we will implement the two tasks that served as use cases in the previous chapters: text classification and part-of-speech tagging.",
     "Using pre-trained transformer encoders, we will implement the two tasks that served as use cases in the previous chapters: text classification and part-of-speech tagging."
   )
   test(

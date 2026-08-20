@@ -9,7 +9,7 @@ import scala.util.matching.Regex
 
 // multiple paragraphs comprising entire document, contents are paragraphs
 class DocumentByParagraph(parentOpt: Option[Document], textRange: TextRange) extends Document(parentOpt, textRange) {
-  override val (preSeparator, contents, postSeparator) = {
+  override val (preSeparator, contents: Seq[ParagraphDocument], postSeparator) = {
     val found = textRange.findAll(DocumentByParagraph.separatorRegex).toVector
     val contents = textRange.removeAll(found)
     val preSeparator =
@@ -23,8 +23,8 @@ class DocumentByParagraph(parentOpt: Option[Document], textRange: TextRange) ext
         else after(contents.last.end)
     val postSeparator = emptyEnd // It is used by the paragraph.
     val paragraphDocuments = contents.indices.map { index =>
-        val contentTextRange = contents(index)
-        val separatorTextRange = interSeparators.lift(index).getOrElse(postParagraphSeparator)
+      val contentTextRange = contents(index)
+      val separatorTextRange = interSeparators.lift(index).getOrElse(postParagraphSeparator)
 
       new ParagraphDocument(Some(this), contentTextRange, separatorTextRange)
     }
@@ -44,7 +44,7 @@ class ParagraphDocument(parentOpt: Option[Document], contentTextRange: TextRange
     extends Document(parentOpt, TextRange(contentTextRange, separatorTextRange)) {
   override val postSeparator: Separator = newSeparator(separatorTextRange)
   val charDocument: CharDocument = new CharDocument(Some(this), contentTextRange)
-  override val contents: Seq[CharDocument] = Array(charDocument)
+  override val contents: Seq[CharDocument] = Seq(charDocument)
 
   def hasEndOfSentence: Boolean = {
     val reverseText = charDocument.toString.withoutWhitespace.reverse

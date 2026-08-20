@@ -4,7 +4,6 @@ import com.microsoft.azure.cognitiveservices.vision.computervision.implementatio
 import com.microsoft.azure.cognitiveservices.vision.computervision.models.{AnalyzeResults, OperationStatusCodes, ReadInStreamOptionalParameter}
 import com.microsoft.azure.cognitiveservices.vision.computervision.ComputerVisionManager
 import org.clulab.pdf2txt.common.pdf.PdfConverter
-import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.MetadataHolder
 
 import java.io.{BufferedInputStream, File, FileInputStream}
@@ -12,7 +11,8 @@ import java.nio.file.Files
 import java.util.{Properties, UUID}
 import scala.annotation.tailrec
 import scala.beans.BeanProperty
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
+import scala.util.Using
 
 // See https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/quickstarts-sdk/client-library?tabs=visual-studio&pivots=programming-language-java.
 class MicrosoftConverter(microsoftSettings: MicrosoftSettings = MicrosoftConverter.defaultSettings) extends PdfConverter {
@@ -20,7 +20,7 @@ class MicrosoftConverter(microsoftSettings: MicrosoftSettings = MicrosoftConvert
   def getKey: String = {
     val properties = new Properties()
 
-    new BufferedInputStream(new FileInputStream(new File(microsoftSettings.credentials))).autoClose { bufferedInputStream =>
+    Using.resource(new BufferedInputStream(new FileInputStream(new File(microsoftSettings.credentials)))) { bufferedInputStream =>
       properties.load(bufferedInputStream)
     }
     properties.getProperty("key")

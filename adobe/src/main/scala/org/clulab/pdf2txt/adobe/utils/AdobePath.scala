@@ -14,7 +14,7 @@ object AdobePath {
   def apply(string: String): AdobePath = {
     assert(string.startsWith("//"))
 
-    val parts = string.drop(2).split('/')
+    val parts = string.drop(2).split('/').toSeq
     val stages = parts.map(AdobeStage(_))
 
     new AdobePath(stages)

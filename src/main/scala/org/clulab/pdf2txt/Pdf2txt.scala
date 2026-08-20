@@ -2,7 +2,6 @@ package org.clulab.pdf2txt
 
 import com.typesafe.config.Config
 import org.clulab.pdf2txt.common.pdf.PdfConverter
-import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.{ConfigError, FileUtils, Logging, MetadataHolder, Pdf2txtConfigured, Pdf2txtException, Preprocessor}
 import org.clulab.pdf2txt.languageModel.{AlwaysLanguageModel, GigawordLanguageModel, GloveLanguageModel, NeverLanguageModel}
 import org.clulab.pdf2txt.preprocessor.{CasePreprocessor, LigaturePreprocessor, LineBreakPreprocessor, LinePreprocessor, LineWrapPreprocessor, NumberPreprocessor, ParagraphPreprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
@@ -11,6 +10,7 @@ import org.clulab.utils.ThreadUtils
 
 import java.io.File
 import scala.annotation.tailrec
+import scala.util.Using
 
 class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) extends Pdf2txtConfigured {
 
@@ -55,7 +55,7 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
 
   def writeOut(outputFile: File, text: String): Unit = {
     try {
-      FileUtils.printWriterFromFile(outputFile).autoClose { printWriter =>
+      Using.resource(FileUtils.printWriterFromFile(outputFile)) { printWriter =>
         printWriter.print(text)
       }
     }
@@ -66,9 +66,9 @@ class Pdf2txt(pdfConverter: PdfConverter, preprocessors: Array[Preprocessor]) ex
 
   def writeMeta(metaFileOpt: Option[File], metadataHolderOpt: Option[MetadataHolder]): Unit = {
     metadataHolderOpt.foreach { metadataHolder =>
-      metadataHolder.get.foreach { text =>
+      metadataHolder.get().foreach { text =>
         try {
-          FileUtils.printWriterFromFile(metaFileOpt.get).autoClose { printWriter =>
+          Using.resource(FileUtils.printWriterFromFile(metaFileOpt.get)) { printWriter =>
             printWriter.print(text)
           }
         }

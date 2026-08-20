@@ -7,7 +7,15 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= {
-  val json4sVersion = "3.5.2"
+  // val json4sVersion = "4.0.6"
+  val json4sVersion = {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      // Spark may have problems above 3.2.11, but processors has runtime errors much below 3.5.5.
+      case Some((2, minor)) if minor <= 12 => "3.5.5"
+      case Some((3, 0)) => "4.0.3"  // This is as close as we can get.
+      case _ => "4.0.6"
+    }
+  }
 
   Seq(
     "com.google.apis"  % "google-api-services-vision"      % "v1-rev451-1.25.0",

@@ -1,10 +1,9 @@
 package org.clulab.pdf2txt.apps.dev
 
-import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
-
 import java.io.{BufferedOutputStream, FileOutputStream, ObjectOutputStream}
 import java.nio.charset.StandardCharsets
 import scala.io.{Codec, Source}
+import scala.util.Using
 
 object FilterGigaword extends App {
   val inFilename = args.lift(0).getOrElse("gigawordDocFreq.sorted.freq.txt")
@@ -16,7 +15,7 @@ object FilterGigaword extends App {
     ("-lsb-", "["), ("-rsb-", "]"), // square
     ("-lcb-", "{"), ("-rcb-", "}") // curvy
   )
-  val wordFrequencies = Source.fromFile(inFilename)(new Codec(StandardCharsets.UTF_8)).autoClose { source =>
+  val wordFrequencies = Using.resource(Source.fromFile(inFilename)(new Codec(StandardCharsets.UTF_8))) { source =>
     source.getLines()
       .map { line =>
         val Array(rawWord, freq) = line.split('\t')
@@ -32,7 +31,7 @@ object FilterGigaword extends App {
   val string = wordFrequencies.map(_._1).mkString(" ")
   val frequencies = wordFrequencies.map(_._2).toArray
 
-  new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(outFilename))).autoClose { objectOutputStream =>
+  Using.resource(new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(outFilename)))) { objectOutputStream =>
     objectOutputStream.writeObject(string)
     objectOutputStream.writeObject(frequencies)
   }

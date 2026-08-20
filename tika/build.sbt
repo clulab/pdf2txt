@@ -7,10 +7,12 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= {
+  val tikaVersion = "2.9.0" // up to 2.9.0 on Java 8
+
   Seq(
-    "org.apache.tika" % "tika-core"                     % "2.1.0",
-    "org.apache.tika" % "tika-parsers"                  % "2.1.0" pomOnly (),
+    "org.apache.tika" % "tika-core"                     % tikaVersion,
+    "org.apache.tika" % "tika-parsers"                  % tikaVersion pomOnly (),
     // Use of xml-apis results in a circular dependency.
-    "org.apache.tika" % "tika-parsers-standard-package" % "2.1.0" exclude("xml-apis", "xml-apis")
+    "org.apache.tika" % "tika-parsers-standard-package" % tikaVersion exclude("xml-apis", "xml-apis")
   )
 }

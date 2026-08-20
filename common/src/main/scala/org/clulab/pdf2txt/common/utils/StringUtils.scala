@@ -144,5 +144,5 @@ class CharIterator(string: String, range: Range) extends Iterator[Char] {
 
   override def hasNext: Boolean = rangeIterator.hasNext
 
-  override def next(): Char = string(rangeIterator.next)
+  override def next(): Char = string(rangeIterator.next())
 }

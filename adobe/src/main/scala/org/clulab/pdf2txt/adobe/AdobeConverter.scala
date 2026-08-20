@@ -8,16 +8,17 @@ import com.adobe.pdfservices.operation.pdfops.options.extractpdf.{ExtractElement
 import net.lingala.zip4j.ZipFile
 import org.clulab.pdf2txt.adobe.utils.{AdobeElement, AdobeStage}
 import org.clulab.pdf2txt.common.pdf.PdfConverter
-import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.{FileEditor, MetadataHolder}
 import org.json4s.{JArray, JObject}
 import org.json4s.jackson.JsonMethods
+import org.json4s.jvalue2monadic // for \
 
 import java.io.File
 import java.util
 import scala.annotation.tailrec
 import scala.beans.BeanProperty
 import scala.io.Source
+import scala.util.Using
 
 class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettings) extends PdfConverter {
   // Put the name of the file in the config
@@ -160,8 +161,7 @@ class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettin
   def convertZip(_zipFile: File): String = {
     val zipFile = new ZipFile(_zipFile)
     val fileHeader = zipFile.getFileHeader("structuredData.json")
-    val inputStream = zipFile.getInputStream(fileHeader)
-    val json = inputStream.autoClose { inputStream =>
+    val json = Using.resource(zipFile.getInputStream(fileHeader)) { inputStream =>
       val source = Source.fromInputStream(inputStream)
 
       source.mkString

@@ -12,4 +12,4 @@ trait Pdf2txtConfiguredAppish extends Configured {
   def getConfig: Config = config
 }
 
-trait Pdf2txtAppish extends App with Logging with Pdf2txtConfiguredAppish
+trait Pdf2txtAppish extends Pdf2txtConfiguredAppish with Logging

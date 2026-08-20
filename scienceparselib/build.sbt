@@ -8,6 +8,7 @@ resolvers ++= Seq(
 
 unmanagedBase := {
   val suffix = CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((major, minor)) if major == 3 => "lib-3"
     case Some((major, minor)) => s"-$major.$minor"
     case None => ""
   }

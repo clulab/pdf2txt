@@ -1,9 +1,9 @@
 package org.clulab.pdf2txt.scienceparse
 
-import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.Test
 
 import java.io.{File, InputStream}
+import scala.util.Using
 
 class ScienceParseTest extends Test {
   val pdfFilename = "./scienceparse/src/test/resources/org/clulab/pdf2txt/scienceparse/clu lab.pdf"
@@ -16,7 +16,7 @@ class ScienceParseTest extends Test {
   behavior of "ScienceParse"
 
   it should "read a PDF stream" in {
-    val text = getInputStream(pdfResourceName).autoClose { inputStream =>
+    val text = Using.resource(getInputStream(pdfResourceName)) { inputStream =>
       scienceParse.read(inputStream)
     }
 

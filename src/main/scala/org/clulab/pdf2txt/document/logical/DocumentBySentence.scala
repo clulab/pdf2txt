@@ -6,13 +6,13 @@ import org.clulab.processors.{Sentence => ProcessorsSentence}
 
 // multiple sentences comprising entire document, contents are sentences
 class DocumentBySentence(parentOpt: Option[Document], textRange: TextRange, processorContents: Array[ProcessorsSentence]) extends Document(parentOpt, textRange) {
-  override val (preSeparator, contents, postSeparator) = {
+  override val (preSeparator, contents: Seq[SentenceDocument], postSeparator) = {
     // Processors works on the entire string, so startOffsets and endOffsets need to be adjusted.
     val offset = start
     val preSeparator =
         if (processorContents.isEmpty) all
         else before(offset + processorContents.head.startOffsets.head)
-    val interSeparators = DoubleIndexedSeq(processorContents).map { case (prev, next) =>
+    val interSeparators = DoubleIndexedSeq(processorContents.toIndexedSeq).map { case (prev, next) =>
       subRange(prev.endOffsets.last, next.startOffsets.head) + offset
     }.toArray
     val postSentenceSeparator =
@@ -45,7 +45,7 @@ object DocumentBySentence {
 class SentenceDocument(parentOpt: Option[Document], contentTextRange: TextRange, separatorTextRange: TextRange,
     processorsOffset: Int, processorsSentence: ProcessorsSentence)
     extends Document(parentOpt, TextRange(contentTextRange, separatorTextRange)) {
-  override val (preSeparator, contents, postSeparator) = {
+  override val (preSeparator, contents: Seq[WordDocument], postSeparator) = {
     // Processors works on the entire string, so startOffsets and endOffsets need to be adjusted.
     val offset = processorsOffset
     val contents = processorsSentence.words.indices

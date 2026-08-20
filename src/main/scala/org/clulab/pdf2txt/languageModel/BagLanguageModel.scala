@@ -1,7 +1,6 @@
 package org.clulab.pdf2txt.languageModel
 
 import org.clulab.pdf2txt.common.utils.ClassLoaderObjectInputStream
-import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.StringUtils
 import org.clulab.pdf2txt.common.utils.TextRange
 import org.clulab.pdf2txt.common.utils.TripleOptIndexedSeq
@@ -9,6 +8,7 @@ import org.clulab.pdf2txt.document.logical.DocumentByWord
 import org.clulab.pdf2txt.document.logical.WordDocument
 
 import scala.collection.mutable
+import scala.util.Using
 
 class BagLanguageModel(val wordFrequencies: Map[String, Int], lowercase: Boolean = false, lowerLimit: Int = 1) extends LanguageModel {
   // TODO: Should the frequency of the joined and unjoined words be compared?
@@ -81,7 +81,7 @@ object GigawordLanguageModel {
       val resource = "org/clulab/pdf2txt/gigaword.ser"
       val classLoader = this.getClass.getClassLoader
 
-      new ClassLoaderObjectInputStream(classLoader, classLoader.getResourceAsStream(resource)).autoClose { objectInputStream =>
+      Using.resource(new ClassLoaderObjectInputStream(classLoader, classLoader.getResourceAsStream(resource))) { objectInputStream =>
         val string = objectInputStream.readObject().asInstanceOf[String].split(' ')
         val counts = objectInputStream.readObject().asInstanceOf[Array[Int]]
 
@@ -102,6 +102,7 @@ object LocalBagLanguageModel {
     val hyphenIndexes = TripleOptIndexedSeq(documentByWord.contents.indices).flatMap { tripleOpt =>
       tripleOpt match {
         case (None, Some(prevIndex), Some(nextIndex)) =>
+          val sth: WordDocument = documentByWord.contents(prevIndex)
           if (isHyphen(documentByWord.contents(prevIndex))) Seq(prevIndex, nextIndex)
           else Seq.empty
         case (Some(prevIndex), Some(hyphenIndex), Some(nextIndex)) =>

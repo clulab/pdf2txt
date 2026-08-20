@@ -1,6 +1,7 @@
 package org.clulab.pdf2txt.common.utils
 
 import java.io.{ InputStream, ObjectInputStream, ObjectStreamClass }
+import scala.language.existentials
 
 class ClassLoaderObjectInputStream(cl: ClassLoader, is: InputStream) extends ObjectInputStream(is) {
 

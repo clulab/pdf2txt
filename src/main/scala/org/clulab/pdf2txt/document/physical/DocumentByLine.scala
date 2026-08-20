@@ -43,5 +43,5 @@ class LineDocument(parentOpt: Option[Document], contentTextRange: TextRange, sep
     extends Document(parentOpt, TextRange(contentTextRange, separatorTextRange)) {
   override val postSeparator: Separator = newSeparator(separatorTextRange)
   val charDocument: CharDocument = new CharDocument(Some(this), contentTextRange)
-  override val contents: Seq[CharDocument] = Array(charDocument)
+  override val contents: Seq[CharDocument] = Seq(charDocument)
 }

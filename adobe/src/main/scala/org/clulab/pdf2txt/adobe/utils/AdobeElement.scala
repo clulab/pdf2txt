@@ -1,6 +1,7 @@
 package org.clulab.pdf2txt.adobe.utils
 
 import org.json4s.{JObject, JString}
+import org.json4s.jvalue2monadic // for \
 
 case class AdobeElement(path: AdobePath, text: String) {
 

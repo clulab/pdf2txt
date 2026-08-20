@@ -11,7 +11,7 @@ Compile / packageBin / mappings := {
   }
 
   // Remove placeholder files (.gitempty).
-  val filtered = (mappings in (Compile, packageBin)).value.filter {
+  val filtered = (Compile / packageBin / mappings).value.filter {
     case (_, name) => !name.endsWith(".gitempty")
   }
 

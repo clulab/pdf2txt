@@ -1,7 +1,6 @@
 package org.clulab.pdf2txt.amazon
 
 import org.clulab.pdf2txt.common.pdf.PdfConverter
-import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.MetadataHolder
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider
 import software.amazon.awssdk.core.SdkBytes
@@ -16,8 +15,9 @@ import java.io.{File, FileInputStream}
 import java.util.concurrent.atomic.AtomicBoolean
 import scala.annotation.tailrec
 import scala.beans.BeanProperty
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection.mutable
+import scala.util.Using
 
 class AmazonConverter(amazonSettings: AmazonSettings = AmazonConverter.defaultSettings) extends PdfConverter {
   val s3IsOpen = new AtomicBoolean(false)
@@ -113,7 +113,7 @@ class AmazonConverter(amazonSettings: AmazonSettings = AmazonConverter.defaultSe
   }
 
   def convertSinglePage(pdfFile: File): String = {
-    val sdkBytes = new FileInputStream(pdfFile).autoClose { inputStream =>
+    val sdkBytes = Using.resource(new FileInputStream(pdfFile)) { inputStream =>
       SdkBytes.fromInputStream(inputStream)
     }
     val document = Document.builder()

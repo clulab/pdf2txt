@@ -2,11 +2,11 @@ package org.clulab.pdf2txt.scienceparse
 
 import org.allenai.scienceparse.{ExtractedMetadata, Parser}
 import org.clulab.pdf2txt.common.pdf.PdfConverter
-import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.{MetadataHolder, TextRange}
 
 import java.io.{BufferedInputStream, File, FileInputStream, InputStream}
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
+import scala.util.Using
 
 class ScienceParseConverter(scienceParseSettings: ScienceParseSettings = ScienceParseConverter.defaultSettings) extends PdfConverter {
   override val metaExtension: String = ".json"
@@ -102,7 +102,7 @@ class ScienceParseConverter(scienceParseSettings: ScienceParseSettings = Science
   }
 
   override def convert(file: File, metadataHolderOpt: Option[MetadataHolder] = None): String = {
-    new BufferedInputStream(new FileInputStream(file)).autoClose { inputStream =>
+    Using.resource(new BufferedInputStream(new FileInputStream(file))) { inputStream =>
       read(inputStream, metadataHolderOpt)
     }
   }

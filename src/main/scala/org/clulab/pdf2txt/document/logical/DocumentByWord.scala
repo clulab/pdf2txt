@@ -7,7 +7,7 @@ import org.clulab.processors.{Sentence => ProcessorsSentence}
 
 // multiple words comprising entire document, contents are words
 class DocumentByWord(parentOpt: Option[Document], textRange: TextRange, processorsSentences: Array[ProcessorsSentence]) extends Document(parentOpt, textRange) {
-  override val (preSeparator, contents, postSeparator) = {
+  override val (preSeparator, contents: Seq[WordDocument], postSeparator) = {
     // Processors works on the entire string, so startOffsets and endOffsets need to be adjusted.
     val offset = start
     val processorContents = processorsSentences.flatMap { sentence =>
@@ -32,7 +32,7 @@ class DocumentByWord(parentOpt: Option[Document], textRange: TextRange, processo
     val preSeparator =
       if (processorContents.isEmpty) all
       else before(processorContents.head.contentTextRange.start)
-    val interSeparators = DoubleIndexedSeq(processorContents).map { case (prev, next) =>
+    val interSeparators = DoubleIndexedSeq(processorContents.toIndexedSeq).map { case (prev, next) =>
       subRange(prev.contentTextRange.end, next.contentTextRange.start)
     }.toArray
     val postWordSeparator =
@@ -68,5 +68,5 @@ class WordDocument(parentOpt: Option[Document], contentTextRange: TextRange, sep
     extends Document(parentOpt, TextRange(contentTextRange, separatorTextRange)) {
   override val postSeparator: Separator = newSeparator(separatorTextRange)
   val charDocument: CharDocument = new CharDocument(Some(this), contentTextRange)
-  override val contents: Seq[CharDocument] = Array(charDocument)
+  override val contents: Seq[CharDocument] = Seq(charDocument)
 }

@@ -1,24 +1,23 @@
 package org.clulab.pdf2txt.common.utils
 
-import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
-
 import java.io.{File, FilenameFilter, PrintWriter}
 import scala.io.{Codec, Source}
+import scala.util.Using
 
 object FileUtils {
 
   protected def getTextFromSource(source: Source): String = source.mkString
 
   def getTextFromFile(file: File): String = {
-    val source = Source.fromFile(file)(Codec.UTF8)
-
-    source.autoClose(getTextFromSource)
+    Using.resource(Source.fromFile(file)(Codec.UTF8)) { source =>
+      getTextFromSource(source)
+    }
   }
 
   def getTextFromResource(resource: String): String = {
-    val source = Sourcer.sourceFromResource(resource)
-
-    source.autoClose(getTextFromSource)
+    Using.resource(Sourcer.sourceFromResource(resource)) { source =>
+      getTextFromSource(source)
+    }
   }
 
   def printWriterFromFile(file: File): PrintWriter = {
@@ -33,6 +32,6 @@ object FileUtils {
 
     val result = Option(dir.listFiles(filter))
       .getOrElse(throw Sourcer.newFileNotFoundException(collectionDir))
-    result
+    result.toSeq
   }
 }

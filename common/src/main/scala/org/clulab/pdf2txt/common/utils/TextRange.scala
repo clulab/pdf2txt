@@ -70,14 +70,14 @@ class TextRange(val text: String, val range: Range) extends IndexedSeq[Char] wit
   // First
   def firstChar: Char = text(start) // assuming nonEmpty
 
-  def findFirstTrimmed: TextRange = findFirst { char: Char => char > ' ' }
+  def findFirstTrimmed: TextRange = findFirstWhere { (char: Char) => char > ' ' }
 
   def withoutFirst: TextRange = if (isEmpty) this else subRange(start + 1, end)
 
   // Last
   def lastChar: Char = text(end - 1) // assuming nonEmpty
 
-  def findLastTrimmed: TextRange = findLast { char: Char => char > ' ' }
+  def findLastTrimmed: TextRange = findLastWhere { (char: Char) => char > ' ' }
 
   def withoutLast: TextRange = if (isEmpty) this else subRange(start, end - 1)
 
@@ -93,12 +93,12 @@ class TextRange(val text: String, val range: Range) extends IndexedSeq[Char] wit
       string.length == length &&
       string.indices.forall { index => string(index) == this(index) }
 
-  def findFirst(f: Char => Boolean): TextRange = range
+  def findFirstWhere(f: Char => Boolean): TextRange = range
       .find { pos => f(text(pos)) }
       .map(subRange)
       .getOrElse(emptyEnd)
 
-  def findLast(f: Char => Boolean): TextRange = range.reverse
+  def findLastWhere(f: Char => Boolean): TextRange = range.reverse
       .find { pos => f(text(pos)) }
       .map(subRange)
       .getOrElse(emptyStart)

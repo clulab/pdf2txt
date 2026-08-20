@@ -2,7 +2,7 @@ package org.clulab.pdf2txt.common.utils
 
 import com.typesafe.config.{Config, ConfigFactory}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
  * Classes that are configured with com.typesafe.config.Config
@@ -35,7 +35,7 @@ trait Configured {
     else throw new RuntimeException(s"ERROR: parameter $argPath must be defined!")
 
   def getArgStrings (argPath: String, defaultValue: Option[Seq[String]]): Seq[String] =
-    if (getConfig.hasPath(argPath)) getConfig.getStringList(argPath).asScala
+    if (getConfig.hasPath(argPath)) getConfig.getStringList(argPath).asScala.toSeq
     else if(defaultValue.nonEmpty) defaultValue.get
     else throw new RuntimeException(s"ERROR: parameter $argPath must be defined!")
 

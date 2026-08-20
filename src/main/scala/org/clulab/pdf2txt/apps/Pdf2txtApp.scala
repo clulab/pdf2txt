@@ -6,7 +6,6 @@ import org.clulab.pdf2txt.Pdf2txt
 import org.clulab.pdf2txt.adobe.{AdobeConverter, AdobeSettings}
 import org.clulab.pdf2txt.amazon.{AmazonConverter, AmazonSettings}
 import org.clulab.pdf2txt.common.pdf.{PdfConverter, TextConverter}
-import org.clulab.pdf2txt.common.utils.Closer.AutoCloser
 import org.clulab.pdf2txt.common.utils.{AppUtils, ConfigError, Pdf2txtAppish, Pdf2txtException, Preprocessor, StandardSystem, Systemish}
 import org.clulab.pdf2txt.ghostact.{GhostActConverter, GhostActSettings}
 import org.clulab.pdf2txt.google.{GoogleConverter, GoogleSettings}
@@ -15,10 +14,11 @@ import org.clulab.pdf2txt.microsoft.{MicrosoftConverter, MicrosoftSettings}
 import org.clulab.pdf2txt.pdfminer.{PdfMinerConverter, PdfMinerSettings}
 import org.clulab.pdf2txt.pdftotext.{PdfToTextConverter, PdfToTextSettings}
 import org.clulab.pdf2txt.preprocessor.{CasePreprocessor, LigaturePreprocessor, LineBreakPreprocessor, LinePreprocessor, LineWrapPreprocessor, NumberPreprocessor, ParagraphPreprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
-import org.clulab.pdf2txt.scienceparse.{ScienceParseConverter, ScienceParseSettings}
+//import org.clulab.pdf2txt.scienceparse.{ScienceParseConverter, ScienceParseSettings}
 import org.clulab.pdf2txt.tika.TikaConverter
 
 import java.io.File
+import scala.util.Using
 
 class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, system: Systemish = new StandardSystem()) {
   type PdfConverterConstructor = () => PdfConverter
@@ -46,7 +46,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
       val microsoftSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.MICROSOFT), classOf[MicrosoftSettings])
       val pdfMinerSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.PDF_MINER), classOf[PdfMinerSettings])
       val pdfToTextSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.PDF_TO_TEXT), classOf[PdfToTextSettings])
-      val scienceParseSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.SCIENCE_PARSE), classOf[ScienceParseSettings])
+//      val scienceParseSettings = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.SCIENCE_PARSE), classOf[ScienceParseSettings])
       val numberParameters = ConfigBeanFactory.create(mapAndConfig.config.getConfig(Pdf2txtArgs.NUMBER_PARAMETERS), classOf[NumberPreprocessor.Parameters])
 
       val pdfConverterConstructor = {
@@ -61,7 +61,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
           case Pdf2txtArgs.MICROSOFT => () => new MicrosoftConverter(microsoftSettings)
           case Pdf2txtArgs.PDF_MINER => () => new PdfMinerConverter(pdfMinerSettings)
           case Pdf2txtArgs.PDF_TO_TEXT => () => new PdfToTextConverter(pdfToTextSettings)
-          case Pdf2txtArgs.SCIENCE_PARSE => () => new ScienceParseConverter(scienceParseSettings)
+//          case Pdf2txtArgs.SCIENCE_PARSE => () => new ScienceParseConverter(scienceParseSettings)
           case Pdf2txtArgs.TEXT => () => new TextConverter()
           case Pdf2txtArgs.TIKA => () => new TikaConverter()
           case _ => throw ConfigError(mapAndConfig, key, value)
@@ -184,7 +184,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
   }
 
   def runFile(): Unit = {
-    pdfConverterConstructor().autoClose { pdfConverter =>
+    Using.resource(pdfConverterConstructor()) { pdfConverter =>
       val pdf2txt = new Pdf2txt(pdfConverter, preprocessors)
 
       pdf2txt.file(inFileOrDirectory, outFileOrDirectory, metaFileOrDirectoryOpt, loops, overwrite)
@@ -192,7 +192,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
   }
 
   def runDir(): Unit = {
-    pdfConverterConstructor().autoClose { pdfConverter =>
+    Using.resource(pdfConverterConstructor()) { pdfConverter =>
       val pdf2txt = new Pdf2txt(pdfConverter, preprocessors)
 
       pdf2txt.dir(inFileOrDirectory, outFileOrDirectory, metaFileOrDirectoryOpt, threads, loops, overwrite)
@@ -293,5 +293,7 @@ object Pdf2txtArgs {
 }
 
 object Pdf2txtApp extends Pdf2txtAppish {
-  new Pdf2txtApp(args).run()
+
+  def main(args: Array[String]): Unit =
+      new Pdf2txtApp(args).run()
 }

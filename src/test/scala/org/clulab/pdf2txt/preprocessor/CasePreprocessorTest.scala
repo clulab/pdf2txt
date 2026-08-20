@@ -18,7 +18,7 @@ class CasePreprocessorTest extends Test {
 
   behavior of "CasePreprocessor"
 
-  val tests = Array(
+  val tests = Seq(
     CaseRestoreTest("restore to all uppercase", "Mihai likes ibm.", "Mihai likes IBM."),
     CaseRestoreTest("restore to initial uppercase","Mihai likes google.", "Mihai likes Google."),
     CaseRestoreTest("restore to all lowercase", "Nobody likes SQUASH or Squash.", "Nobody likes squash or squash."),
