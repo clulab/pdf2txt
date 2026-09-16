@@ -9,7 +9,8 @@ addSbtPlugin("com.eed3si9n"             % "sbt-buildinfo"        % "0.10.0")    
 addDependencyTreePlugin // Replace the following line with this update.
 // addSbtPlugin("net.virtual-void"         % "sbt-dependency-graph" % "0.9.2")     // up to 0.9.2 !
 //addSbtPlugin("com.typesafe.sbt"         % "sbt-ghpages"          % "0.6.3")     // up to 0.6.3
-addSbtPlugin("com.typesafe.sbt"         % "sbt-git"              % "1.0.0")     // up to 1.0.0
+// The git plugin does not seem to be working as of 2026-09-16.
+//addSbtPlugin("com.typesafe.sbt"         % "sbt-git"              % "1.0.0")     // up to 1.0.0
 addSbtPlugin("com.typesafe.sbt"         % "sbt-native-packager"  % "1.7.6")     // up to 1.8.1
 // addSbtPlugin("com.typesafe.play"        % "sbt-plugin"           % playVersion) // See build.properties.
 // See https://index.scala-lang.org/sbt/sbt-pgp/sbt-pgp for details, especially version up to 2.1.2.

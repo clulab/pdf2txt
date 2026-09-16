@@ -1,7 +1,7 @@
 package org.clulab.pdf2txt.apps
 
 import com.typesafe.config.ConfigBeanFactory
-import org.clulab.pdf2txt.BuildInfo
+//import org.clulab.pdf2txt.BuildInfo
 import org.clulab.pdf2txt.Pdf2txt
 import org.clulab.pdf2txt.adobe.{AdobeConverter, AdobeSettings}
 import org.clulab.pdf2txt.amazon.{AmazonConverter, AmazonSettings}
@@ -35,7 +35,7 @@ class Pdf2txtApp(args: Array[String], params: Map[String, String] = Map.empty, s
 
       AppUtils.checkArgs(Pdf2txtArgs.argKeys, mapAndConfig, system)
       if (Pdf2txtArgs.helps.exists(mapAndConfig.contains)) {
-        AppUtils.showSyntax("/org/clulab/pdf2txt/Pdf2txtApp.syntax.txt", system.out, BuildInfo.version)
+        AppUtils.showSyntax("/org/clulab/pdf2txt/Pdf2txtApp.syntax.txt", system.out /*, BuildInfo.version*/)
         system.exit(0)
       }
 
