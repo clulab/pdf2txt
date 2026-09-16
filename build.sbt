@@ -11,7 +11,6 @@ val scala13 = "2.13.18" // up to 2.13.18
 val scala33 = "3.3.8"   // up to 3.3.8
 val scala3 = scala33
 
-// scala13 is skipped here.
 ThisBuild / crossScalaVersions := Seq(scala12, scala11, scala13, scala3)
 ThisBuild / scalaVersion := crossScalaVersions.value.head
 
