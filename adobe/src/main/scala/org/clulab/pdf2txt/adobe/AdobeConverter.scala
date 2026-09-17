@@ -1,20 +1,23 @@
 package org.clulab.pdf2txt.adobe
 
-import com.adobe.pdfservices.operation.ExecutionContext
-import com.adobe.pdfservices.operation.auth.Credentials
-import com.adobe.pdfservices.operation.io.FileRef
-import com.adobe.pdfservices.operation.pdfops.ExtractPDFOperation
-import com.adobe.pdfservices.operation.pdfops.options.extractpdf.{ExtractElementType, ExtractPDFOptions}
+import com.adobe.pdfservices.operation.{PDFServices, PDFServicesMediaType}
+import com.adobe.pdfservices.operation.auth.ServicePrincipalCredentials
+import com.adobe.pdfservices.operation.pdfjobs.jobs.ExtractPDFJob
+import com.adobe.pdfservices.operation.pdfjobs.params.extractpdf.{ExtractElementType, ExtractPDFParams}
+import com.adobe.pdfservices.operation.pdfjobs.result.ExtractPDFResult
 import net.lingala.zip4j.ZipFile
+import org.apache.commons.io.IOUtils
 import org.clulab.pdf2txt.adobe.utils.{AdobeElement, AdobeStage}
 import org.clulab.pdf2txt.common.pdf.PdfConverter
 import org.clulab.pdf2txt.common.utils.{FileEditor, MetadataHolder}
 import org.json4s.{JArray, JObject}
 import org.json4s.jackson.JsonMethods
-import org.json4s.jvalue2monadic // for \
+import org.json4s.jvalue2monadic
 
-import java.io.File
+import java.io.{BufferedInputStream, File, FileInputStream}
+import java.nio.file.Files
 import java.util
+import java.util.Properties
 import scala.annotation.tailrec
 import scala.beans.BeanProperty
 import scala.io.Source
@@ -22,18 +25,28 @@ import scala.util.Using
 
 class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettings) extends PdfConverter {
   // Put the name of the file in the config
-  val executionContextOpt: Option[ExecutionContext] =
+  val pdfServicesOpt: Option[PDFServices] =
       // Output a warning in this case.  Can only do local files.
       if (!new File(adobeSettings.credentials).exists) None
       else {
-        val credentials = Credentials
-            .serviceAccountCredentialsBuilder()
-            .fromFile(adobeSettings.credentials)
-            .build()
+        val (id, secret) = {
+          val properties = new Properties()
 
-        Some(ExecutionContext.create(credentials))
+          Using.resource(new BufferedInputStream(new FileInputStream(new File(adobeSettings.credentials)))) { bufferedInputStream =>
+            properties.load(bufferedInputStream)
+          }
+          (
+            properties.getProperty("PDF_SERVICES_CLIENT_ID"),
+            properties.getProperty("PDF_SERVICES_CLIENT_SECRET")
+          )
+        }
+        val credentials = new ServicePrincipalCredentials(
+          id,
+          secret
+        )
+        Some(new PDFServices(credentials))
       }
-  val extractPdfOptions: ExtractPDFOptions = ExtractPDFOptions.extractPdfOptionsBuilder()
+  val extractPdfParams: ExtractPDFParams = ExtractPDFParams.extractPDFParamsBuilder()
       .addElementsToExtract(util.Arrays.asList(ExtractElementType.TEXT))
       .build()
 
@@ -171,19 +184,21 @@ class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettin
   }
 
   def convertPdf(pdfFile: File, zipFile: File): Unit = {
-    if (executionContextOpt.isEmpty)
+    if (pdfServicesOpt.isEmpty)
       throw new RuntimeException("The AdobeConverter does not have the credentials to run.  It can only use previously converted documents.")
-    val pdfFileRef = FileRef.createFromLocalFile(pdfFile.getAbsolutePath)
-    val extractPdfOperation = {
-      val extractPdfOperation = ExtractPDFOperation.createNew()
-
-      extractPdfOperation.setOptions(extractPdfOptions)
-      extractPdfOperation.setInputFile(pdfFileRef)
-      extractPdfOperation
+    val pdfServices = pdfServicesOpt.get
+    val asset = Using.resource(Files.newInputStream(pdfFile.toPath)) { inputStream =>
+      pdfServices.upload(inputStream, PDFServicesMediaType.PDF.getMediaType)
     }
-    val zipFileRef = extractPdfOperation.execute(executionContextOpt.get)
+    val extractPDFJob = new ExtractPDFJob(asset).setParams(extractPdfParams)
+    val location = pdfServices.submit(extractPDFJob)
+    val pdfServicesResponse = pdfServices.getJobResult(location, classOf[ExtractPDFResult])
+    val resultAsset = pdfServicesResponse.getResult.getResource
+    val streamAsset = pdfServices.getContent(resultAsset)
 
-    zipFileRef.saveAs(zipFile.getAbsolutePath)
+    Using.resource(Files.newOutputStream(zipFile.toPath)) { outputStream =>
+      IOUtils.copy(streamAsset.getInputStream, outputStream);
+    }
   }
 
   override def convert(pdfFile: File, metadataHolderOpt: Option[MetadataHolder] = None): String = {
@@ -202,7 +217,7 @@ case class AdobeSettings(@BeanProperty var credentials: String) {
 object AdobeConverter {
   val defaultCredentials: String = {
     val userHome = System.getProperty("user.home")
-    s"$userHome/.pdf2txt/pdfservices-api-credentials.json"
+    s"$userHome/.pdf2txt/pdfservices-api-credentials.properties"
   }
   val defaultSettings: AdobeSettings = AdobeSettings(defaultCredentials)
   val headers: Seq[String] = Seq("H", "H1", "H2", "H3", "H4", "H5", "H6")
