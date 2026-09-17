@@ -29,21 +29,15 @@ class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettin
       // Output a warning in this case.  Can only do local files.
       if (!new File(adobeSettings.credentials).exists) None
       else {
-        val (id, secret) = {
+        val credentials = Using.resource(new BufferedInputStream(new FileInputStream(new File(adobeSettings.credentials)))) { bufferedInputStream =>
           val properties = new Properties()
 
-          Using.resource(new BufferedInputStream(new FileInputStream(new File(adobeSettings.credentials)))) { bufferedInputStream =>
-            properties.load(bufferedInputStream)
-          }
-          (
+          properties.load(bufferedInputStream)
+          new ServicePrincipalCredentials(
             properties.getProperty("PDF_SERVICES_CLIENT_ID"),
             properties.getProperty("PDF_SERVICES_CLIENT_SECRET")
           )
         }
-        val credentials = new ServicePrincipalCredentials(
-          id,
-          secret
-        )
         Some(new PDFServices(credentials))
       }
   val extractPdfParams: ExtractPDFParams = ExtractPDFParams.extractPDFParamsBuilder()
@@ -61,6 +55,7 @@ class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettin
       // long paragraphs that are likely to contain full sentences.
       element.path.isIn(AdobeStage.Table) || element.path.isIn(AdobeStage.TOC)
     }
+    var prevNameOpt = Option.empty[String]
 
     nonTableElements.foreach { element =>
       val text = element.text
@@ -100,7 +95,8 @@ class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettin
         case AdobeStage.StyleSpan => ignore
         case AdobeStage.HyphenSpan => ignore
         case AdobeStage.NbspSpan => ignore
-        case AdobeStage.Sub => ignore
+        case AdobeStage.Sub =>
+          text
 
         case AdobeStage.Table => ignore
         case AdobeStage.TD => ignore
@@ -111,6 +107,8 @@ class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettin
         case AdobeStage.TOCI => ignore
 
         case AdobeStage.Title => text
+        case AdobeStage.TOC => text
+        case AdobeStage.TOCI => text
         case AdobeStage.Watermark => ignore
         case _ => text // Hope for maintainability.
       }
@@ -120,14 +118,22 @@ class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettin
           // So far there have been at most ParagraphSpan[2]s so that only the
           // first ParagraphSpan needs not to be separated.
           dereferencedText
+        case AdobeStage.Sub =>
+          val trimmedText = dereferencedText.trim
+
+          if (trimmedText.isEmpty) trimmedText
+          else trimmedText + "\n"
         case _ =>
           val trimmedText = dereferencedText.trim
 
           if (trimmedText.isEmpty) trimmedText
           else trimmedText + "\n\n"
       }
-
+      // Only insert an extra newline when transitioning out of a Sub
+      if (prevNameOpt.contains(AdobeStage.Sub) && element.name != AdobeStage.Sub)
+        stringBuffer.append("\n")
       stringBuffer.append(separatedText)
+      prevNameOpt = Some(element.name)
     }
     stringBuffer.toString
   }
