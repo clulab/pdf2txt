@@ -55,9 +55,10 @@ class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettin
       // long paragraphs that are likely to contain full sentences.
       element.path.isIn(AdobeStage.Table) || element.path.isIn(AdobeStage.TOC)
     }
-    var prevNameOpt = Option.empty[String]
 
-    nonTableElements.foreach { element =>
+    nonTableElements.zipWithIndex.foreach { case (element, index) =>
+      val prevElementOpt = nonTableElements.lift(index - 1)
+      val prevNameOpt = prevElementOpt.map(_.name)
       val text = element.text
       val extractedText = element.name match {
         case AdobeStage.Document => ignore
@@ -133,7 +134,6 @@ class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettin
       if (prevNameOpt.contains(AdobeStage.Sub) && element.name != AdobeStage.Sub)
         stringBuffer.append("\n")
       stringBuffer.append(separatedText)
-      prevNameOpt = Some(element.name)
     }
     stringBuffer.toString
   }
