@@ -1,13 +1,13 @@
 package org.clulab.pdf2txt.adobe
 
-import com.adobe.pdfservices.operation.{PDFServices, PDFServicesMediaType}
+import com.adobe.pdfservices.operation.{PDFServices, PDFServicesMediaType, PDFServicesResponse}
 import com.adobe.pdfservices.operation.auth.ServicePrincipalCredentials
 import com.adobe.pdfservices.operation.pdfjobs.jobs.ExtractPDFJob
 import com.adobe.pdfservices.operation.pdfjobs.params.extractpdf.{ExtractElementType, ExtractPDFParams}
 import com.adobe.pdfservices.operation.pdfjobs.result.ExtractPDFResult
 import net.lingala.zip4j.ZipFile
 import org.apache.commons.io.IOUtils
-import org.clulab.pdf2txt.adobe.utils.{AdobeElement, AdobeStage}
+import org.clulab.pdf2txt.adobe.utils.{AdobeElement, AdobeNames}
 import org.clulab.pdf2txt.common.pdf.PdfConverter
 import org.clulab.pdf2txt.common.utils.{FileEditor, MetadataHolder}
 import org.json4s.{JArray, JObject}
@@ -45,6 +45,44 @@ class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettin
       .build()
 
   def convertElements(elements: Seq[AdobeElement]): String = {
+    val result1 = convertElements1(elements)
+    val result2 = convertElementsOrig(elements)
+
+    if (result1 != result2)
+      println("Something went wrong!")
+    result1
+  }
+
+  def convertElements1(elements: Seq[AdobeElement]): String = {
+    val stringBuffer = new StringBuffer()
+    val nonEmptyElements = elements.filter { element =>
+      element.text.nonEmpty
+    }
+    val nonTableElements = nonEmptyElements.filterNot { element =>
+      // For now skip everything in tables.  One might make an exception for
+      // long paragraphs that are likely to contain full sentences.
+      element.path.isIn(AdobeNames.Table) || element.path.isIn(AdobeNames.TOC)
+    }
+
+    nonTableElements.zipWithIndex.foreach { case (element, index) =>
+      val prevElementOpt = nonTableElements.lift(index - 1)
+      val nextElementOpt = nonTableElements.lift(index + 1)
+
+      val preSeparator = element.preSeparate(prevElementOpt, nextElementOpt)
+      val extractedText = element.extract()
+      val dereferencedText = dereference(extractedText)
+      val postSeparator =
+          if (dereferencedText.trim.isEmpty) ""
+          else element.postSeparate(prevElementOpt, nextElementOpt)
+
+      stringBuffer.append(preSeparator)
+      stringBuffer.append(dereferencedText)
+      stringBuffer.append(postSeparator)
+    }
+    stringBuffer.toString
+  }
+
+  def convertElementsOrig(elements: Seq[AdobeElement]): String = {
     val stringBuffer = new StringBuffer()
     val ignore = ""
     val nonEmptyElements = elements.filter { element =>
@@ -53,18 +91,21 @@ class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettin
     val nonTableElements = nonEmptyElements.filterNot { element =>
       // For now skip everything in tables.  One might make an exception for
       // long paragraphs that are likely to contain full sentences.
-      element.path.isIn(AdobeStage.Table) || element.path.isIn(AdobeStage.TOC)
+      element.path.isIn(AdobeNames.Table) || element.path.isIn(AdobeNames.TOC)
     }
 
     nonTableElements.zipWithIndex.foreach { case (element, index) =>
       val prevElementOpt = nonTableElements.lift(index - 1)
       val prevNameOpt = prevElementOpt.map(_.name)
+      val nextElementOpt = nonTableElements.lift(index + 1)
+      val nextNameOpt = nextElementOpt.map(_.name)
+
       val text = element.text
       val extractedText = element.name match {
-        case AdobeStage.Document => ignore
-        case AdobeStage.Aside => text
-        case AdobeStage.Figure => ignore
-        case AdobeStage.Footnote =>
+        case AdobeNames.Document => ignore
+        case AdobeNames.Aside => text
+        case AdobeNames.Figure => ignore
+        case AdobeNames.Footnote =>
           // Footnotes often begin with some numbers and maybe a space.
           if (text.head.isDigit)
             text.dropWhile(_.isDigit).dropWhile(_.isSpaceChar)
@@ -73,53 +114,51 @@ class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettin
             text.drop(2)
           else text
 
-        case header if AdobeConverter.headers.contains(header) => text
+        case header if AdobeNames.headers.contains(header) => text
 
-        case AdobeStage.L => ignore
-        case AdobeStage.LI => ignore
-        case AdobeStage.Lbl => ignore
-        case AdobeStage.LBody =>
+        case AdobeNames.L => ignore
+        case AdobeNames.LI => ignore
+        case AdobeNames.Lbl => ignore
+        case AdobeNames.LBody =>
           // These sometimes have the bullet still in front.
           if (text.head == '-' || text.head == '*') text.drop(1)
           else text
 
-        case AdobeStage.P => text
-        case AdobeStage.ParagraphSpan => text
+        case AdobeNames.P => text
+        case AdobeNames.ParagraphSpan => text
 
-        case AdobeStage.Reference =>
+        case AdobeNames.Reference =>
           // A reference within a reference can usually be ignored.
-          if (element.path.isIn(AdobeStage.Reference)) ignore
+          if (element.path.isIn(AdobeNames.Reference)) ignore
           else text
-        case AdobeStage.Sect => ignore
-        case AdobeStage.Span => ignore
-        case AdobeStage.ExtraCharSpan => ignore
-        case AdobeStage.StyleSpan => ignore
-        case AdobeStage.HyphenSpan => ignore
-        case AdobeStage.NbspSpan => ignore
-        case AdobeStage.Sub =>
+        case AdobeNames.Sect => ignore
+        case AdobeNames.StyleSpan => ignore
+        case AdobeNames.Span => ignore
+        case AdobeNames.ExtraCharSpan => ignore
+        case AdobeNames.HyphenSpan => ignore
+        case AdobeNames.NbspSpan => ignore
+        case AdobeNames.Sub =>
           text
 
-        case AdobeStage.Table => ignore
-        case AdobeStage.TD => ignore
-        case AdobeStage.TH => ignore
-        case AdobeStage.TR => ignore
+        case AdobeNames.Table => ignore
+        case AdobeNames.TD => ignore
+        case AdobeNames.TH => ignore
+        case AdobeNames.TR => ignore
 
-        case AdobeStage.TOC => ignore
-        case AdobeStage.TOCI => ignore
+        case AdobeNames.TOC => ignore
+        case AdobeNames.TOCI => ignore
 
-        case AdobeStage.Title => text
-        case AdobeStage.TOC => text
-        case AdobeStage.TOCI => text
-        case AdobeStage.Watermark => ignore
+        case AdobeNames.Title => text
+        case AdobeNames.Watermark => ignore
         case _ => text // Hope for maintainability.
       }
       val dereferencedText = dereference(extractedText)
       val separatedText = element.name match {
-        case AdobeStage.ParagraphSpan if element.index == 1 =>
+        case AdobeNames.ParagraphSpan if element.index == 1 =>
           // So far there have been at most ParagraphSpan[2]s so that only the
           // first ParagraphSpan needs not to be separated.
           dereferencedText
-        case AdobeStage.Sub =>
+        case AdobeNames.Sub =>
           val trimmedText = dereferencedText.trim
 
           if (trimmedText.isEmpty) trimmedText
@@ -131,7 +170,7 @@ class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettin
           else trimmedText + "\n\n"
       }
       // Only insert an extra newline when transitioning out of a Sub
-      if (prevNameOpt.contains(AdobeStage.Sub) && element.name != AdobeStage.Sub)
+      if (prevNameOpt.contains(AdobeNames.Sub) && element.name != AdobeNames.Sub)
         stringBuffer.append("\n")
       stringBuffer.append(separatedText)
     }
@@ -198,7 +237,20 @@ class AdobeConverter(adobeSettings: AdobeSettings = AdobeConverter.defaultSettin
     }
     val extractPDFJob = new ExtractPDFJob(asset).setParams(extractPdfParams)
     val location = pdfServices.submit(extractPDFJob)
-    val pdfServicesResponse = pdfServices.getJobResult(location, classOf[ExtractPDFResult])
+
+    @tailrec
+    def waitForDone(): PDFServicesResponse[ExtractPDFResult] = {
+      val pdfServicesResponse = pdfServices.getJobResult(location, classOf[ExtractPDFResult])
+      val isDone = pdfServicesResponse.getStatus == "done"
+      if (!isDone) {
+        println("There needs to be some kind of wait.")
+        waitForDone()
+      }
+      else
+        pdfServicesResponse
+    }
+
+    val pdfServicesResponse = waitForDone()
     val resultAsset = pdfServicesResponse.getResult.getResource
     val streamAsset = pdfServices.getContent(resultAsset)
 
@@ -226,5 +278,4 @@ object AdobeConverter {
     s"$userHome/.pdf2txt/pdfservices-api-credentials.properties"
   }
   val defaultSettings: AdobeSettings = AdobeSettings(defaultCredentials)
-  val headers: Seq[String] = Seq("H", "H1", "H2", "H3", "H4", "H5", "H6")
 }
